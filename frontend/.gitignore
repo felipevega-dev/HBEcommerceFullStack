@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+.cursorrules
+./cursorrules
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
