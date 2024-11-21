@@ -8,7 +8,10 @@ const Narbar = () => {
   return (
     <div className='flex justify-between items-center py-5 font-medium'>
 
-        <img src={logo} className='w-36' alt='logo' />
+        {/* logo */}
+        <Link to='/'>
+            <img src={logo} className='w-36' alt='logo' />
+        </Link>
 
         <ul className='hidden sm:flex gap-5 text-sm text-gray-700'>
             <NavLink to='/' className='flex flex-col items-center gap-1'>
@@ -28,16 +31,6 @@ const Narbar = () => {
 
             <NavLink to='/contact' className='flex flex-col items-center gap-1'>
                 <p>CONTACTO</p>
-                <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden'></hr>
-            </NavLink>
-
-            <NavLink to='/login' className='flex flex-col items-center gap-1'>
-                <p>INGRESO</p>
-                <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden'></hr>
-            </NavLink>
-
-            <NavLink to='/cart' className='flex flex-col items-center gap-1'>
-                <p>CARRITO</p>
                 <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden'></hr>
             </NavLink>
         </ul>   
