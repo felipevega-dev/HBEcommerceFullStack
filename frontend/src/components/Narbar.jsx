@@ -2,9 +2,14 @@ import React from 'react'
 import logo from '../assets/logo.png'
 import { Link,NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { ShopContext } from '../context/ShopContext';
+
 const Narbar = () => {
     const [visible, setVisible] = useState(false);
+
+    const { setShowSearch } = useContext(ShopContext);
+
   return (
     <div className='flex justify-between items-center py-5 font-medium'>
 
@@ -36,7 +41,7 @@ const Narbar = () => {
         </ul>   
 
         <div className='flex gap-6 items-center'>
-            <img src={assets.search_icon} className='w-5 cursor-pointer' alt='search' />
+            <img onClick={() => setShowSearch(true)} src={assets.search_icon} className='w-5 cursor-pointer' alt='search' />
             <div className='group relative'>
                 <img src={assets.profile_icon} className='w-5 cursor-pointer' alt='user' />
                 <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>

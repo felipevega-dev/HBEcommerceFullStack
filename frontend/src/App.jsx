@@ -11,11 +11,12 @@ import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
 import Narbar from './components/Narbar'
 import Footer from './components/Footer'
-
+import SearchBar from './components/SearchBar'
 const App = () => {
   return (
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] xl:px-[20vw] 2xl:px-[25vw]'>
       <Narbar />
+      <SearchBar />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/collection' element={<Collections />} />
