@@ -1,0 +1,9 @@
+.env
+node_modules
+*.env
+*.log
+*.txt
+*.md
+*.csv
+*.pdf
+
