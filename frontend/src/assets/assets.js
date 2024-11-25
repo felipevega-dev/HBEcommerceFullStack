@@ -98,7 +98,7 @@ export const assets = {
     cross_icon,
     mercadopago_logo,
     paypal_logo,
-    harrys_logo
+    harrys_logo,
 }
 
 export const products = [

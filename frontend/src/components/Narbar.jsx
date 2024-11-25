@@ -1,5 +1,5 @@
 import React from 'react'
-import logo from '../assets/logo.png'
+import harrys_logo from '../assets/harrys_logo.png'
 import { Link,NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { useState, useContext } from 'react'
@@ -15,7 +15,7 @@ const Narbar = () => {
 
         {/* logo */}
         <Link to='/'>
-            <img src={logo} className='w-36' alt='logo' />
+            <img src={harrys_logo} className='w-36' alt='logo' />
         </Link>
 
         <ul className='hidden sm:flex gap-5 text-sm text-gray-700'>
