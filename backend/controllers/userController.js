@@ -73,8 +73,14 @@ const registerUser = async (req, res) => {
 const adminLogin = async (req, res) => {
     try {
         const {email, password} = req.body;
-            if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign({email}, process.env.JWT_SECRET);
+        if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            // Generamos el token con el email concatenado con el password
+            const token = jwt.sign(
+                { 
+                    email: process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD 
+                }, 
+                process.env.JWT_SECRET
+            );
             return res.json({success: true, message: 'Login exitoso', token});
         } else {
             return res.json({success: false, message: 'Credenciales invalidas'});

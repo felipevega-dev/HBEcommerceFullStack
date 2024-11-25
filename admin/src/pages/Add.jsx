@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
+import axios from 'axios'
+import { backendUrl } from '../App'
+import { toast } from 'react-toastify'
 
-const Add = () => {
+const Add = ({token}) => {
 
   const [image1, setImage1] = useState(false)
   const [image2, setImage2] = useState(false)
@@ -15,9 +18,80 @@ const Add = () => {
   const [price, setPrice] = useState('')
   const [sizes, setSizes] = useState([])
   const [bestseller, setBestseller] = useState(false)
+
+  const resetForm = () => {
+    setImage1(false)
+    setImage2(false)
+    setImage3(false)
+    setImage4(false)
+    setName('')
+    setDescription('')
+    setCategory('Prendas')
+    setSubcategory('Polerones')
+    setPrice('')
+    setSizes([])
+    setBestseller(false)
+  }
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault()
+    try{
+      if (!image1) {
+        toast.error('Se requiere al menos una imagen');
+        return;
+      }
+
+      if (sizes.length === 0) {
+        toast.error('Selecciona al menos una talla');
+        return;
+      }
+
+      const formData = new FormData()
+      formData.append('name', name)
+      formData.append('description', description)
+      formData.append('price', price) 
+      formData.append('category', category)
+      formData.append('subcategory', subcategory)
+      formData.append('bestseller', bestseller)
+      formData.append('sizes', JSON.stringify(sizes))
+
+      image1 && formData.append('image1', image1)
+      image2 && formData.append('image2', image2)
+      image3 && formData.append('image3', image3)
+      image4 && formData.append('image4', image4)
+
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token.trim()}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+
+      toast.promise(
+        axios.post(backendUrl + '/api/product/add', formData, config),
+        {
+          pending: 'Subiendo producto...',
+          success: {
+            render({data}) {
+              resetForm();
+              return '¡Producto agregado exitosamente!';
+            }
+          },
+          error: {
+            render({data}) {
+              return `Error: ${data.response?.data?.message || 'Error al subir el producto'}`;
+            }
+          }
+        }
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Error al crear el producto');
+    }
+  }
   
   return (
-    <form className='flex flex-col w-full items-start gap-3'>
+    <form onSubmit={onSubmitHandler} className='flex flex-col w-full items-start gap-3'>
         <div>
           <p className='text-lg font-semibold mb-2'>Subir Imágenes</p>
 

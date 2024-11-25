@@ -1,31 +1,66 @@
 import productModel from '../models/productModel.js';
+import cloudinary from 'cloudinary';
+
+// Configurar cloudinary
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET_KEY
+});
 
 // Funcion para añadir un producto
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, subCategory, sizes, bestSeller } = req.body;
+        const { name, description, price, category, subcategory, sizes, bestseller } = req.body;
         
-        const image1 = req.files.image1 && req.files.image1[0];
-        const image2 = req.files.image2 && req.files.image2[0];
-        const image3 = req.files.image3 && req.files.image3[0];
-        const image4 = req.files.image4 && req.files.image4[0];
+        // Recolectar todas las imágenes disponibles
+        const imageFiles = [];
+        ['image1', 'image2', 'image3', 'image4'].forEach(fieldName => {
+            if (req.files && req.files[fieldName]) {
+                imageFiles.push(req.files[fieldName][0]);
+            }
+        });
 
-        const images = [image1, image2, image3, image4].filter((item) => item !== undefined);
+        if (imageFiles.length === 0) {
+            return res.json({ success: false, message: 'Se requiere al menos una imagen' });
+        }
 
-        let imagesUrl = await Promise.all(
-            images.map(async (image) => {
-                let result = await cloudinary.uploader.upload(image.path, {resource_type: 'image',});
+        if (imageFiles.length > 4) {
+            return res.json({ success: false, message: 'No se pueden subir más de 4 imágenes' });
+        }
+
+        // Subir todas las imágenes a Cloudinary
+        const imagesUrl = await Promise.all(
+            imageFiles.map(async (file) => {
+                const result = await cloudinary.v2.uploader.upload(file.path, {
+                    resource_type: 'image',
+                });
                 return result.secure_url;
             })
         );
 
-        const productData = await Product.create({ name, description, category, price: Number(price), subCategory, bestSeller: bestSeller === 'true' ? true : false, sizes: JSON.parse(sizes), images: imagesUrl, date: Date.now() });
+        const productData = {
+            name, 
+            description, 
+            category, 
+            price: Number(price), 
+            subCategory: subcategory, 
+            bestSeller: bestseller === 'true' ? true : false, 
+            sizes: JSON.parse(sizes), 
+            images: imagesUrl, // Array de URLs de imágenes
+            date: Date.now()
+        };
 
         const product = new productModel(productData);
         await product.save();
 
-        res.json({ success: true, message: 'Producto creado', product });
+        res.json({ 
+            success: true, 
+            message: 'Producto creado exitosamente', 
+            product
+        });
     } catch (error) {
+        console.log('Error al crear producto:', error);
         res.json({ success: false, message: error.message });
     }
 }
