@@ -71,7 +71,18 @@ const registerUser = async (req, res) => {
 
 // Ruta para admin login
 const adminLogin = async (req, res) => {
-    
+    try {
+        const {email, password} = req.body;
+            if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            const token = jwt.sign({email}, process.env.JWT_SECRET);
+            return res.json({success: true, message: 'Login exitoso', token});
+        } else {
+            return res.json({success: false, message: 'Credenciales invalidas'});
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message: error.message});
+    }
 }
 
 export {loginUser, registerUser, adminLogin};
