@@ -93,4 +93,60 @@ const singleProduct = async (req, res) => {
     }
 }
 
-export { addProduct, listProducts, removeProduct, singleProduct };
+const updateProduct = async (req, res) => {
+    try {
+        const { id, name, description, price, category, subcategory, sizes, bestseller, currentImages } = req.body;
+        
+        let imagesUrl = currentImages ? JSON.parse(currentImages) : [];
+
+        // Procesar nuevas imágenes si se proporcionan
+        if (req.files) {
+            const imageFiles = [];
+            ['image1', 'image2', 'image3', 'image4'].forEach(fieldName => {
+                if (req.files[fieldName]) {
+                    imageFiles.push(req.files[fieldName][0]);
+                }
+            });
+
+            // Subir nuevas imágenes a Cloudinary
+            const newImagesUrl = await Promise.all(
+                imageFiles.map(async (file) => {
+                    const result = await cloudinary.v2.uploader.upload(file.path, {
+                        resource_type: 'image',
+                    });
+                    return result.secure_url;
+                })
+            );
+
+            imagesUrl = [...imagesUrl, ...newImagesUrl];
+        }
+
+        const productData = {
+            name,
+            description,
+            category,
+            price: Number(price),
+            subCategory: subcategory,
+            bestSeller: bestseller === 'true',
+            sizes: JSON.parse(sizes),
+            images: imagesUrl
+        };
+
+        const updatedProduct = await productModel.findByIdAndUpdate(
+            id,
+            productData,
+            { new: true }
+        );
+
+        res.json({
+            success: true,
+            message: 'Producto actualizado exitosamente',
+            product: updatedProduct
+        });
+    } catch (error) {
+        console.log('Error al actualizar producto:', error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { addProduct, listProducts, removeProduct, singleProduct, updateProduct };
