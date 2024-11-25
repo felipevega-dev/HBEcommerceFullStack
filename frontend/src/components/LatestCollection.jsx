@@ -18,7 +18,7 @@ const LatestCollection = () => {
       <div className='text-center py-8 text-3xl'>
         <Title text1='ÚLTIMAS' text2='COLECCIONES' />
         <p className='w-3/4 mx-auto text-gray-600 text-xs md:text-base'>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+          Ultimas colecciones de Harry's Boutique
         </p>
       </div>
       {/* products */}

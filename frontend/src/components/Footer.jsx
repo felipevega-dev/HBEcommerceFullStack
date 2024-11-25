@@ -7,9 +7,9 @@ const Footer = () => {
         <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 test-sm'>
 
             <div>
-                <img src={assets.logo} className='mb-5 w-32' alt='logo' />
+                <img src={assets.logo_footer} className='mb-5 w-32' alt='logo' />
                 <p className='w-full md:w-2/3 text-gray-600'>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+                Harry's Boutique, tu tienda de ropa para mascotas
                 </p>
             </div>
 
