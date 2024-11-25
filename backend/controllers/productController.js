@@ -1,4 +1,3 @@
-import Product from '../models/Product.js';
 import productModel from '../models/productModel.js';
 
 // Funcion para añadir un producto
