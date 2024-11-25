@@ -18,7 +18,9 @@ const Login = ({setToken}) => {
             console.log('Respuesta login:', response.data);
 
             if (response.data.success && response.data.token) {
-                setToken(response.data.token.trim());
+                const token = response.data.token.trim();
+                console.log('Token guardado:', token);
+                setToken(token);
                 toast.success('Login exitoso');
             } else {
                 toast.error(response.data.message || 'Error en el login');
