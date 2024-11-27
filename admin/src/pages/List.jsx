@@ -81,7 +81,7 @@ const List = ({token}) => {
       <div className="py-1">
         <button
           onClick={() => {
-            navigate(`/product/${product._id}/edit`);
+            navigate(`/edit/${product._id}`);
             setShowActionMenu(null);
           }}
           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

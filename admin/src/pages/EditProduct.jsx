@@ -21,6 +21,11 @@ const EditProduct = ({ token }) => {
     bestseller: false,
     currentImages: []
   });
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [showNewSubcategoryInput, setShowNewSubcategoryInput] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [newSubcategory, setNewSubcategory] = useState('');
 
   const fetchProduct = async () => {
     try {
@@ -112,6 +117,43 @@ const EditProduct = ({ token }) => {
     }));
   };
 
+  const handleImageChange = (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prev => {
+          const newPreviews = [...prev];
+          newPreviews[index] = reader.result;
+          return newPreviews;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddNewCategory = () => {
+    if (newCategory.trim()) {
+      if (!categories.includes(newCategory.trim())) {
+        setCategories(prev => [...prev, newCategory.trim()]);
+        setFormData(prev => ({...prev, category: newCategory.trim()}));
+      }
+      setNewCategory('');
+      setShowNewCategoryInput(false);
+    }
+  };
+
+  const handleAddNewSubcategory = () => {
+    if (newSubcategory.trim()) {
+      if (!subcategories.includes(newSubcategory.trim())) {
+        setSubcategories(prev => [...prev, newSubcategory.trim()]);
+        setFormData(prev => ({...prev, subcategory: newSubcategory.trim()}));
+      }
+      setNewSubcategory('');
+      setShowNewSubcategoryInput(false);
+    }
+  };
+
   useEffect(() => {
     fetchProduct();
     fetchCategories();
@@ -155,32 +197,112 @@ const EditProduct = ({ token }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Categoría</label>
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData(prev => ({...prev, category: e.target.value}))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              required
-            >
-              <option value="">Selecciona una categoría</option>
-              {categories.map((cat, index) => (
-                <option key={index} value={cat}>{cat}</option>
-              ))}
-            </select>
+            <div className="mt-1 space-y-2">
+              {!showNewCategoryInput ? (
+                <div className="flex gap-2">
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({...prev, category: e.target.value}))}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Selecciona una categoría</option>
+                    {categories.map((cat, index) => (
+                      <option key={index} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCategoryInput(true)}
+                    className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                  >
+                    +
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="Nueva categoría"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNewCategory}
+                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    ✓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewCategoryInput(false);
+                      setNewCategory('');
+                    }}
+                    className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Subcategoría</label>
-            <select
-              value={formData.subcategory}
-              onChange={(e) => setFormData(prev => ({...prev, subcategory: e.target.value}))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              required
-            >
-              <option value="">Selecciona una subcategoría</option>
-              {subcategories.map((subcat, index) => (
-                <option key={index} value={subcat}>{subcat}</option>
-              ))}
-            </select>
+            <div className="mt-1 space-y-2">
+              {!showNewSubcategoryInput ? (
+                <div className="flex gap-2">
+                  <select
+                    value={formData.subcategory}
+                    onChange={(e) => setFormData(prev => ({...prev, subcategory: e.target.value}))}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Selecciona una subcategoría</option>
+                    {subcategories.map((subcat, index) => (
+                      <option key={index} value={subcat}>{subcat}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewSubcategoryInput(true)}
+                    className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                  >
+                    +
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newSubcategory}
+                    onChange={(e) => setNewSubcategory(e.target.value)}
+                    placeholder="Nueva subcategoría"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNewSubcategory}
+                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    ✓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewSubcategoryInput(false);
+                      setNewSubcategory('');
+                    }}
+                    className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -260,7 +382,7 @@ const EditProduct = ({ token }) => {
                             <img 
                               src={img} 
                               alt={`Producto ${index + 1}`} 
-                              className="w-full h-24 object-cover rounded"
+                              className="w-full h-32 object-contain bg-gray-50 rounded"
                             />
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200">
                               <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded">
@@ -293,13 +415,40 @@ const EditProduct = ({ token }) => {
           <label className="block text-sm font-medium text-gray-700 mb-2">Agregar nuevas imágenes</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {fileInputRefs.map((ref, index) => (
-              <div key={index}>
+              <div key={index} className="relative">
                 <input
                   type="file"
                   ref={ref}
                   accept="image/*"
+                  onChange={(e) => handleImageChange(e, index)}
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
                 />
+                {imagePreviews[index] && (
+                  <div className="mt-2 relative">
+                    <div className="absolute top-0 left-0 right-0 bg-indigo-600 text-white text-xs py-1 px-2 text-center rounded-t">
+                      Vista previa
+                    </div>
+                    <img
+                      src={imagePreviews[index]}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-32 object-contain bg-gray-50 rounded-b border-t-0 border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        ref.current.value = '';
+                        setImagePreviews(prev => {
+                          const newPreviews = [...prev];
+                          newPreviews[index] = null;
+                          return newPreviews;
+                        });
+                      }}
+                      className="absolute top-8 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
