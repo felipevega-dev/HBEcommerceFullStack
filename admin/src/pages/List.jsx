@@ -20,6 +20,8 @@ const List = ({token}) => {
     currentImages: []
   });
   const fileInputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
 
   const fetchList = async () => {
     try {
@@ -34,6 +36,19 @@ const List = ({token}) => {
       toast.error('Error al obtener la lista de productos');
     }
   }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/product/categories');
+      if (response.data.success) {
+        setCategories(response.data.categories);
+        setSubcategories(response.data.subcategories);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Error al obtener categorías');
+    }
+  };
 
   const removeProduct = async () => {
     try {
@@ -104,6 +119,7 @@ const List = ({token}) => {
 
   useEffect(() => {
     fetchList();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -166,7 +182,7 @@ const List = ({token}) => {
               <input
                 type="text"
                 value={editFormData.name}
-                onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                onChange={(e) => setEditFormData(prev => ({...prev, name: e.target.value}))}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
@@ -177,7 +193,7 @@ const List = ({token}) => {
               <input
                 type="number"
                 value={editFormData.price}
-                onChange={(e) => setEditFormData({...editFormData, price: e.target.value})}
+                onChange={(e) => setEditFormData(prev => ({...prev, price: e.target.value}))}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
@@ -185,24 +201,36 @@ const List = ({token}) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Categoría</label>
-              <input
-                type="text"
+              <select
                 value={editFormData.category}
-                onChange={(e) => setEditFormData({...editFormData, category: e.target.value})}
+                onChange={(e) => setEditFormData(prev => ({...prev, category: e.target.value}))}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
-              />
+              >
+                <option value="">Selecciona una categoría</option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Subcategoría</label>
-              <input
-                type="text"
+              <select
                 value={editFormData.subcategory}
-                onChange={(e) => setEditFormData({...editFormData, subcategory: e.target.value})}
+                onChange={(e) => setEditFormData(prev => ({...prev, subcategory: e.target.value}))}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 required
-              />
+              >
+                <option value="">Selecciona una subcategoría</option>
+                {subcategories.map((subcat, index) => (
+                  <option key={index} value={subcat}>
+                    {subcat}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -210,7 +238,7 @@ const List = ({token}) => {
             <label className="block text-sm font-medium text-gray-700">Descripción</label>
             <textarea
               value={editFormData.description}
-              onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+              onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               required

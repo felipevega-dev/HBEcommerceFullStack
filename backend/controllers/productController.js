@@ -149,4 +149,22 @@ const updateProduct = async (req, res) => {
     }
 };
 
-export { addProduct, listProducts, removeProduct, singleProduct, updateProduct };
+const getCategories = async (req, res) => {
+    try {
+        const products = await productModel.find();
+        
+        // Obtener categorías y subcategorías únicas
+        const categories = [...new Set(products.map(product => product.category))];
+        const subcategories = [...new Set(products.map(product => product.subCategory))];
+        
+        res.json({ 
+            success: true, 
+            categories,
+            subcategories
+        });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { addProduct, listProducts, removeProduct, singleProduct, updateProduct, getCategories };

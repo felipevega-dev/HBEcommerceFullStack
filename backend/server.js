@@ -34,6 +34,7 @@ const initializeServer = async () => {
             console.log(chalk.cyan('\n=== Rutas disponibles ==='));
             console.log(chalk.yellow('→') + ' /api/user');
             console.log(chalk.yellow('→') + ' /api/product');
+            console.log(chalk.yellow('→') + ' /api/product/categories');
             console.log('\n' + chalk.green('¡Servidor listo para recibir peticiones!') + '\n');
         });
 
