@@ -13,7 +13,7 @@ productRouter.post('/add', adminAuth, upload.fields([
 ]), addProduct);
 productRouter.get('/list', listProducts);
 productRouter.delete('/remove', adminAuth, removeProduct);
-productRouter.get('/single', singleProduct);
+productRouter.get('/single/:id', singleProduct);
 productRouter.put('/update', adminAuth, upload.fields([
     { name: 'image1', maxCount: 1 }, 
     { name: 'image2', maxCount: 1 }, 

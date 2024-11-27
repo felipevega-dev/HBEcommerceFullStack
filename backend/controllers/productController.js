@@ -85,8 +85,11 @@ const removeProduct = async (req, res) => {
 
 const singleProduct = async (req, res) => {
     try {
-        const { productId } = req.body;
-        const product = await productModel.findById(productId);
+        const { id } = req.params;
+        const product = await productModel.findById(id);
+        if (!product) {
+            return res.json({ success: false, message: 'Producto no encontrado' });
+        }
         res.json({ success: true, product });
     } catch (error) {
         res.json({ success: false, message: error.message });
