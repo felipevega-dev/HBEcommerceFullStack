@@ -42,13 +42,13 @@ const Narbar = () => {
 
         <div className='flex gap-6 items-center'>
             <img onClick={() => setShowSearch(true)} src={assets.search_icon} className='w-5 cursor-pointer' alt='search' />
-            <div className='group relative'>
+            <div className='group relative z-50'>
                 <Link to='/login'><img src={assets.profile_icon} className='w-5 cursor-pointer' alt='user' /></Link>
                 <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
-                    <div className='flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500'>
-                        <p className='text-sm'>Mi   cuenta</p>
-                        <p className='text-sm'>Mis compras</p>  
-                        <p className='text-sm'>Salir</p>
+                    <div className='flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 shadow-lg'>
+                        <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Mi cuenta</p>
+                        <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Mis compras</p>  
+                        <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Desconectarse</p>
                     </div>
                 </div>
             </div>
