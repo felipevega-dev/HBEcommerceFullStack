@@ -83,6 +83,7 @@ import barbie_hero3 from './polerones/barbie_hero3.png'
 import barbie_hero4 from './polerones/barbie_hero4.png'
 import logo_footer from './logo2.png'
 import carrito from './carrito.png'
+import dropdown_icon2 from './dropdown_icon2.png'
 import carritofb from './carritofb.png'
 
 
@@ -116,4 +117,5 @@ export const assets = {
     logo_footer,
     carrito,
     carritofb,
+    dropdown_icon2,
 }
