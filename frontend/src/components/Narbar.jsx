@@ -4,11 +4,20 @@ import { Link,NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { useState, useContext } from 'react'
 import { ShopContext } from '../context/ShopContext';
+import { toast } from 'react-toastify';
 
 const Narbar = () => {
     const [visible, setVisible] = useState(false);
 
-    const { setShowSearch, getCartCount } = useContext(ShopContext);
+    const { setShowSearch, getCartCount, navigate, token, setToken, setCartItems } = useContext(ShopContext);
+
+    const logout = () => {
+        toast.success('Desconectado correctamente');
+        navigate('/login');
+        setToken('');
+        localStorage.removeItem('token');
+        setCartItems([]);
+    }
 
   return (
     <div className='flex justify-between items-center py-5 font-medium'>
@@ -42,15 +51,19 @@ const Narbar = () => {
 
         <div className='flex gap-6 items-center'>
             <img onClick={() => setShowSearch(true)} src={assets.search_icon} className='w-5 cursor-pointer' alt='search' />
+            
             <div className='group relative z-50'>
-                <Link to='/login'><img src={assets.profile_icon} className='w-5 cursor-pointer' alt='user' /></Link>
-                <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
-                    <div className='flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 shadow-lg'>
-                        <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Mi cuenta</p>
-                        <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Mis compras</p>  
-                        <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Desconectarse</p>
+                <img onClick={() => token ? null : navigate('/login')} src={assets.profile_icon} className='w-5 cursor-pointer' alt='user' />
+                {/* dropdown menu */}
+                {token && (
+                    <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
+                        <div className='flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 shadow-lg'>
+                            <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Mi cuenta</p>
+                            <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer' onClick={() => navigate('/orders')}>Mis compras</p>  
+                            <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer' onClick={logout}>Desconectarse</p>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
             <Link to='/cart' className='relative'>
                 <img src={assets.cart_icon} className='w-5 min-w-5 cursor-pointer' alt='cart' />

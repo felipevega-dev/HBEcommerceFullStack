@@ -37,6 +37,23 @@ const ShopContextProvider = (props) => {
         }
 
         setCartItems(cartData);
+
+        if (token) {
+            try {
+                await axios.post(
+                    `${backendUrl}/api/cart/add`, 
+                    {itemId, size}, 
+                    {
+                        headers: {
+                            'token': token
+                        }
+                    }
+                );
+            } catch (error) {
+                console.log(error);
+                toast.error(error.response?.data?.message || 'Error al agregar al carrito');
+            }
+        }
     }
 
     const getCartCount = () => {
@@ -103,13 +120,39 @@ const ShopContextProvider = (props) => {
         }
     }, []);
 
+    useEffect(() => {
+        const syncCart = async () => {
+            if (token) {
+                try {
+                    const response = await axios.post(
+                        `${backendUrl}/api/cart/get`,
+                        {},
+                        {
+                            headers: {
+                                'token': token
+                            }
+                        }
+                    );
+                    if (response.data.success) {
+                        setCartItems(response.data.cartData);
+                    }
+                } catch (error) {
+                    console.log(error);
+                    toast.error('Error al sincronizar el carrito');
+                }
+            }
+        };
+
+        syncCart();
+    }, [token]);
+
     const value = {
         products , currency , delivery_fee, 
         search, setSearch, showSearch, setShowSearch,
         cartItems, addToCart, 
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
-        token, setToken
+        token, setToken,
     }
 
   return (
