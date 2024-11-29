@@ -4,6 +4,7 @@ import axios from 'axios';
 import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { StrictMode } from 'react';
 
 const EditProduct = ({ token }) => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const EditProduct = ({ token }) => {
     price: '',
     category: '',
     subcategory: '',
+    color: '',
     sizes: [],
     bestseller: false,
     currentImages: []
@@ -26,6 +28,12 @@ const EditProduct = ({ token }) => {
   const [showNewSubcategoryInput, setShowNewSubcategoryInput] = useState(false);
   const [newCategory, setNewCategory] = useState('');
   const [newSubcategory, setNewSubcategory] = useState('');
+  const [selectedColors, setSelectedColors] = useState([]);
+
+  const availableColors = [
+    'Negro', 'Blanco', 'Gris', 'Rojo', 'Azul', 'Verde', 
+    'Amarillo', 'Rosa', 'Morado', 'Naranja', 'Marrón', 'Beige'
+  ];
 
   const fetchProduct = async () => {
     try {
@@ -42,6 +50,7 @@ const EditProduct = ({ token }) => {
           bestseller: product.bestSeller,
           currentImages: product.images
         });
+        setSelectedColors(product.colors || []);
       }
     } catch (error) {
       toast.error('Error al cargar el producto');
@@ -51,10 +60,9 @@ const EditProduct = ({ token }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/product/categories`);
+      const response = await axios.get(`${backendUrl}/api/category`);
       if (response.data.success) {
         setCategories(response.data.categories);
-        setSubcategories(response.data.subcategories);
       }
     } catch (error) {
       toast.error('Error al cargar categorías');
@@ -65,6 +73,11 @@ const EditProduct = ({ token }) => {
     e.preventDefault();
     
     try {
+      if (selectedColors.length === 0) {
+        toast.error('Por favor selecciona al menos un color');
+        return;
+      }
+
       const formDataToSend = new FormData();
       formDataToSend.append('id', id);
       formDataToSend.append('name', formData.name);
@@ -72,8 +85,9 @@ const EditProduct = ({ token }) => {
       formDataToSend.append('price', formData.price);
       formDataToSend.append('category', formData.category);
       formDataToSend.append('subcategory', formData.subcategory);
-      formDataToSend.append('sizes', JSON.stringify(formData.sizes));
+      formDataToSend.append('colors', JSON.stringify(selectedColors));
       formDataToSend.append('bestseller', formData.bestseller);
+      formDataToSend.append('sizes', JSON.stringify(formData.sizes));
       formDataToSend.append('currentImages', JSON.stringify(formData.currentImages));
 
       fileInputRefs.forEach((ref, index) => {
@@ -143,20 +157,53 @@ const EditProduct = ({ token }) => {
     }
   };
 
-  const handleAddNewSubcategory = () => {
-    if (newSubcategory.trim()) {
-      if (!subcategories.includes(newSubcategory.trim())) {
-        setSubcategories(prev => [...prev, newSubcategory.trim()]);
-        setFormData(prev => ({...prev, subcategory: newSubcategory.trim()}));
+  const handleColorToggle = (color) => {
+    setSelectedColors(prev => 
+      prev.includes(color)
+        ? prev.filter(c => c !== color)
+        : [...prev, color]
+    );
+  };
+
+  const handleAddNewSubcategory = async () => {
+    if (!newSubcategory.trim() || !formData.category) return;
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/category/subcategory/add`,
+        {
+          categoryName: formData.category,
+          subcategoryName: newSubcategory
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        setCategories(categories.map(cat => 
+          cat.name === formData.category 
+            ? response.data.category 
+            : cat
+        ));
+        setFormData(prev => ({...prev, subcategory: newSubcategory}));
+        setNewSubcategory('');
+        setShowNewSubcategoryInput(false);
+        toast.success('Subcategoría añadida exitosamente');
       }
-      setNewSubcategory('');
-      setShowNewSubcategoryInput(false);
+    } catch (error) {
+      toast.error('Error al añadir subcategoría');
     }
   };
 
   useEffect(() => {
-    fetchProduct();
-    fetchCategories();
+    const initialize = async () => {
+      await fetchCategories();
+      await fetchProduct();
+    };
+    initialize();
   }, [id]);
 
   return (
@@ -195,114 +242,113 @@ const EditProduct = ({ token }) => {
             />
           </div>
 
-          <div>
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Categoría</label>
-            <div className="mt-1 space-y-2">
-              {!showNewCategoryInput ? (
-                <div className="flex gap-2">
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData(prev => ({...prev, category: e.target.value}))}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    required
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categories.map((cat, index) => (
-                      <option key={index} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => setShowNewCategoryInput(true)}
-                    className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                  >
-                    +
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    placeholder="Nueva categoría"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddNewCategory}
-                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                  >
-                    ✓
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowNewCategoryInput(false);
-                      setNewCategory('');
-                    }}
-                    className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </div>
+            {!showNewCategoryInput ? (
+              <div className="flex gap-2">
+                <select 
+                  value={formData.category}
+                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md"
+                  required
+                >
+                  <option value="">Selecciona una categoría</option>
+                  {categories.map((cat) => (
+                    <option key={cat.name} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowNewCategoryInput(true)}
+                  className="px-3 py-2 bg-black text-white rounded"
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Nueva categoría"
+                  className="w-full px-3 py-2 border rounded"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddNewCategory}
+                  className="px-3 py-2 bg-green-600 text-white rounded"
+                >
+                  ✓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewCategoryInput(false);
+                    setNewCategory('');
+                  }}
+                  className="px-3 py-2 bg-red-600 text-white rounded"
+                >
+                  ×
+                </button>
+              </div>
+            )}
           </div>
 
-          <div>
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Subcategoría</label>
-            <div className="mt-1 space-y-2">
-              {!showNewSubcategoryInput ? (
-                <div className="flex gap-2">
-                  <select
-                    value={formData.subcategory}
-                    onChange={(e) => setFormData(prev => ({...prev, subcategory: e.target.value}))}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    required
-                  >
-                    <option value="">Selecciona una subcategoría</option>
-                    {subcategories.map((subcat, index) => (
-                      <option key={index} value={subcat}>{subcat}</option>
+            {!showNewSubcategoryInput ? (
+              <div className="flex gap-2">
+                <select 
+                  value={formData.subcategory}
+                  onChange={(e) => setFormData(prev => ({ ...prev, subcategory: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md"
+                  required
+                >
+                  <option value="">Selecciona una subcategoría</option>
+                  {categories
+                    .find(cat => cat.name === formData.category)
+                    ?.subcategories.map((subcat) => (
+                      <option key={subcat} value={subcat}>{subcat}</option>
                     ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => setShowNewSubcategoryInput(true)}
-                    className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                  >
-                    +
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newSubcategory}
-                    onChange={(e) => setNewSubcategory(e.target.value)}
-                    placeholder="Nueva subcategoría"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddNewSubcategory}
-                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                  >
-                    ✓
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowNewSubcategoryInput(false);
-                      setNewSubcategory('');
-                    }}
-                    className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </div>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowNewSubcategoryInput(true)}
+                  className="px-3 py-2 bg-black text-white rounded"
+                  disabled={!formData.category}
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newSubcategory}
+                  onChange={(e) => setNewSubcategory(e.target.value)}
+                  placeholder="Nueva subcategoría"
+                  className="w-full px-3 py-2 border rounded"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddNewSubcategory}
+                  className="px-3 py-2 bg-green-600 text-white rounded"
+                >
+                  ✓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewSubcategoryInput(false);
+                    setNewSubcategory('');
+                  }}
+                  className="px-3 py-2 bg-red-600 text-white rounded"
+                >
+                  ×
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -355,60 +401,62 @@ const EditProduct = ({ token }) => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Imágenes actuales (arrastra para reordenar)
           </label>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="images" direction="horizontal">
-              {(provided) => (
-                <div 
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="grid grid-cols-2 md:grid-cols-4 gap-4"
-                >
-                  {formData.currentImages.map((img, index) => (
-                    <Draggable 
-                      key={img} 
-                      draggableId={img} 
-                      index={index}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={`relative ${
-                            snapshot.isDragging ? 'z-50' : ''
-                          }`}
-                        >
-                          <div className="relative group">
-                            <img 
-                              src={img} 
-                              alt={`Producto ${index + 1}`} 
-                              className="w-full h-32 object-contain bg-gray-50 rounded"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200">
-                              <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded">
-                                {index === 0 ? 'Principal' : `${index + 1}º`}
+          <StrictMode>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="images" direction="horizontal">
+                {(provided) => (
+                  <div 
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                  >
+                    {formData.currentImages.map((img, index) => (
+                      <Draggable 
+                        key={img} 
+                        draggableId={img} 
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`relative ${
+                              snapshot.isDragging ? 'z-50' : ''
+                            }`}
+                          >
+                            <div className="relative group">
+                              <img 
+                                src={img} 
+                                alt={`Producto ${index + 1}`} 
+                                className="w-full h-32 object-contain bg-gray-50 rounded"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200">
+                                <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded">
+                                  {index === 0 ? 'Principal' : `${index + 1}º`}
+                                </div>
                               </div>
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({
+                                  ...prev,
+                                  currentImages: prev.currentImages.filter((_, i) => i !== index)
+                                }))}
+                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                              >
+                                ×
+                              </button>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => setFormData(prev => ({
-                                ...prev,
-                                currentImages: prev.currentImages.filter((_, i) => i !== index)
-                              }))}
-                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            >
-                              ×
-                            </button>
                           </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </StrictMode>
         </div>
 
         <div>
@@ -452,6 +500,33 @@ const EditProduct = ({ token }) => {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">Colores</label>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {availableColors.map((colorOption) => (
+              <button
+                key={colorOption}
+                type="button"
+                onClick={() => {
+                  setSelectedColors(prev => 
+                    prev.includes(colorOption)
+                      ? prev.filter(c => c !== colorOption)
+                      : [...prev, colorOption]
+                  );
+                }}
+                className={`px-4 py-2 border rounded-md ${
+                  selectedColors.includes(colorOption) 
+                    ? 'bg-black text-white' 
+                    : 'hover:bg-gray-50'
+                }`}
+              >
+                {colorOption}
+              </button>
+            ))}
+          </div>
+          <p className="text-sm text-gray-500">Colores seleccionados: {selectedColors.join(', ')}</p>
         </div>
 
         <div className="flex justify-end gap-4">

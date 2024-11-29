@@ -1,4 +1,5 @@
 import productModel from '../models/productModel.js';
+import categoryModel from '../models/categoryModel.js';
 import cloudinary from 'cloudinary';
 
 // Configurar cloudinary
@@ -11,8 +12,24 @@ cloudinary.v2.config({
 // Funcion para añadir un producto
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, subcategory, sizes, bestseller } = req.body;
+        const { name, description, price, category, subcategory, color, sizes, bestseller } = req.body;
         
+        // Verificar si la categoría existe
+        const categoryDoc = await categoryModel.findOne({ name: category });
+        if (!categoryDoc) {
+            // Si no existe, crear nueva categoría con la subcategoría
+            await categoryModel.create({
+                name: category,
+                subcategories: [subcategory]
+            });
+        } else if (!categoryDoc.subcategories.includes(subcategory)) {
+            // Si existe pero no tiene la subcategoría, añadirla
+            await categoryModel.findOneAndUpdate(
+                { name: category },
+                { $addToSet: { subcategories: subcategory } }
+            );
+        }
+
         // Recolectar todas las imágenes disponibles
         const imageFiles = [];
         ['image1', 'image2', 'image3', 'image4'].forEach(fieldName => {
@@ -45,6 +62,7 @@ const addProduct = async (req, res) => {
             category, 
             price: Number(price), 
             subCategory: subcategory, 
+            color, 
             bestSeller: bestseller === 'true' ? true : false, 
             sizes: JSON.parse(sizes), 
             images: imagesUrl, // Array de URLs de imágenes
@@ -98,8 +116,22 @@ const singleProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { id, name, description, price, category, subcategory, sizes, bestseller, currentImages } = req.body;
+        const { id, name, description, price, category, subcategory, colors, sizes, bestseller, currentImages } = req.body;
         
+        // Verificar si la categoría y subcategoría existen o crearlas
+        const categoryDoc = await categoryModel.findOne({ name: category });
+        if (!categoryDoc) {
+            await categoryModel.create({
+                name: category,
+                subcategories: [subcategory]
+            });
+        } else if (!categoryDoc.subcategories.includes(subcategory)) {
+            await categoryModel.findOneAndUpdate(
+                { name: category },
+                { $addToSet: { subcategories: subcategory } }
+            );
+        }
+
         let imagesUrl = currentImages ? JSON.parse(currentImages) : [];
 
         // Procesar nuevas imágenes si se proporcionan
@@ -111,7 +143,6 @@ const updateProduct = async (req, res) => {
                 }
             });
 
-            // Subir nuevas imágenes a Cloudinary
             const newImagesUrl = await Promise.all(
                 imageFiles.map(async (file) => {
                     const result = await cloudinary.v2.uploader.upload(file.path, {
@@ -130,6 +161,7 @@ const updateProduct = async (req, res) => {
             category,
             price: Number(price),
             subCategory: subcategory,
+            colors: JSON.parse(colors), // Parsear el array de colores
             bestSeller: bestseller === 'true',
             sizes: JSON.parse(sizes),
             images: imagesUrl
@@ -154,16 +186,10 @@ const updateProduct = async (req, res) => {
 
 const getCategories = async (req, res) => {
     try {
-        const products = await productModel.find();
-        
-        // Obtener categorías y subcategorías únicas
-        const categories = [...new Set(products.map(product => product.category))];
-        const subcategories = [...new Set(products.map(product => product.subCategory))];
-        
+        const categories = await categoryModel.find();
         res.json({ 
             success: true, 
-            categories,
-            subcategories
+            categories
         });
     } catch (error) {
         res.json({ success: false, message: error.message });
