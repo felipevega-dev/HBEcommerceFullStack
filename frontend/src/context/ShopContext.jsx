@@ -45,13 +45,15 @@ const ShopContextProvider = (props) => {
                     {itemId, size}, 
                     {
                         headers: {
-                            'token': token
+                            'Authorization': `Bearer ${token}`
                         }
                     }
                 );
             } catch (error) {
-                console.log(error);
-                toast.error(error.response?.data?.message || 'Error al agregar al carrito');
+                console.error('Error al agregar al carrito:', error);
+                if (error.response?.status !== 401) {
+                    toast.error('Error al agregar al carrito');
+                }
             }
         }
     }
@@ -77,6 +79,12 @@ const ShopContextProvider = (props) => {
         let cartData = structuredClone(cartItems);
         cartData[itemId][size] = quantity;
         setCartItems(cartData);
+        
+        if (token) {
+            await axios.post(
+                `${backendUrl}/api/cart/update`, {itemId, size, quantity}, {headers: {token}}
+            );
+        }
     }
 
     const getCartAmount = () => {
@@ -110,13 +118,38 @@ const ShopContextProvider = (props) => {
         }
     }
 
-    useEffect(() => {
-        getProductsData();
-    }, []);
+    const getUserCart = async (userToken) => {
+        try {
+            const response = await axios.post(
+                `${backendUrl}/api/cart/get`, 
+                {}, 
+                {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                }
+            );
+            
+            if (response.data.success) {
+                setCartItems(response.data.cartData);
+            }
+        } catch (error) {
+            if (error.response?.status === 401 || error.response?.status === 404) {
+                setCartItems({});
+                return;
+            }
+            console.error('Error al obtener el carrito:', error);
+            toast.error('Error al obtener el carrito');
+        }
+    }
 
     useEffect(() => {
-        if (!token && localStorage.getItem('token')) {
-            setToken(localStorage.getItem('token'));
+        getProductsData();
+        
+        const storedToken = localStorage.getItem('token');
+        if (storedToken && !token) {
+            setToken(storedToken);
+            getUserCart(storedToken);
         }
     }, []);
 
@@ -129,7 +162,7 @@ const ShopContextProvider = (props) => {
                         {},
                         {
                             headers: {
-                                'token': token
+                                'Authorization': `Bearer ${token}`
                             }
                         }
                     );
@@ -137,19 +170,25 @@ const ShopContextProvider = (props) => {
                         setCartItems(response.data.cartData);
                     }
                 } catch (error) {
-                    console.log(error);
+                    if (error.response?.status === 401 || error.response?.status === 404) {
+                        setCartItems({});
+                        return;
+                    }
+                    console.error('Error al sincronizar el carrito:', error);
                     toast.error('Error al sincronizar el carrito');
                 }
             }
         };
 
-        syncCart();
+        if (token) {
+            syncCart();
+        }
     }, [token]);
 
     const value = {
         products , currency , delivery_fee, 
         search, setSearch, showSearch, setShowSearch,
-        cartItems, addToCart, 
+        cartItems, addToCart, setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
         token, setToken,

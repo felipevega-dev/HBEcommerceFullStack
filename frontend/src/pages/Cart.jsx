@@ -24,6 +24,29 @@ const Cart = () => {
     setCartData(tempData);
   }, [cartItems]);
 
+  if (cartData.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center border-t pt-14 min-h-[60vh]'>
+        <div className='text-2xl mb-8'>
+          <Title text1='CARRITO' text2='DE COMPRAS' />
+        </div>
+        <div className='flex flex-col items-center gap-6'>
+          <img src={assets.carritofb} alt="Carrito vacío" className='w-24 opacity-50' />
+          <h2 className='text-xl font-medium text-gray-600'>Tu Carrito está vacío</h2>
+          <p className='text-gray-500 text-center max-w-md'>
+            ¡Aprovecha! Tenemos miles de productos en oferta y oportunidades únicas.
+          </p>
+          <button 
+            onClick={() => navigate('/')} 
+            className='bg-black text-white px-8 py-3 mt-4 hover:bg-gray-800 transition-colors'
+          >
+            Ver ofertas
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='flex flex-col border-t pt-14'>
       <div className='text-2xl mb-3'>
@@ -33,9 +56,8 @@ const Cart = () => {
       <div className='flex flex-col gap-4'>
         {cartData.map((item, index) => {
           const productData = products.find((product) => product._id === item._id);
-          if (!productData) return null; // Si no encontramos el producto, no renderizamos nada
+          if (!productData) return null;
 
-          // Obtenemos la primera imagen o una imagen por defecto
           const productImage = productData.images?.[0] || productData.image?.[0] || assets.default_product;
 
           return (
