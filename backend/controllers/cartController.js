@@ -4,9 +4,9 @@ import userModel from '../models/userModel.js';
 const addToCart = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { itemId, size } = req.body;
+        const { itemId, size, quantity = 1 } = req.body;
 
-        console.log('Adding to cart:', { userId, itemId, size }); // Debug
+        console.log('Adding to cart:', { userId, itemId, size, quantity }); // Debug
 
         const userData = await userModel.findById(userId);
         if (!userData) {
@@ -24,8 +24,8 @@ const addToCart = async (req, res) => {
             cartData[itemId] = {};
         }
 
-        // Incrementamos la cantidad
-        cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
+        // Actualizamos para usar la cantidad proporcionada
+        cartData[itemId][size] = (cartData[itemId][size] || 0) + quantity;
 
         // Actualizamos el documento y obtenemos el resultado actualizado
         const updatedUser = await userModel.findByIdAndUpdate(

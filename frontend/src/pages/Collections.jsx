@@ -68,7 +68,7 @@ const Collections = () => {
   return (
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
       {/* Left */}
-      <div className='min-w-60'>
+      <div className='min-w-44'>
         <p onClick={() => setShowFilters(!showFilters)} className='my-2 text-xl flex items-center cursor-pointer gap-2'>FILTROS
           <img src={assets.dropdown_icon} alt='filter' className={`h-3 sm:hidden ${showFilters ? 'rotate-90' : ''}`} />
         </p>
@@ -89,7 +89,7 @@ const Collections = () => {
         </div>
         {/* Subcategorías */}
         <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilters ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>TIPO</p>
+          <p className='mb-3 text-sm font-medium'>SUBCATEGORÍAS</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2 items-center'>
               <input type='checkbox' className='w-3' value={'Polerones'} onChange={toggleSubcategory}/> Polerones
@@ -98,8 +98,8 @@ const Collections = () => {
               <input type='checkbox' className='w-3' value={'Vestidos'} onChange={toggleSubcategory}/> Vestidos
             </p>
             <p className='flex gap-2 items-center'>
-              <input type='checkbox' className='w-3' value={'Camisetas'} onChange={toggleSubcategory}/> Camisetas
-            </p>
+              <input type='checkbox' className='w-3' value={'Camisas'} onChange={toggleSubcategory}/> Camisas
+            </p>  
           </div>
         </div>
       </div>

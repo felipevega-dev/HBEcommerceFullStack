@@ -9,6 +9,7 @@ import productRouter from './routes/productRoute.js';
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import uploadRouter from './routes/uploadRoute.js';
+import reviewRouter from './routes/reviewRoute.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -31,6 +32,7 @@ const initializeServer = async () => {
         app.use('/api/cart', cartRouter);
         app.use('/api/order', orderRouter);
         app.use('/api/upload', uploadRouter);
+        app.use('/api/review', reviewRouter);
         app.get('/', (req, res) => res.send('API running'));
 
         // Iniciar servidor
@@ -40,7 +42,10 @@ const initializeServer = async () => {
             console.log(chalk.cyan('\n=== Rutas disponibles ==='));
             console.log(chalk.yellow('→') + ' /api/user');
             console.log(chalk.yellow('→') + ' /api/product');
-            console.log(chalk.yellow('→') + ' /api/product/categories');
+            console.log(chalk.yellow('→') + ' /api/cart');
+            console.log(chalk.yellow('→') + ' /api/order');
+            console.log(chalk.yellow('→') + ' /api/upload');
+            console.log(chalk.yellow('→') + ' /api/review');
             console.log('\n' + chalk.green('¡Servidor listo para recibir peticiones!') + '\n');
         });
 

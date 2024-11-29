@@ -16,7 +16,7 @@ const ShopContextProvider = (props) => {
     const [products, setProducts] = useState([]);
     const [token, setToken] = useState('');
 
-    const addToCart = async (itemId, size) => {
+    const addToCart = async (itemId, size, quantity = 1) => {
         if (!size) {
             toast.error('Seleccione una talla');
             return;
@@ -26,7 +26,7 @@ const ShopContextProvider = (props) => {
             try {
                 const response = await axios.post(
                     `${backendUrl}/api/cart/add`,
-                    { itemId, size },
+                    { itemId, size, quantity },
                     {
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -46,7 +46,7 @@ const ShopContextProvider = (props) => {
             if (!cartData[itemId]) {
                 cartData[itemId] = {};
             }
-            cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
+            cartData[itemId][size] = (cartData[itemId][size] || 0) + quantity;
             setCartItems(cartData);
         }
     };
