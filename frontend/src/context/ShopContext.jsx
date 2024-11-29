@@ -17,46 +17,39 @@ const ShopContextProvider = (props) => {
     const [token, setToken] = useState('');
 
     const addToCart = async (itemId, size) => {
-        if  (!size) {
+        if (!size) {
             toast.error('Seleccione una talla');
             return;
         }
-      
-        let cartData = structuredClone(cartItems);
-
-        if (cartData[itemId]) {
-           if (!cartData[itemId][size]) {
-                cartData[itemId][size] = 1;
-           }else {
-            cartData[itemId][size] += 1;
-           }
-        } 
-        else {
-            cartData[itemId] = {};
-            cartData[itemId][size] = 1;
-        }
-
-        setCartItems(cartData);
 
         if (token) {
             try {
-                await axios.post(
-                    `${backendUrl}/api/cart/add`, 
-                    {itemId, size}, 
+                const response = await axios.post(
+                    `${backendUrl}/api/cart/add`,
+                    { itemId, size },
                     {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     }
                 );
+
+                if (response.data.success) {
+                    setCartItems(response.data.cartData);
+                }
             } catch (error) {
                 console.error('Error al agregar al carrito:', error);
-                if (error.response?.status !== 401) {
-                    toast.error('Error al agregar al carrito');
-                }
+                toast.error('Error al agregar al carrito');
             }
+        } else {
+            let cartData = structuredClone(cartItems);
+            if (!cartData[itemId]) {
+                cartData[itemId] = {};
+            }
+            cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
+            setCartItems(cartData);
         }
-    }
+    };
 
     const getCartCount = () => {
         let totalCount = 0;
@@ -76,16 +69,41 @@ const ShopContextProvider = (props) => {
 
 
     const updateQuantity = async (itemId, size, quantity) => {
-        let cartData = structuredClone(cartItems);
-        cartData[itemId][size] = quantity;
-        setCartItems(cartData);
-        
         if (token) {
-            await axios.post(
-                `${backendUrl}/api/cart/update`, {itemId, size, quantity}, {headers: {token}}
-            );
+            try {
+                const response = await axios.post(
+                    `${backendUrl}/api/cart/update`,
+                    { itemId, size, quantity },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (response.data.success) {
+                    setCartItems(response.data.cartData);
+                }
+            } catch (error) {
+                console.error('Error al actualizar el carrito:', error);
+                toast.error('Error al actualizar el carrito');
+            }
+        } else {
+            let cartData = structuredClone(cartItems);
+            if (quantity === 0) {
+                if (cartData[itemId]) {
+                    delete cartData[itemId][size];
+                    if (Object.keys(cartData[itemId]).length === 0) {
+                        delete cartData[itemId];
+                    }
+                }
+            } else {
+                if (!cartData[itemId]) cartData[itemId] = {};
+                cartData[itemId][size] = quantity;
+            }
+            setCartItems(cartData);
         }
-    }
+    };
 
     const getCartAmount = () => {
         let totalAmount = 0;
@@ -131,27 +149,49 @@ const ShopContextProvider = (props) => {
             );
             
             if (response.data.success) {
-                setCartItems(response.data.cartData);
+                setCartItems(response.data.cartData || {});
             }
         } catch (error) {
             if (error.response?.status === 401 || error.response?.status === 404) {
-                setCartItems({});
                 return;
             }
             console.error('Error al obtener el carrito:', error);
-            toast.error('Error al obtener el carrito');
         }
     }
 
     useEffect(() => {
-        getProductsData();
-        
-        const storedToken = localStorage.getItem('token');
-        if (storedToken && !token) {
-            setToken(storedToken);
-            getUserCart(storedToken);
-        }
-    }, []);
+        const initializeApp = async () => {
+            try {
+                await getProductsData();
+                
+                const storedToken = localStorage.getItem('token');
+                if (storedToken) {
+                    setToken(storedToken);
+                    const cartResponse = await axios.post(
+                        `${backendUrl}/api/cart/get`,
+                        {},
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${storedToken}`
+                            }
+                        }
+                    );
+                    
+                    if (cartResponse.data.success) {
+                        setCartItems(cartResponse.data.cartData || {});
+                    }
+                }
+            } catch (error) {
+                console.error('Error en la inicialización:', error);
+                if (error.response?.status === 401) {
+                    localStorage.removeItem('token');
+                    setToken('');
+                }
+            }
+        };
+
+        initializeApp();
+    }, [backendUrl]);
 
     useEffect(() => {
         const syncCart = async () => {
@@ -166,24 +206,28 @@ const ShopContextProvider = (props) => {
                             }
                         }
                     );
+                    
                     if (response.data.success) {
-                        setCartItems(response.data.cartData);
+                        setCartItems(response.data.cartData || {});
                     }
                 } catch (error) {
-                    if (error.response?.status === 401 || error.response?.status === 404) {
-                        setCartItems({});
-                        return;
-                    }
                     console.error('Error al sincronizar el carrito:', error);
-                    toast.error('Error al sincronizar el carrito');
                 }
             }
         };
 
-        if (token) {
-            syncCart();
+        syncCart();
+    }, [token, backendUrl]);
+
+    const updateToken = (newToken) => {
+        setToken(newToken);
+        if (newToken) {
+            localStorage.setItem('token', newToken);
+        } else {
+            localStorage.removeItem('token');
+            setCartItems({});
         }
-    }, [token]);
+    };
 
     const value = {
         products , currency , delivery_fee, 
@@ -191,7 +235,7 @@ const ShopContextProvider = (props) => {
         cartItems, addToCart, setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
-        token, setToken,
+        token, setToken: updateToken,
     }
 
   return (
