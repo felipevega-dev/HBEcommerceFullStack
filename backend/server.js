@@ -11,6 +11,7 @@ import orderRouter from './routes/orderRoute.js';
 import uploadRouter from './routes/uploadRoute.js';
 import reviewRouter from './routes/reviewRoute.js';
 import categoryRouter from './routes/categoryRoute.js';
+import mercadoPagoRouter from './routes/mercadoPagoRoute.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -35,6 +36,7 @@ const initializeServer = async () => {
         app.use('/api/upload', uploadRouter);
         app.use('/api/review', reviewRouter);
         app.use('/api/category', categoryRouter);
+        app.use('/api/mercadopago', mercadoPagoRouter);
         app.get('/', (req, res) => res.send('API running'));
 
         // Inicializar algunas categorías por defecto si no existen
@@ -74,6 +76,7 @@ const initializeServer = async () => {
             console.log(chalk.yellow('→') + ' /api/upload');
             console.log(chalk.yellow('→') + ' /api/review');
             console.log(chalk.yellow('→') + ' /api/category');
+            console.log(chalk.yellow('→') + ' /api/mercadopago');
             console.log('\n' + chalk.green('¡Servidor listo para recibir peticiones!') + '\n');
         });
 

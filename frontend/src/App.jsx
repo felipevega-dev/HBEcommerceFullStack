@@ -15,6 +15,9 @@ import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PaymentSuccess from './pages/PaymentSuccess'
+import PaymentFailure from './pages/PaymentFailure'
+import PaymentPending from './pages/PaymentPending'
 
 const App = () => {
   return (
@@ -33,6 +36,9 @@ const App = () => {
         <Route path='/place-order' element={<PlaceOrder />} />
         <Route path='/orders' element={<Orders />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/payment/success' element={<PaymentSuccess />} />
+        <Route path='/payment/failure' element={<PaymentFailure />} />
+        <Route path='/payment/pending' element={<PaymentPending />} />
       </Routes>
       <Footer />
     </div>

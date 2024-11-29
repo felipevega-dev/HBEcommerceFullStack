@@ -5,11 +5,13 @@ import { assets } from '../assets/assets';
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
   const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
   const [savedAddresses, setSavedAddresses] = useState([]);
+  const [preferenceId, setPreferenceId] = useState(null);
 
   const [formData, setFormData] = useState({
     firstname: '',
@@ -64,6 +66,10 @@ const PlaceOrder = () => {
     }
   }, [token, backendUrl]);
 
+  useEffect(() => {
+    initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+  }, []);
+
   const handleUseSavedAddress = (address) => {
     setFormData({
       firstname: address.firstname || '',
@@ -88,12 +94,9 @@ const PlaceOrder = () => {
     setFormData({...formData, [name]: value});
   }
 
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-
+  const createPreference = async () => {
     try {
-      let orderItems = []
-
+      let orderItems = [];
       for (const items in cartItems) {
         for (const item in cartItems[items]) {
           if (cartItems[items][item] > 0) {
@@ -106,65 +109,126 @@ const PlaceOrder = () => {
           }
         }
       }
-      
-      let orderData = {
-        address: formData,
+
+      // Asegurarnos de que el token esté incluido en los headers
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const data = {
         items: orderItems,
         amount: getCartAmount() + delivery_fee,
+        address: formData
+      };
+
+      const response = await axios.post(
+        `${backendUrl}/api/mercadopago/create-preference`,
+        data,
+        config
+      );
+
+      if (response.data.success) {
+        setPreferenceId(response.data.preferenceId);
+      } else {
+        console.error('Error en la respuesta:', response.data);
+        toast.error('Error al crear la preferencia de pago');
       }
+    } catch (error) {
+      console.error('Error completo:', error);
+      console.error('Error response:', error.response);
+      toast.error('Error al procesar el pago');
+    }
+  };
 
-      // Guardar nueva dirección si no existe ya
-      if (savedAddresses.length < 2) {
-        const addressExists = savedAddresses.some(addr => 
-          addr.street === formData.street && 
-          addr.city === formData.city
-        );
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
 
-        if (!addressExists) {
-          try {
-            await axios.put(
-              `${backendUrl}/api/user/profile`,
-              {
-                billingAddresses: [...savedAddresses, formData]
-              },
-              {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
+    if (!formData.firstname || !formData.email || !formData.street) {
+      toast.error('Por favor complete todos los campos requeridos');
+      return;
+    }
+
+    if (method === 'mercadopago') {
+      await createPreference();
+    } else {
+      try {
+        let orderItems = []
+
+        for (const items in cartItems) {
+          for (const item in cartItems[items]) {
+            if (cartItems[items][item] > 0) {
+              const itemInfo = structuredClone(products.find(product => product._id === items));
+              if (itemInfo) {
+                itemInfo.size = item;
+                itemInfo.quantity = cartItems[items][item];
+                orderItems.push(itemInfo);
               }
-            );
-            toast.success('Nueva dirección guardada');
-          } catch (error) {
-            console.error('Error al guardar nueva dirección:', error);
+            }
           }
         }
-      }
+        
+        let orderData = {
+          address: formData,
+          items: orderItems,
+          amount: getCartAmount() + delivery_fee,
+        }
 
-      // Proceder con la orden según el método de pago
-      switch (method) {
-        case 'cod':
-          const response = await axios.post(`${backendUrl}/api/order/place`, orderData, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+        // Guardar nueva dirección si no existe ya
+        if (savedAddresses.length < 2) {
+          const addressExists = savedAddresses.some(addr => 
+            addr.street === formData.street && 
+            addr.city === formData.city
+          );
+
+          if (!addressExists) {
+            try {
+              await axios.put(
+                `${backendUrl}/api/user/profile`,
+                {
+                  billingAddresses: [...savedAddresses, formData]
+                },
+                {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                }
+              );
+              toast.success('Nueva dirección guardada');
+            } catch (error) {
+              console.error('Error al guardar nueva dirección:', error);
             }
-          });
-          
-          if (response.data.success) {
-            setCartItems({});
-            toast.success('Orden creada exitosamente');
-            navigate('/orders');
-          } else {
-            toast.error(response.data.message);
           }
-          break;
-        default:
-          break;
-      }
+        }
 
-    } catch (error) {
-      console.error('Error al crear la orden:', error);
-      toast.error(error.response?.data?.message || 'Error al crear la orden');
+        // Proceder con la orden según el método de pago
+        switch (method) {
+          case 'cod':
+            const response = await axios.post(`${backendUrl}/api/order/place`, orderData, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (response.data.success) {
+              setCartItems({});
+              toast.success('Orden creada exitosamente');
+              navigate('/orders');
+            } else {
+              toast.error(response.data.message);
+            }
+            break;
+          default:
+            break;
+        }
+
+      } catch (error) {
+        console.error('Error al crear la orden:', error);
+        toast.error(error.response?.data?.message || 'Error al crear la orden');
+      }
     }
   }
 
@@ -237,7 +301,7 @@ const PlaceOrder = () => {
           <div className='flex gap-3 flex-col lg:flex-row'>
             <div onClick={() => setMethod('mercadopago')} className='flex items-center gap-3 border p-2 px-3 cursor-pointer'>
               <p className={`min-w-3.5 h-3.5 border rounded-full ${method === 'mercadopago' ? 'bg-green-400' : ''}`}></p>
-              <img className='h-5 mx-4' src={assets.mercadopago_logo} alt="card" />
+              <img className='h-5 mx-4' src={assets.mercadopago_logo} alt="MercadoPago" />
             </div>
             <div onClick={() => setMethod('paypal')} className='flex items-center gap-3 border p-2 px-3 cursor-pointer'>
               <p className={`min-w-3.5 h-3.5 border rounded-full ${method === 'paypal' ? 'bg-green-400' : ''}`}></p>
@@ -248,13 +312,41 @@ const PlaceOrder = () => {
               <p className='text-gray-500 text-sm font-medium mx-4'>POR PAGAR A DOMICILIO</p>
             </div>
           </div>
-        </div>
-        <div className='w-full text-end mt-8'>
-          <button type="submit" className='bg-black text-white px-16 py-3 text-sm'>
-            HACER PEDIDO
-          </button>
-        </div>
 
+          {/* Contenedor para el botón de MercadoPago */}
+          {method === 'mercadopago' && !preferenceId && (
+            <div className='w-full text-end mt-8'>
+              <button 
+                type="submit" 
+                className='bg-black text-white px-16 py-3 text-sm'
+              >
+                Continuar con MercadoPago
+              </button>
+            </div>
+          )}
+
+          {/* Contenedor para el Wallet de MercadoPago */}
+          {method === 'mercadopago' && preferenceId && (
+            <div className="mt-8">
+              <Wallet
+                initialization={{ preferenceId }}
+                customization={{ texts: { valueProp: 'smart_option' } }}
+              />
+            </div>
+          )}
+
+          {/* Botón de hacer pedido (solo visible para otros métodos) */}
+          {method !== 'mercadopago' && (
+            <div className='w-full text-end mt-8'>
+              <button 
+                type="submit" 
+                className='bg-black text-white px-16 py-3 text-sm'
+              >
+                HACER PEDIDO
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </form>
   )
