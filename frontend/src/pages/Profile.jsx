@@ -3,6 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Title from '../components/Title';
+import { assets } from '../assets/assets';
 
 const Profile = () => {
   const { token, navigate, backendUrl } = useContext(ShopContext);
@@ -26,6 +27,7 @@ const Profile = () => {
     country: '',
     isDefault: false
   });
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -184,6 +186,53 @@ const Profile = () => {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+        // Convertir la imagen a base64
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            try {
+                // Subir la imagen a Cloudinary
+                const uploadResponse = await axios.post(
+                    `${backendUrl}/api/upload`,
+                    { image: reader.result },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (uploadResponse.data.success) {
+                    // Actualizar el perfil del usuario con la nueva URL
+                    const response = await axios.put(
+                        `${backendUrl}/api/user/profile`,
+                        { profileImage: uploadResponse.data.url },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                    if (response.data.success) {
+                        setUser(response.data.user);
+                        toast.success('Foto de perfil actualizada');
+                    }
+                }
+            } catch (error) {
+                toast.error('Error al actualizar la foto de perfil');
+            }
+        };
+    } catch (error) {
+        toast.error('Error al procesar la imagen');
+    }
+  };
+
   if (loading) {
     return <div className="p-4">Cargando...</div>;
   }
@@ -197,6 +246,28 @@ const Profile = () => {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Información Personal */}
         <div className="bg-white p-6 rounded-lg shadow">
+          <div className="mb-6 flex flex-col items-center">
+            <div className="relative">
+              <img
+                src={user?.profileImage || assets.profiledefault}
+                alt="Profile"
+                className="w-24 h-24 rounded-full object-cover"
+              />
+              <label className="absolute bottom-0 right-0 bg-black text-white p-2 rounded-full cursor-pointer">
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </label>
+            </div>
+          </div>
+
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-medium">Información Personal</h3>
             <div className="flex gap-2">
@@ -402,7 +473,16 @@ const Profile = () => {
 
         {/* Pedidos Recientes */}
         <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-xl font-medium mb-4">Pedidos Recientes</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-medium">Pedidos Recientes</h3>
+            <button
+              onClick={() => navigate('/orders')}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Ver todos los pedidos →
+            </button>
+          </div>
+          
           {recentOrders.length > 0 ? (
             <div className="space-y-4">
               {recentOrders.map((order) => (
@@ -412,14 +492,22 @@ const Profile = () => {
                     {new Date(order.date).toLocaleDateString()}
                   </p>
                   <p className="text-sm">Total: ${order.amount}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`w-2 h-2 rounded-full ${
-                      order.status === 'pending' ? 'bg-yellow-500' :
-                      order.status === 'processing' ? 'bg-blue-500' :
-                      order.status === 'shipped' ? 'bg-green-500' :
-                      'bg-gray-500'
-                    }`}></span>
-                    <span className="text-sm">{order.status}</span>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${
+                        order.status === 'pending' ? 'bg-yellow-500' :
+                        order.status === 'processing' ? 'bg-blue-500' :
+                        order.status === 'shipped' ? 'bg-green-500' :
+                        'bg-gray-500'
+                      }`}></span>
+                      <span className="text-sm">{order.status}</span>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/orders?highlight=${order._id}`)}
+                      className="text-sm text-gray-600 hover:text-gray-800"
+                    >
+                      Ver detalles →
+                    </button>
                   </div>
                 </div>
               ))}

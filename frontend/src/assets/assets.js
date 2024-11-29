@@ -85,7 +85,7 @@ import logo_footer from './logo2.png'
 import carrito from './carrito.png'
 import dropdown_icon2 from './dropdown_icon2.png'
 import carritofb from './carritofb.png'
-
+import profiledefault from './profiledefault.png'
 
 export const assets = {
     logo,
@@ -118,4 +118,5 @@ export const assets = {
     carrito,
     carritofb,
     dropdown_icon2,
+    profiledefault
 }
