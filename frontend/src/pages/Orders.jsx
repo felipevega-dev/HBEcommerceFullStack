@@ -13,15 +13,17 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      if (!token) {
-        navigate('/login');
+      const storedToken = localStorage.getItem('token');
+      
+      if (!token && !storedToken) {
+        navigate('/login', { state: { from: '/orders' } });
         return;
       }
 
       try {
         const response = await axios.get(`${backendUrl}/api/order/user-orders`, {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token || storedToken}`
           }
         });
 
@@ -32,7 +34,11 @@ const Orders = () => {
         }
       } catch (error) {
         console.error('Error al obtener órdenes:', error);
-        toast.error('Error al cargar las órdenes');
+        if (error.response?.status === 401) {
+          navigate('/login', { state: { from: '/orders' } });
+        } else {
+          toast.error('Error al cargar las órdenes');
+        }
       } finally {
         setLoading(false);
       }
@@ -68,6 +74,7 @@ const Orders = () => {
       case 'pending': return 'bg-yellow-500';
       case 'processing': return 'bg-blue-500';
       case 'shipped': return 'bg-green-500';
+      case 'delivered': return 'bg-purple-500';
       default: return 'bg-gray-500';
     }
   };
@@ -77,6 +84,7 @@ const Orders = () => {
       case 'pending': return 'Pendiente';
       case 'processing': return 'En proceso';
       case 'shipped': return 'Enviado';
+      case 'delivered': return 'Entregado';
       default: return 'Estado desconocido';
     }
   };

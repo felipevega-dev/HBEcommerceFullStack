@@ -1,12 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { ShopContext } from '../context/ShopContext';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Login');
   const {token, setToken, navigate, backendUrl} = useContext(ShopContext);
-
+  const location = useLocation();
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,9 +45,11 @@ const Login = () => {
 
   useEffect(() => {
     if (token) {
-      navigate('/');
+      // Redirigir a la página original o a home si no hay página original
+      const from = location.state?.from || '/';
+      navigate(from);
     }
-  }, [token, navigate]);
+  }, [token, navigate, location]);
 
   return (
     <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800'>

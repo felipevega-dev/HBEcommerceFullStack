@@ -103,9 +103,48 @@ const userOrders = async (req, res) => {
 // Update order status from admin panel
 const updateStatus = async (req, res) => {
     try {
+        const { orderId, status } = req.body;
         
+        if (!orderId || !status) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order ID and status are required'
+            });
+        }
+
+        const validStatuses = ['pending', 'processing', 'shipped', 'delivered'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status value'
+            });
+        }
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            orderId,
+            { status },
+            { new: true } // Retorna el documento actualizado
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Order status updated successfully',
+            order: updatedOrder
+        });
+
     } catch (error) {
-        
+        console.error('Error updating order status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating order status'
+        });
     }
 }
 

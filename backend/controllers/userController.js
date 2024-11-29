@@ -2,6 +2,7 @@ import userModel from '../models/userModel.js';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import orderModel from '../models/orderModel.js';
 
 const createToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '1d'});
@@ -55,17 +56,34 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Crear nuevo usuario
-    const newUser = await userModel({name, email, password: hashedPassword});
+    // Crear nuevo usuario con la estructura actualizada
+    const newUser = new userModel({
+        name,
+        email,
+        password: hashedPassword,
+        cartData: {},
+        billingAddresses: [], // Inicializar el array vacío de direcciones
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    });
     
     const user = await newUser.save();
 
     const token = createToken(user._id);
 
-    res.json({success: true, message: 'Usuario creado exitosamente', token});
+    res.json({
+        success: true,
+        message: 'Usuario creado exitosamente',
+        token
+    });
    } catch (error) {
-     console.log(error);
-     res.json({success: false, message: error.message});
+     console.error('Error al registrar usuario:', error);
+     // Mejorar el mensaje de error para debugging
+     res.status(400).json({
+         success: false,
+         message: error.message || 'Error al crear usuario',
+         details: error.errors // Incluir detalles de validación si existen
+     });
    }
 }
 
@@ -91,5 +109,86 @@ const adminLogin = async (req, res) => {
     }
 }
 
-export {loginUser, registerUser, adminLogin};
+const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await userModel.findById(userId).select('-password');
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        // Obtener las últimas órdenes del usuario
+        const recentOrders = await orderModel
+            .find({ userId })
+            .sort({ date: -1 })
+            .limit(5);
+
+        res.json({
+            success: true,
+            user,
+            recentOrders
+        });
+
+    } catch (error) {
+        console.error('Error al obtener perfil:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener información del perfil'
+        });
+    }
+};
+
+const updateUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const updates = req.body;
+        
+        // Eliminar campos que no queremos que el usuario actualice
+        delete updates.password;
+        delete updates.email;
+        
+        // Validar límite de direcciones
+        if (updates.billingAddresses && updates.billingAddresses.length > 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'No se pueden guardar más de 2 direcciones'
+            });
+        }
+
+        // Actualizar fecha de modificación
+        updates.updatedAt = Date.now();
+
+        const user = await userModel.findByIdAndUpdate(
+            userId,
+            { $set: updates },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Perfil actualizado correctamente',
+            user
+        });
+
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al actualizar el perfil'
+        });
+    }
+};
+
+export {loginUser, registerUser, adminLogin, getUserProfile, updateUserProfile};
 

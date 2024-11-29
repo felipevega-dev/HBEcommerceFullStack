@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
 import { assets } from '../assets/assets';
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
   const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+  const [savedAddresses, setSavedAddresses] = useState([]);
 
   const [formData, setFormData] = useState({
     firstname: '',
@@ -22,10 +23,68 @@ const PlaceOrder = () => {
     phone: ''
   });
 
+  // Cargar direcciones guardadas del usuario
+  useEffect(() => {
+    const fetchUserAddresses = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/user/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.data.success && response.data.user.billingAddresses) {
+          setSavedAddresses(response.data.user.billingAddresses);
+          
+          // Buscar la dirección predeterminada
+          const defaultAddress = response.data.user.billingAddresses.find(addr => addr.isDefault);
+          
+          // Si existe una dirección predeterminada, usarla automáticamente
+          if (defaultAddress) {
+            setFormData({
+              firstname: defaultAddress.firstname || '',
+              lastname: defaultAddress.lastname || '',
+              email: response.data.user.email || '',
+              street: defaultAddress.street || '',
+              city: defaultAddress.city || '',
+              region: defaultAddress.region || '',
+              postalCode: defaultAddress.postalCode || '',
+              country: defaultAddress.country || '',
+              phone: defaultAddress.phone || ''
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar direcciones:', error);
+      }
+    };
+
+    if (token) {
+      fetchUserAddresses();
+    }
+  }, [token, backendUrl]);
+
+  const handleUseSavedAddress = (address) => {
+    setFormData({
+      firstname: address.firstname || '',
+      lastname: address.lastname || '',
+      email: address.email || '',
+      street: address.street || '',
+      city: address.city || '',
+      region: address.region || '',
+      postalCode: address.postalCode || '',
+      country: address.country || '',
+      phone: address.phone || ''
+    });
+  };
+
+  const getAddressPreview = (address) => {
+    return `${address.street}, ${address.city}`;
+  };
+
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-
     setFormData({...formData, [name]: value});
   }
 
@@ -33,7 +92,6 @@ const PlaceOrder = () => {
     e.preventDefault();
 
     try {
-      console.log('Token being sent:', token);
       let orderItems = []
 
       for (const items in cartItems) {
@@ -55,8 +113,34 @@ const PlaceOrder = () => {
         amount: getCartAmount() + delivery_fee,
       }
 
-      console.log('Order data being sent:', orderData);
+      // Guardar nueva dirección si no existe ya
+      if (savedAddresses.length < 2) {
+        const addressExists = savedAddresses.some(addr => 
+          addr.street === formData.street && 
+          addr.city === formData.city
+        );
 
+        if (!addressExists) {
+          try {
+            await axios.put(
+              `${backendUrl}/api/user/profile`,
+              {
+                billingAddresses: [...savedAddresses, formData]
+              },
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              }
+            );
+            toast.success('Nueva dirección guardada');
+          } catch (error) {
+            console.error('Error al guardar nueva dirección:', error);
+          }
+        }
+      }
+
+      // Proceder con la orden según el método de pago
       switch (method) {
         case 'cod':
           const response = await axios.post(`${backendUrl}/api/order/place`, orderData, {
@@ -64,11 +148,6 @@ const PlaceOrder = () => {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
-          }).catch(error => {
-            console.log('Error response:', error.response?.data);
-            console.log('Error status:', error.response?.status);
-            console.log('Error headers:', error.response?.headers);
-            throw error;
           });
           
           if (response.data.success) {
@@ -84,7 +163,7 @@ const PlaceOrder = () => {
       }
 
     } catch (error) {
-      console.error('Error completo al crear la orden:', error);
+      console.error('Error al crear la orden:', error);
       toast.error(error.response?.data?.message || 'Error al crear la orden');
     }
   }
@@ -93,11 +172,43 @@ const PlaceOrder = () => {
     <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
       {/* Left Side */}
       <div className='flex flex-col gap-4 w-full sm:max-w-[480px]'>
-      
-
         <div className='text-xl sm:text-2xl my-3'>
           <Title text1={'INFORMACIÓN DEL'} text2='ENVÍO' />
         </div>
+
+        {/* Direcciones guardadas */}
+        {savedAddresses.length > 0 && (
+          <div className="mb-6">
+            <p className="text-sm font-medium text-gray-700 mb-3">Direcciones guardadas:</p>
+            <div className="flex flex-col gap-2">
+              {savedAddresses.map((address, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => handleUseSavedAddress(address)}
+                  className={`flex justify-between items-center w-full px-4 py-3 text-left border ${
+                    address.isDefault ? 'border-black' : 'border-gray-300'
+                  } rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black`}
+                >
+                  <div>
+                    <p className="font-medium text-sm">
+                      Utilizar dirección: {getAddressPreview(address)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {address.firstname} {address.lastname}
+                    </p>
+                  </div>
+                  {address.isDefault && (
+                    <span className="text-xs bg-black text-white px-2 py-1 rounded">
+                      Predeterminada
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className='flex gap-3'>
           <input required onChange={onChangeHandler} name='firstname' value={formData.firstname} className='border border-gray-300 rounded px-3.5 py-1.5 w-full' type="text" placeholder='Nombre' />
           <input required onChange={onChangeHandler} name='lastname' value={formData.lastname} className='border border-gray-300 rounded px-3.5 py-1.5 w-full' type="text" placeholder='Apellido' />

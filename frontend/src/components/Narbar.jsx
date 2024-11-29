@@ -58,7 +58,7 @@ const Narbar = () => {
                 {token && (
                     <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4'>
                         <div className='flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 shadow-lg'>
-                            <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer'>Mi cuenta</p>
+                            <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer' onClick={() => navigate('/profile')}>Mi cuenta</p>
                             <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer' onClick={() => navigate('/orders')}>Mis compras</p>  
                             <p className='text-sm hover:bg-slate-200 p-1 rounded cursor-pointer' onClick={logout}>Desconectarse</p>
                         </div>
