@@ -25,11 +25,27 @@ const Add = ({token}) => {
   const [showNewSubcategoryInput, setShowNewSubcategoryInput] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [newSubcategory, setNewSubcategory] = useState('')
+  const [selectedColors, setSelectedColors] = useState([]);
 
   const availableColors = [
     'Negro', 'Blanco', 'Gris', 'Rojo', 'Azul', 'Verde', 
     'Amarillo', 'Rosa', 'Morado', 'Naranja', 'Marrón', 'Beige'
   ];
+
+  const colorMap = {
+    'Negro': '#000000',
+    'Blanco': '#FFFFFF',
+    'Gris': '#808080',
+    'Rojo': '#FF0000',
+    'Azul': '#0000FF',
+    'Verde': '#008000',
+    'Amarillo': '#FFFF00',
+    'Rosa': '#FFC0CB',
+    'Morado': '#800080',
+    'Naranja': '#FFA500',
+    'Marrón': '#8B4513',
+    'Beige': '#F5F5DC'
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -142,8 +158,8 @@ const Add = ({token}) => {
         return;
       }
 
-      if (!color) {
-        toast.error('Selecciona un color');
+      if (selectedColors.length === 0) {
+        toast.error('Selecciona al menos un color');
         return;
       }
 
@@ -153,7 +169,7 @@ const Add = ({token}) => {
       formData.append('price', price)
       formData.append('category', category)
       formData.append('subcategory', subcategory)
-      formData.append('color', color)
+      formData.append('colors', JSON.stringify(selectedColors))
       formData.append('bestseller', bestseller)
       formData.append('sizes', JSON.stringify(sizes))
 
@@ -371,26 +387,42 @@ const Add = ({token}) => {
         </div>
 
         <div className='flex flex-col gap-2 w-full'>
-          <p className='text-lg font-semibold mb-2'>Color</p>
+          <p className='text-lg font-semibold mb-2'>Colores</p>
           <div className='grid grid-cols-3 sm:grid-cols-4 gap-2'>
             {availableColors.map((colorOption) => (
               <button
                 key={colorOption}
                 type="button"
-                onClick={() => setColor(colorOption)}
-                className={`px-4 py-2 border rounded-md ${
-                  color === colorOption 
-                    ? 'bg-black text-white' 
-                    : 'hover:bg-gray-50'
-                }`}
+                onClick={() => {
+                  setSelectedColors(prev => 
+                    prev.includes(colorOption)
+                      ? prev.filter(c => c !== colorOption)
+                      : [...prev, colorOption]
+                  );
+                }}
+                className={`px-4 py-2 rounded-md transition-all`}
+                style={{
+                  backgroundColor: selectedColors.includes(colorOption) ? colorMap[colorOption] : 'white',
+                  color: selectedColors.includes(colorOption) ? 
+                    ['Blanco', 'Amarillo', 'Beige'].includes(colorOption) ? 'black' : 'white' 
+                    : 'black',
+                  border: selectedColors.includes(colorOption) && colorOption === 'Blanco' 
+                    ? '2px solid black'
+                    : '1px solid #e5e7eb'
+                }}
               >
                 {colorOption}
               </button>
             ))}
           </div>
+          <p className="text-sm text-gray-500 mt-1">
+            Colores seleccionados: {selectedColors.join(', ')}
+          </p>
         </div>
 
-        <button type='submit' className='w-28 py-3 mt-4 bg-black text-white rounded-md'>SUBIR</button>
+        <div className="w-full flex justify-end">
+          <button type='submit' className='w-28 py-3 mt-4 bg-black text-white rounded-md'>SUBIR</button>
+        </div>
 
     </form>
   )

@@ -30,10 +30,20 @@ const EditProduct = ({ token }) => {
   const [newSubcategory, setNewSubcategory] = useState('');
   const [selectedColors, setSelectedColors] = useState([]);
 
-  const availableColors = [
-    'Negro', 'Blanco', 'Gris', 'Rojo', 'Azul', 'Verde', 
-    'Amarillo', 'Rosa', 'Morado', 'Naranja', 'Marrón', 'Beige'
-  ];
+  const colorMap = {
+    'Negro': '#000000',
+    'Blanco': '#FFFFFF',
+    'Gris': '#808080',
+    'Rojo': '#FF0000',
+    'Azul': '#0000FF',
+    'Verde': '#008000',
+    'Amarillo': '#FFFF00',
+    'Rosa': '#FFC0CB',
+    'Morado': '#800080',
+    'Naranja': '#FFA500',
+    'Marrón': '#8B4513',
+    'Beige': '#F5F5DC'
+  };
 
   const fetchProduct = async () => {
     try {
@@ -121,13 +131,13 @@ const EditProduct = ({ token }) => {
   const handleDragEnd = (result) => {
     if (!result.destination) return;
     
-    const newImages = Array.from(formData.currentImages);
-    const [reorderedItem] = newImages.splice(result.source.index, 1);
-    newImages.splice(result.destination.index, 0, reorderedItem);
+    const items = Array.from(formData.currentImages);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
     
     setFormData(prev => ({
       ...prev,
-      currentImages: newImages
+      currentImages: items
     }));
   };
 
@@ -397,66 +407,65 @@ const EditProduct = ({ token }) => {
           <label className="ml-2 block text-sm text-gray-900">Best Seller</label>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
             Imágenes actuales (arrastra para reordenar)
           </label>
-          <StrictMode>
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="images" direction="horizontal">
-                {(provided) => (
-                  <div 
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4"
-                  >
-                    {formData.currentImages.map((img, index) => (
-                      <Draggable 
-                        key={img} 
-                        draggableId={img} 
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`relative ${
-                              snapshot.isDragging ? 'z-50' : ''
-                            }`}
-                          >
-                            <div className="relative group">
-                              <img 
-                                src={img} 
-                                alt={`Producto ${index + 1}`} 
-                                className="w-full h-32 object-contain bg-gray-50 rounded"
-                              />
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200">
-                                <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded">
-                                  {index === 0 ? 'Principal' : `${index + 1}º`}
-                                </div>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="droppable" direction="horizontal">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="flex gap-4 flex-wrap"
+                >
+                  {formData.currentImages.map((image, index) => (
+                    <Draggable
+                      key={image}
+                      draggableId={image}
+                      index={index}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={`relative ${snapshot.isDragging ? 'z-10' : ''}`}
+                        >
+                          <div className="relative group">
+                            <img
+                              src={image}
+                              alt={`Imagen ${index + 1}`}
+                              className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg">
+                              <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded">
+                                {index === 0 ? 'Principal' : `${index + 1}º`}
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => setFormData(prev => ({
-                                  ...prev,
-                                  currentImages: prev.currentImages.filter((_, i) => i !== index)
-                                }))}
-                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                              >
-                                ×
-                              </button>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newImages = formData.currentImages.filter((_, i) => i !== index);
+                                setFormData(prev => ({
+                                  ...prev,
+                                  currentImages: newImages
+                                }));
+                              }}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                            >
+                              ×
+                            </button>
                           </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </StrictMode>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
 
         <div>
@@ -505,7 +514,7 @@ const EditProduct = ({ token }) => {
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Colores</label>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {availableColors.map((colorOption) => (
+            {Object.keys(colorMap).map((colorOption) => (
               <button
                 key={colorOption}
                 type="button"
@@ -516,11 +525,16 @@ const EditProduct = ({ token }) => {
                       : [...prev, colorOption]
                   );
                 }}
-                className={`px-4 py-2 border rounded-md ${
-                  selectedColors.includes(colorOption) 
-                    ? 'bg-black text-white' 
-                    : 'hover:bg-gray-50'
-                }`}
+                className={`px-4 py-2 rounded-md transition-all`}
+                style={{
+                  backgroundColor: selectedColors.includes(colorOption) ? colorMap[colorOption] : 'white',
+                  color: selectedColors.includes(colorOption) ? 
+                    ['Blanco', 'Amarillo', 'Beige'].includes(colorOption) ? 'black' : 'white' 
+                    : 'black',
+                  border: selectedColors.includes(colorOption) && colorOption === 'Blanco' 
+                    ? '2px solid black'
+                    : '1px solid #e5e7eb'
+                }}
               >
                 {colorOption}
               </button>

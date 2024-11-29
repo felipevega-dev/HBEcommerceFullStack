@@ -15,13 +15,22 @@ const Collections = () => {
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [sortType, setSortType] = useState('latest');
   const [categories, setCategories] = useState([]);
+  const [showCategories, setShowCategories] = useState(false);
+  const [showSubcategories, setShowSubcategories] = useState(false);
+  const [showColors, setShowColors] = useState(false);
+  const [showSizes, setShowSizes] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12;
 
   // Obtener colores únicos de los productos
   const availableColors = useMemo(() => {
-    return [...new Set(products
-      .filter(product => product.color)
-      .map(product => product.color)
-    )];
+    const colors = new Set();
+    products.forEach(product => {
+      if (product.colors && Array.isArray(product.colors)) {
+        product.colors.forEach(color => colors.add(color));
+      }
+    });
+    return [...colors];
   }, [products]);
 
   // Obtener tallas únicas de los productos
@@ -103,7 +112,9 @@ const Collections = () => {
     }
 
     if (selectedColors.length > 0) {
-      productsCopy = productsCopy.filter(item => selectedColors.includes(item.color));
+      productsCopy = productsCopy.filter(item => 
+        item.colors?.some(color => selectedColors.includes(color))
+      );
     }
 
     if (selectedSizes.length > 0) {
@@ -139,97 +150,186 @@ const Collections = () => {
     .filter(cat => category.length === 0 || category.includes(cat.name))
     .reduce((acc, cat) => [...acc, ...cat.subcategories], []);
 
+  const clearAllFilters = () => {
+    setCategory([]);
+    setSubcategory([]);
+    setSelectedColors([]);
+    setSelectedSizes([]);
+  };
+
+  // Calcular productos para la página actual
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filterProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filterProducts.length / productsPerPage);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
       {/* Left */}
       <div className='min-w-44'>
-        <p onClick={() => setShowFilters(!showFilters)} className='my-2 text-xl flex items-center cursor-pointer gap-2'>
-          FILTROS
-          <img 
-            src={assets.dropdown_icon} 
-            alt='filter' 
-            className={`h-3 sm:hidden ${showFilters ? 'rotate-90' : ''}`} 
-          />
-        </p>
-        
-        {/* Filtro Categorías */}
-        <div className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilters ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>CATEGORÍAS</p>
-          <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
-            {categories.map((cat) => (
-              <p key={cat.name} className='flex gap-2 items-center'>
-                <input 
-                  type='checkbox' 
-                  className='w-3' 
-                  value={cat.name}
-                  checked={category.includes(cat.name)}
-                  onChange={toggleCategory}
-                /> 
-                {cat.name}
-              </p>
-            ))}
-          </div>
+        <div className='flex justify-between items-center'>
+          <p onClick={() => setShowFilters(!showFilters)} 
+             className='my-2 text-xl flex items-center cursor-pointer gap-2'>
+            FILTROS
+            <img 
+              src={assets.dropdown_icon} 
+              alt='filter' 
+              className={`h-3 sm:hidden ${showFilters ? 'rotate-90' : ''}`} 
+            />
+          </p>
+          {(category.length > 0 || subcategory.length > 0 || selectedColors.length > 0 || selectedSizes.length > 0) && (
+            <button
+              onClick={clearAllFilters}
+              className="text-sm text-red-500 hover:text-red-700"
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
 
-        {/* Subcategorías */}
-        <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilters ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>SUBCATEGORÍAS</p>
-          <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
-            {availableSubcategories.map((subcat) => (
-              <p key={subcat} className='flex gap-2 items-center'>
-                <input 
-                  type='checkbox' 
-                  className='w-3' 
-                  value={subcat}
-                  checked={subcategory.includes(subcat)}
-                  onChange={toggleSubcategory}
-                /> 
-                {subcat}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Filtro de Colores */}
-        <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilters ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>COLORES</p>
-          <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
-            {availableColors.map((color) => (
-              <p key={color} className='flex gap-2 items-center'>
-                <input 
-                  type='checkbox' 
-                  className='w-3' 
-                  value={color}
-                  checked={selectedColors.includes(color)}
-                  onChange={() => toggleColor(color)}
-                /> 
-                <span 
-                  className='w-4 h-4 rounded-full inline-block mr-2'
-                  style={{ backgroundColor: color.toLowerCase() }}
-                ></span>
-                {color}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Filtro de Tallas */}
-        <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilters ? '' : 'hidden'} sm:block`}>
-          <p className='mb-3 text-sm font-medium'>TALLAS</p>
-          <div className='flex flex-wrap gap-2'>
-            {availableSizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => toggleSize(size)}
-                className={`px-3 py-1 border rounded ${
-                  selectedSizes.includes(size) 
-                    ? 'bg-black text-white' 
-                    : 'bg-white hover:bg-gray-50'
-                }`}
+        <div className={`space-y-4 ${showFilters ? '' : 'hidden'} sm:block`}>
+          {/* Acordeón de Categorías */}
+          <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setShowCategories(!showCategories)}
+              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+            >
+              <span className="font-medium">Categorías</span>
+              <svg
+                className={`w-4 h-4 transition-transform ${showCategories ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {size}
-              </button>
-            ))}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showCategories && (
+              <div className="p-4">
+                {categories.map((cat) => (
+                  <label key={cat.name} className="flex items-center gap-2 py-1">
+                    <input 
+                      type='checkbox' 
+                      className='w-4 h-4 rounded border-gray-300' 
+                      value={cat.name}
+                      checked={category.includes(cat.name)}
+                      onChange={toggleCategory}
+                    /> 
+                    <span className="text-sm">{cat.name}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Acordeón de Subcategorías */}
+          <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setShowSubcategories(!showSubcategories)}
+              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+            >
+              <span className="font-medium">Subcategorías</span>
+              <svg
+                className={`w-4 h-4 transition-transform ${showSubcategories ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showSubcategories && (
+              <div className="p-4">
+                {availableSubcategories.map((subcat) => (
+                  <label key={subcat} className="flex items-center gap-2 py-1">
+                    <input 
+                      type='checkbox' 
+                      className='w-4 h-4 rounded border-gray-300' 
+                      value={subcat}
+                      checked={subcategory.includes(subcat)}
+                      onChange={toggleSubcategory}
+                    /> 
+                    <span className="text-sm">{subcat}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Acordeón de Colores */}
+          <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setShowColors(!showColors)}
+              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+            >
+              <span className="font-medium">Colores</span>
+              <svg
+                className={`w-4 h-4 transition-transform ${showColors ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showColors && (
+              <div className="p-4">
+                {availableColors.map((color) => (
+                  <label key={color} className="flex items-center gap-2 py-1">
+                    <input 
+                      type="checkbox"
+                      checked={selectedColors.includes(color)}
+                      onChange={() => toggleColor(color)}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span 
+                      className="w-4 h-4 rounded-full inline-block mr-2"
+                      style={{ backgroundColor: color.toLowerCase() }}
+                    />
+                    <span className="text-sm">{color}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Acordeón de Tallas */}
+          <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setShowSizes(!showSizes)}
+              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+            >
+              <span className="font-medium">Tallas</span>
+              <svg
+                className={`w-4 h-4 transition-transform ${showSizes ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showSizes && (
+              <div className="p-4">
+                {availableSizes.map((size) => (
+                  <label key={size} className="flex items-center gap-2 py-1">
+                    <input 
+                      type="checkbox"
+                      checked={selectedSizes.includes(size)}
+                      onChange={() => toggleSize(size)}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span className="text-sm">{size}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -252,7 +352,7 @@ const Collections = () => {
         
         {/* Products */}
         <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6'>
-          {filterProducts.map((item, index) => (
+          {currentProducts.map((item, index) => (
             <ProductItem 
               key={index} 
               name={item.name} 
@@ -262,6 +362,37 @@ const Collections = () => {
             />
           ))}
         </div>
+
+        {/* Paginación */}
+        {filterProducts.length > 0 && (
+          <div className="mt-8 flex justify-center gap-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border rounded-md disabled:opacity-50"
+            >
+              ←
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`px-3 py-1 border rounded-md ${
+                  currentPage === index + 1 ? 'bg-black text-white' : ''
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border rounded-md disabled:opacity-50"
+            >
+              →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
