@@ -14,7 +14,7 @@ const ShopContextProvider = (props) => {
     const [cartItems, setCartItems] = useState({});
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
-    const [token, setToken] = useState('');
+    const [token, setToken] = useState(localStorage.getItem('token') || '');
 
     const addToCart = async (itemId, size, quantity = 1) => {
         if (!size) {
@@ -197,20 +197,19 @@ const ShopContextProvider = (props) => {
         const syncCart = async () => {
             if (token) {
                 try {
-                    const response = await axios.post(
-                        `${backendUrl}/api/cart/get`,
-                        {},
-                        {
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            }
+                    const response = await axios.post(`${backendUrl}/api/cart/get`, {}, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
                         }
-                    );
+                    });
                     
                     if (response.data.success) {
                         setCartItems(response.data.cartData || {});
                     }
                 } catch (error) {
+                    if (error.response?.status === 401) {
+                        updateToken('');
+                    }
                     console.error('Error al sincronizar el carrito:', error);
                 }
             }
@@ -220,14 +219,22 @@ const ShopContextProvider = (props) => {
     }, [token, backendUrl]);
 
     const updateToken = (newToken) => {
-        setToken(newToken);
         if (newToken) {
             localStorage.setItem('token', newToken);
+            setToken(newToken);
         } else {
             localStorage.removeItem('token');
+            setToken('');
             setCartItems({});
         }
     };
+
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+            setToken(storedToken);
+        }
+    }, []);
 
     const value = {
         products , currency , delivery_fee, 

@@ -76,16 +76,14 @@ import cross_icon from './cross_icon.png'
 import mercadopago_logo from './mp_logo.png'
 import paypal_logo from './paypal_logo.png'
 import harrys_logo from './harrys_logo.png'
-import barbie_hero from './polerones/barbie_hero.png'
-import barbie_hero1 from './polerones/barbie_hero1.png'
-import barbie_hero2 from './polerones/barbie_hero2.png'
-import barbie_hero3 from './polerones/barbie_hero3.png'
-import barbie_hero4 from './polerones/barbie_hero4.png'
 import logo_footer from './logo2.png'
 import carrito from './carrito.png'
 import dropdown_icon2 from './dropdown_icon2.png'
 import carritofb from './carritofb.png'
 import profiledefault from './profiledefault.png'
+import logo3 from './logo3.png'
+import facebook_icon from './facebook_icon.png'
+import instagram_icon from './instagram_icon.png'
 
 export const assets = {
     logo,
@@ -109,14 +107,12 @@ export const assets = {
     mercadopago_logo,
     paypal_logo,
     harrys_logo,
-    barbie_hero,
-    barbie_hero1,
-    barbie_hero2,
-    barbie_hero3,
-    barbie_hero4,
     logo_footer,
     carrito,
     carritofb,
     dropdown_icon2,
-    profiledefault
+    profiledefault,
+    logo3,
+    facebook_icon,
+    instagram_icon
 }

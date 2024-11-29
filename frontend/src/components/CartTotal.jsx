@@ -1,33 +1,59 @@
 import React, { useContext } from 'react'
-import { ShopContext } from '../context/ShopContext';
-import Title from './Title';
+import { ShopContext } from '../context/ShopContext'
+import { motion } from 'framer-motion'
 
 const CartTotal = () => {
-    const { getCartAmount, currency, delivery_fee } = useContext(ShopContext);
-  return (
-    <div className='w-full'>
-        <div className='text-2xl'>
-            <Title text1="TOTAL DEL" text2={'CARRITO'}/>
-        </div>
+    const { getCartAmount, currency, delivery_fee } = useContext(ShopContext)
+    const subtotal = getCartAmount()
+    const total = subtotal === 0 ? 0 : subtotal + delivery_fee
 
-        <div className='flex flex-col gap-2 mt-2 text-sm'>
-            <div className='flex justify-between'>
-                <p>Subtotal</p>
-                <p>{currency} {getCartAmount()} CLP</p>
+    return (
+        <motion.div 
+            className='w-full bg-gray-50 p-6 rounded-lg'
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+        >
+            <h2 className='text-xl font-medium mb-4'>
+                Resumen del Pedido
+            </h2>
+
+            <div className='space-y-3 text-sm'>
+                <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Subtotal</span>
+                    <span className='font-medium'>
+                        {currency} {subtotal.toLocaleString('es-CL')} CLP
+                    </span>
+                </div>
+
+                <div className='flex justify-between items-center'>
+                    <span className='text-gray-600'>Envío</span>
+                    <span className='font-medium'>
+                        {currency} {delivery_fee.toLocaleString('es-CL')} CLP
+                    </span>
+                </div>
+
+                <div className='h-px bg-gray-200 my-2'></div>
+
+                <div className='flex justify-between items-center text-base font-medium'>
+                    <span>Total</span>
+                    <motion.span
+                        key={total}
+                        initial={{ scale: 1.1 }}
+                        animate={{ scale: 1 }}
+                        className='text-lg'
+                    >
+                        {currency} {total.toLocaleString('es-CL')} CLP
+                    </motion.span>
+                </div>
+
+                {subtotal > 0 && (
+                    <p className='text-xs text-gray-500 mt-4'>
+                        * Los precios incluyen IVA
+                    </p>
+                )}
             </div>
-            <hr />
-            <div className='flex justify-between'>
-                <p>Envío</p>
-                <p>{currency} {delivery_fee} CLP</p>
-            </div>
-            <hr />
-            <div className='flex justify-between'>
-                <p>Total</p>
-                <p>{currency} {getCartAmount()=== 0 ? 0 : getCartAmount() + delivery_fee} CLP</p>
-            </div>
-        </div>
-    </div>
-  )
+        </motion.div>
+    )
 }
 
 export default CartTotal

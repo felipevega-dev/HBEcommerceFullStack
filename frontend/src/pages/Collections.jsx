@@ -1,61 +1,65 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react'
 import { ShopContext } from '../context/ShopContext'
+import { motion, AnimatePresence } from 'framer-motion'
 import { assets } from '../assets/assets'
-import Title from '../components/Title'
 import ProductItem from '../components/ProductItem'
-import axios from 'axios';
+import axios from 'axios'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 const Collections = () => {
-  const { products, search, showSearch, backendUrl } = useContext(ShopContext);
-  const [showFilters, setShowFilters] = useState(false);
-  const [filterProducts, setFilterProducts] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [subcategory, setSubcategory] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const [selectedSizes, setSelectedSizes] = useState([]);
-  const [sortType, setSortType] = useState('latest');
-  const [categories, setCategories] = useState([]);
-  const [showCategories, setShowCategories] = useState(false);
-  const [showSubcategories, setShowSubcategories] = useState(false);
-  const [showColors, setShowColors] = useState(false);
-  const [showSizes, setShowSizes] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+  const { products, search, showSearch, backendUrl } = useContext(ShopContext)
+  const [showFilters, setShowFilters] = useState(false)
+  const [filterProducts, setFilterProducts] = useState([])
+  const [category, setCategory] = useState([])
+  const [subcategory, setSubcategory] = useState([])
+  const [selectedColors, setSelectedColors] = useState([])
+  const [selectedSizes, setSelectedSizes] = useState([])
+  const [sortType, setSortType] = useState('latest')
+  const [categories, setCategories] = useState([])
+  const [showCategories, setShowCategories] = useState(true)
+  const [showSubcategories, setShowSubcategories] = useState(true)
+  const [showColors, setShowColors] = useState(true)
+  const [showSizes, setShowSizes] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+  const productsPerPage = 12
 
   // Obtener colores únicos de los productos
   const availableColors = useMemo(() => {
-    const colors = new Set();
+    const colors = new Set()
     products.forEach(product => {
       if (product.colors && Array.isArray(product.colors)) {
-        product.colors.forEach(color => colors.add(color));
+        product.colors.forEach(color => colors.add(color))
       }
-    });
-    return [...colors];
-  }, [products]);
+    })
+    return [...colors]
+  }, [products])
 
   // Obtener tallas únicas de los productos
   const availableSizes = useMemo(() => {
-    const sizes = new Set();
+    const sizes = new Set()
     products.forEach(product => {
-      product.sizes.forEach(size => sizes.add(size));
-    });
-    return Array.from(sizes);
-  }, [products]);
+      product.sizes.forEach(size => sizes.add(size))
+    })
+    return Array.from(sizes)
+  }, [products])
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${backendUrl}/api/category`);
+        const response = await axios.get(`${backendUrl}/api/category`)
         if (response.data.success) {
-          setCategories(response.data.categories);
+          setCategories(response.data.categories)
         }
       } catch (error) {
-        console.error('Error al cargar categorías:', error);
+        console.error('Error al cargar categorías:', error)
+      } finally {
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchCategories();
-  }, [backendUrl]);
+    fetchCategories()
+  }, [backendUrl])
 
   const toggleCategory = (e) => {
     if (category.includes(e.target.value)) {
@@ -158,190 +162,227 @@ const Collections = () => {
   };
 
   // Calcular productos para la página actual
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filterProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(filterProducts.length / productsPerPage);
+  const currentProducts = filterProducts.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  )
+  const totalPages = Math.ceil(filterProducts.length / productsPerPage)
 
   // Función para cambiar de página
   const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    setCurrentPage(pageNumber)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
-    <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
-      {/* Left */}
-      <div className='min-w-44'>
-        <div className='flex justify-between items-center'>
-          <p onClick={() => setShowFilters(!showFilters)} 
-             className='my-2 text-xl flex items-center cursor-pointer gap-2'>
-            FILTROS
-            <img 
-              src={assets.dropdown_icon} 
-              alt='filter' 
-              className={`h-3 sm:hidden ${showFilters ? 'rotate-90' : ''}`} 
-            />
-          </p>
-          {(category.length > 0 || subcategory.length > 0 || selectedColors.length > 0 || selectedSizes.length > 0) && (
-            <button
-              onClick={clearAllFilters}
-              className="text-sm text-red-500 hover:text-red-700"
-            >
-              Limpiar filtros
-            </button>
-          )}
+    <motion.div 
+      className='flex flex-col sm:flex-row gap-8 pt-10 border-t'
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      {/* Filtros */}
+      <motion.aside 
+        className='w-full sm:w-64 flex-shrink-0'
+        initial={{ x: -20 }}
+        animate={{ x: 0 }}
+      >
+        <div className='sticky top-24'>
+          <div className='flex justify-between items-center mb-6'>
+            <h2 className='text-xl font-medium'>Filtros</h2>
+            {(category.length > 0 || subcategory.length > 0 || selectedColors.length > 0 || selectedSizes.length > 0) && (
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-red-500 hover:text-red-700"
+              >
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+
+          <div className='space-y-4'>
+            {/* Acordeón de Categorías */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setShowCategories(!showCategories)}
+                className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+              >
+                <span className="font-medium">Categorías</span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${showCategories ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {showCategories && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="p-4"
+                  >
+                    {categories.map((cat) => (
+                      <label key={cat.name} className="flex items-center gap-2 py-1">
+                        <input 
+                          type='checkbox' 
+                          className='w-4 h-4 rounded border-gray-300' 
+                          value={cat.name}
+                          checked={category.includes(cat.name)}
+                          onChange={toggleCategory}
+                        /> 
+                        <span className="text-sm">{cat.name}</span>
+                      </label>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Acordeón de Subcategorías */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setShowSubcategories(!showSubcategories)}
+                className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+              >
+                <span className="font-medium">Subcategorías</span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${showSubcategories ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {showSubcategories && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="p-4"
+                  >
+                    {availableSubcategories.map((subcat) => (
+                      <label key={subcat} className="flex items-center gap-2 py-1">
+                        <input 
+                          type='checkbox' 
+                          className='w-4 h-4 rounded border-gray-300' 
+                          value={subcat}
+                          checked={subcategory.includes(subcat)}
+                          onChange={toggleSubcategory}
+                        /> 
+                        <span className="text-sm">{subcat}</span>
+                      </label>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Acordeón de Colores */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setShowColors(!showColors)}
+                className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+              >
+                <span className="font-medium">Colores</span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${showColors ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {showColors && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="p-4"
+                  >
+                    {availableColors.map((color) => (
+                      <label key={color} className="flex items-center gap-2 py-1">
+                        <input 
+                          type="checkbox"
+                          checked={selectedColors.includes(color)}
+                          onChange={() => toggleColor(color)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span 
+                          className="w-4 h-4 rounded-full inline-block mr-2"
+                          style={{ backgroundColor: color.toLowerCase() }}
+                        />
+                        <span className="text-sm">{color}</span>
+                      </label>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Acordeón de Tallas */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setShowSizes(!showSizes)}
+                className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
+              >
+                <span className="font-medium">Tallas</span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${showSizes ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {showSizes && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="p-4"
+                  >
+                    {availableSizes.map((size) => (
+                      <label key={size} className="flex items-center gap-2 py-1">
+                        <input 
+                          type="checkbox"
+                          checked={selectedSizes.includes(size)}
+                          onChange={() => toggleSize(size)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm">{size}</span>
+                      </label>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
+      </motion.aside>
 
-        <div className={`space-y-4 ${showFilters ? '' : 'hidden'} sm:block`}>
-          {/* Acordeón de Categorías */}
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={() => setShowCategories(!showCategories)}
-              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
-            >
-              <span className="font-medium">Categorías</span>
-              <svg
-                className={`w-4 h-4 transition-transform ${showCategories ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {showCategories && (
-              <div className="p-4">
-                {categories.map((cat) => (
-                  <label key={cat.name} className="flex items-center gap-2 py-1">
-                    <input 
-                      type='checkbox' 
-                      className='w-4 h-4 rounded border-gray-300' 
-                      value={cat.name}
-                      checked={category.includes(cat.name)}
-                      onChange={toggleCategory}
-                    /> 
-                    <span className="text-sm">{cat.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Acordeón de Subcategorías */}
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={() => setShowSubcategories(!showSubcategories)}
-              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
-            >
-              <span className="font-medium">Subcategorías</span>
-              <svg
-                className={`w-4 h-4 transition-transform ${showSubcategories ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {showSubcategories && (
-              <div className="p-4">
-                {availableSubcategories.map((subcat) => (
-                  <label key={subcat} className="flex items-center gap-2 py-1">
-                    <input 
-                      type='checkbox' 
-                      className='w-4 h-4 rounded border-gray-300' 
-                      value={subcat}
-                      checked={subcategory.includes(subcat)}
-                      onChange={toggleSubcategory}
-                    /> 
-                    <span className="text-sm">{subcat}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Acordeón de Colores */}
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={() => setShowColors(!showColors)}
-              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
-            >
-              <span className="font-medium">Colores</span>
-              <svg
-                className={`w-4 h-4 transition-transform ${showColors ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {showColors && (
-              <div className="p-4">
-                {availableColors.map((color) => (
-                  <label key={color} className="flex items-center gap-2 py-1">
-                    <input 
-                      type="checkbox"
-                      checked={selectedColors.includes(color)}
-                      onChange={() => toggleColor(color)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span 
-                      className="w-4 h-4 rounded-full inline-block mr-2"
-                      style={{ backgroundColor: color.toLowerCase() }}
-                    />
-                    <span className="text-sm">{color}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Acordeón de Tallas */}
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={() => setShowSizes(!showSizes)}
-              className="w-full px-5 py-3 flex justify-between items-center bg-gray-50"
-            >
-              <span className="font-medium">Tallas</span>
-              <svg
-                className={`w-4 h-4 transition-transform ${showSizes ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {showSizes && (
-              <div className="p-4">
-                {availableSizes.map((size) => (
-                  <label key={size} className="flex items-center gap-2 py-1">
-                    <input 
-                      type="checkbox"
-                      checked={selectedSizes.includes(size)}
-                      onChange={() => toggleSize(size)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm">{size}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Right */}
+      {/* Productos */}
       <div className='flex-1'>
-        <div className='flex justify-between text-base sm:text-2xl mb-4'> 
-          <Title text1='TODOS' text2='LOS PRODUCTOS'/>
-          {/* Sort */}
+        <div className='flex justify-between items-center mb-8'>
+          <h1 className='text-2xl font-medium'>
+            Todos los Productos
+            <span className='text-sm text-gray-500 ml-2'>
+              ({filterProducts.length} productos)
+            </span>
+          </h1>
+
           <select 
-            className='border-2 border-gray-300 text-sm px-2' 
+            className='px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-200'
             onChange={(e) => setSortType(e.target.value)}
+            value={sortType}
           >
             <option value='latest'>Más recientes</option>
             <option value='oldest'>Más antiguos</option>
@@ -349,53 +390,91 @@ const Collections = () => {
             <option value='price_desc'>Mayor precio</option>
           </select>
         </div>
-        
-        {/* Products */}
-        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6'>
-          {currentProducts.map((item, index) => (
-            <ProductItem 
-              key={index} 
-              name={item.name} 
-              id={item._id} 
-              price={item.price} 
-              image={item.images}
-            />
-          ))}
-        </div>
 
-        {/* Paginación */}
-        {filterProducts.length > 0 && (
-          <div className="mt-8 flex justify-center gap-2">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border rounded-md disabled:opacity-50"
-            >
-              ←
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => paginate(index + 1)}
-                className={`px-3 py-1 border rounded-md ${
-                  currentPage === index + 1 ? 'bg-black text-white' : ''
-                }`}
-              >
-                {index + 1}
-              </button>
+        {isLoading ? (
+          <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6'>
+            {[...Array(12)].map((_, index) => (
+              <div key={index} className='animate-pulse'>
+                <div className='bg-gray-200 rounded-lg aspect-[3/4] mb-3'></div>
+                <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
+                <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+              </div>
             ))}
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border rounded-md disabled:opacity-50"
-            >
-              →
-            </button>
           </div>
+        ) : (
+          <>
+            <motion.div 
+              className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6'
+              layout
+            >
+              <AnimatePresence mode='popLayout'>
+                {currentProducts.map((product) => (
+                  <motion.div
+                    key={product._id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ProductItem
+                      id={product._id}
+                      name={product.name}
+                      price={product.price}
+                      image={product.images}
+                      rating={product.rating}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Paginación */}
+            {filterProducts.length > 0 && (
+              <div className='flex justify-center gap-2 mt-12'>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className='px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed'
+                >
+                  ←
+                </motion.button>
+                
+                {[...Array(totalPages)].map((_, index) => (
+                  <motion.button
+                    key={index}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => paginate(index + 1)}
+                    className={`px-4 py-2 rounded-lg border ${
+                      currentPage === index + 1 
+                        ? 'bg-black text-white' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {index + 1}
+                  </motion.button>
+                ))}
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className='px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed'
+                >
+                  →
+                </motion.button>
+              </div>
+            )}
+          </>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }
 
-export default Collections;
+export default Collections
