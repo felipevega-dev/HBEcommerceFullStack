@@ -64,9 +64,17 @@ const placeOrderPaypal = async (req, res) => {
 // All order data for admin panel
 const allOrders = async (req, res) => {
     try {
-        
+        const orders = await orderModel.find();
+        res.json({
+            success: true,
+            orders
+        });
     } catch (error) {
-        
+        console.error('Error al obtener todas las órdenes:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener todas las órdenes'
+        });
     }
 }
 
