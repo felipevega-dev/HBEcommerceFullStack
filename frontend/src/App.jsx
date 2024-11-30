@@ -23,6 +23,8 @@ const Profile = React.lazy(() => import('./pages/Profile'))
 const PaymentSuccess = React.lazy(() => import('./pages/PaymentSuccess'))
 const PaymentFailure = React.lazy(() => import('./pages/PaymentFailure'))
 const PaymentPending = React.lazy(() => import('./pages/PaymentPending'))
+const Delivery = React.lazy(() => import('./pages/Delivery'))
+const Politicas = React.lazy(() => import('./pages/Politicas'))
 
 const App = () => {
   const location = useLocation()
@@ -68,6 +70,8 @@ const App = () => {
             <Route path='/product/:productId' element={<Product />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/login' element={<Login />} />
+            <Route path='/delivery' element={<Delivery />} />
+            <Route path='/politicas' element={<Politicas />} />
             
             {/* Rutas protegidas */}
             <Route element={<ProtectedRoute />}>

@@ -148,4 +148,39 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { placeOrder, placeOrderMercadoPago, placeOrderPaypal, allOrders, userOrders, updateStatus };
+// Delete order from admin panel
+const deleteOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        
+        if (!orderId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order ID is required'
+            });
+        }
+
+        const deletedOrder = await orderModel.findByIdAndDelete(orderId);
+
+        if (!deletedOrder) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Order deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting order'
+        });
+    }
+}
+
+export { placeOrder, placeOrderMercadoPago, placeOrderPaypal, allOrders, userOrders, updateStatus, deleteOrder };

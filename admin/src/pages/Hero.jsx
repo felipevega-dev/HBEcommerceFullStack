@@ -193,182 +193,197 @@ const Hero = ({ token }) => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Gestionar Hero Slides</h1>
 
-      {/* Formulario para añadir nuevo slide */}
-      <form onSubmit={handleSubmit} className="mb-8 p-4 border rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Añadir Nuevo Slide</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Seleccionar Producto</label>
-            <select
-              value={newSlide.productId}
-              onChange={handleProductSelect}
-              className="w-full p-2 border rounded"
-              required
-            >
-              <option value="">Selecciona un producto</option>
-              {products.map(product => (
-                <option key={product._id} value={product._id}>
-                  {product.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Título del Slide</label>
-            <input
-              type="text"
-              value={newSlide.title}
-              onChange={(e) => setNewSlide(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Subtítulo</label>
-            <input
-              type="text"
-              value={newSlide.subtitle}
-              onChange={(e) => setNewSlide(prev => ({ ...prev, subtitle: e.target.value }))}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          {newSlide.image && (
-            <div>
-              <label className="block text-sm font-medium mb-1">Vista previa</label>
-              <img
-                src={newSlide.image}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded"
-              />
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Añadir Slide
-          </button>
-        </div>
-      </form>
-
-      {/* Lista de slides existentes */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Slides Actuales</h2>
-        {isLoading ? (
-          <p>Cargando...</p>
-        ) : (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="slides">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="space-y-4"
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Columna izquierda: Formulario para añadir nuevo slide */}
+        <div className="lg:sticky lg:top-6">
+          <form onSubmit={handleSubmit} className="p-4 border rounded-lg bg-white shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">Añadir Nuevo Slide</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Seleccionar Producto</label>
+                <select
+                  value={newSlide.productId}
+                  onChange={handleProductSelect}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
                 >
-                  {slides.map((slide, index) => (
-                    <Draggable
-                      key={slide._id}
-                      draggableId={slide._id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="border rounded-lg p-4 bg-white"
-                        >
-                          <div className="flex items-start gap-4">
-                            <img
-                              src={slide.image}
-                              alt={slide.title}
-                              className="w-48 h-32 object-cover rounded"
-                            />
-                            <div className="flex-grow">
-                              {editingSlide?.id === slide._id ? (
-                                <div className="space-y-2">
-                                  <input
-                                    type="text"
-                                    value={editingSlide.title}
-                                    onChange={(e) => setEditingSlide(prev => ({
-                                      ...prev,
-                                      title: e.target.value
-                                    }))}
-                                    className="w-full p-2 border rounded"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={editingSlide.subtitle}
-                                    onChange={(e) => setEditingSlide(prev => ({
-                                      ...prev,
-                                      subtitle: e.target.value
-                                    }))}
-                                    className="w-full p-2 border rounded"
-                                  />
-                                  <div className="flex gap-2">
-                                    <button
-                                      onClick={handleSaveEdit}
-                                      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                                    >
-                                      Guardar
-                                    </button>
-                                    <button
-                                      onClick={() => setEditingSlide(null)}
-                                      className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                    >
-                                      Cancelar
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <>
-                                  <h3 className="font-semibold">{slide.title}</h3>
-                                  <p className="text-gray-600">{slide.subtitle}</p>
-                                  <p className="text-sm text-gray-500">
-                                    Producto: {slide.productId?.name || 'No disponible'}
-                                  </p>
-                                  <div className="flex gap-2 mt-2">
-                                    <button
-                                      onClick={() => handleEdit(slide)}
-                                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                      Editar
-                                    </button>
-                                    <button
-                                      onClick={() => handleDelete(slide._id)}
-                                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                                    >
-                                      Eliminar
-                                    </button>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                            <div className="text-gray-400 cursor-move">
-                              ⋮⋮
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
+                  <option value="">Selecciona un producto</option>
+                  {products.map(product => (
+                    <option key={product._id} value={product._id}>
+                      {product.name}
+                    </option>
                   ))}
-                  {provided.placeholder}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Título del Slide</label>
+                <input
+                  type="text"
+                  value={newSlide.title}
+                  onChange={(e) => setNewSlide(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Subtítulo</label>
+                <input
+                  type="text"
+                  value={newSlide.subtitle}
+                  onChange={(e) => setNewSlide(prev => ({ ...prev, subtitle: e.target.value }))}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              {newSlide.image && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Vista previa</label>
+                  <div className="relative rounded-lg overflow-hidden">
+                    <img
+                      src={newSlide.image}
+                      alt="Preview"
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+                  </div>
                 </div>
               )}
-            </Droppable>
-          </DragDropContext>
-        )}
+
+              <button
+                type="submit"
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              >
+                Añadir Slide
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Columna derecha: Lista de slides existentes */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Slides Actuales</h2>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <p>Cargando...</p>
+            </div>
+          ) : (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="slides">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-4"
+                  >
+                    {slides.map((slide, index) => (
+                      <Draggable
+                        key={slide._id}
+                        draggableId={slide._id}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`border rounded-lg p-4 bg-white shadow-sm transition-shadow ${
+                              snapshot.isDragging ? 'shadow-lg' : ''
+                            }`}
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="relative w-48 h-32 flex-shrink-0">
+                                <img
+                                  src={slide.image}
+                                  alt={slide.title}
+                                  className="w-full h-full object-cover rounded"
+                                />
+                                <div 
+                                  {...provided.dragHandleProps}
+                                  className="absolute top-2 right-2 w-8 h-8 bg-black bg-opacity-50 rounded-full flex items-center justify-center cursor-move hover:bg-opacity-70 transition-all"
+                                >
+                                  <span className="text-white">⋮⋮</span>
+                                </div>
+                              </div>
+                              <div className="flex-grow">
+                                {editingSlide?.id === slide._id ? (
+                                  <div className="space-y-2">
+                                    <input
+                                      type="text"
+                                      value={editingSlide.title}
+                                      onChange={(e) => setEditingSlide(prev => ({
+                                        ...prev,
+                                        title: e.target.value
+                                      }))}
+                                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editingSlide.subtitle}
+                                      onChange={(e) => setEditingSlide(prev => ({
+                                        ...prev,
+                                        subtitle: e.target.value
+                                      }))}
+                                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={handleSaveEdit}
+                                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                      >
+                                        Guardar
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingSlide(null)}
+                                        className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                                      >
+                                        Cancelar
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <h3 className="font-semibold text-lg">{slide.title}</h3>
+                                    <p className="text-gray-600 mt-1">{slide.subtitle}</p>
+                                    <p className="text-sm text-gray-500 mt-2">
+                                      Producto: {slide.productId?.name || 'No disponible'}
+                                    </p>
+                                    <div className="flex gap-2 mt-3">
+                                      <button
+                                        onClick={() => handleEdit(slide)}
+                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                      >
+                                        Editar
+                                      </button>
+                                      <button
+                                        onClick={() => handleDelete(slide._id)}
+                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                      >
+                                        Eliminar
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

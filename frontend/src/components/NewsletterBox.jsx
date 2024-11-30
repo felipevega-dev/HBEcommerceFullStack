@@ -34,7 +34,7 @@ const NewsletterBox = () => {
     }
 
     return (
-        <section className='py-16 bg-gray-50'>
+        <section className='py-8 bg-gray-50'>
             <motion.div 
                 className='max-w-3xl mx-auto px-6 text-center space-y-8'
                 initial={{ opacity: 0, y: 20 }}

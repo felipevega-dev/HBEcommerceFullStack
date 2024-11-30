@@ -8,6 +8,7 @@ import Review, { ReviewForm } from '../components/Review'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { toast } from 'react-toastify'
 import axios from 'axios'
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const Product = () => {
   const { productId } = useParams()
@@ -144,16 +145,18 @@ const Product = () => {
               <motion.button
                 key={index}
                 onClick={() => setCurrentImage(image)}
-                className={`relative rounded-lg overflow-hidden flex-shrink-0 
+                className={`relative rounded-lg overflow-hidden flex-shrink-0 transition-all duration-200
                   ${currentImage === image ? 'ring-2 ring-black' : 'hover:opacity-80'}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <img 
-                  src={image} 
-                  alt={`${productData.name}-${index}`}
-                  className='w-20 h-20 object-cover'
-                />
+                <div className="aspect-square w-20">
+                  <img 
+                    src={image} 
+                    alt={`${productData.name}-${index}`}
+                    className='w-full h-full object-contain'
+                  />
+                </div>
               </motion.button>
             ))}
           </div>
@@ -161,15 +164,52 @@ const Product = () => {
           {/* Main Image */}
           <div className='flex-1'>
             <motion.div
-              className='relative rounded-lg overflow-hidden'
+              className='relative rounded-lg overflow-hidden bg-white'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <img 
-                src={currentImage || productData.images?.[0]} 
-                alt={productData.name}
-                className='w-full h-auto'
-              />
+              <TransformWrapper
+                initialScale={1}
+                minScale={1}
+                maxScale={3}
+                centerOnInit={true}
+                wheel={{ step: 0.1 }}
+              >
+                {({ zoomIn, zoomOut }) => (
+                  <>
+                    <div className="absolute top-4 right-4 z-10 flex gap-2">
+                      <button
+                        onClick={() => zoomIn()}
+                        className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => zoomOut()}
+                        className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+                        </svg>
+                      </button>
+                    </div>
+                    <TransformComponent
+                      wrapperClass="!w-full"
+                      contentClass="!w-full"
+                    >
+                      <div className="aspect-[19/20] w-full">
+                        <img 
+                          src={currentImage || productData.images?.[0]} 
+                          alt={productData.name}
+                          className="w-full h-full object-contain cursor-zoom-in"
+                        />
+                      </div>
+                    </TransformComponent>
+                  </>
+                )}
+              </TransformWrapper>
             </motion.div>
           </div>
         </div>
@@ -257,7 +297,7 @@ const Product = () => {
       </div>
 
       {/* Reviews Section */}
-      <div className='mt-20' id="reviews-section">
+      <div className='mt-10' id="reviews-section">
         <div className='flex border-b'>
           <button
             className={`px-5 py-3 text-sm ${

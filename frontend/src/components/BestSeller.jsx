@@ -37,10 +37,10 @@ const BestSeller = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
             >
-                <h2 className='text-3xl md:text-4xl prata-regular'>
+                <h1 className='text-3xl font-medium'>
                     Los Más Vendidos
-                </h2>
-                <p className='text-gray-600 text-sm md:text-base max-w-2xl mx-auto'>
+                </h1>
+                <p className='text-gray-600 text-sm max-w-2xl mx-auto'>
                     Descubre nuestros productos más populares, elegidos por nuestros clientes
                 </p>
             </motion.div>

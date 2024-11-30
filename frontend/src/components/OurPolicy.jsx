@@ -22,7 +22,7 @@ const OurPolicy = () => {
   ]
 
   return (
-    <section className='py-20 bg-gray-50'>
+    <section className='py-24 bg-gray-50'>
       <div className='max-w-7xl mx-auto px-4'>
         <motion.div 
           className='grid grid-cols-1 sm:grid-cols-3 gap-12'

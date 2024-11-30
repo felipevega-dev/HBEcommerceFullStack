@@ -54,6 +54,31 @@ const Orders = ({token}) => {
     }
   };
 
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar esta orden?')) {
+      return;
+    }
+
+    try {
+      const response = await axios.delete(`${backendUrl}/api/order/${orderId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        setOrders(orders.filter(order => order._id !== orderId));
+        toast.success('Orden eliminada con éxito');
+        setExpandedOrder(null);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast.error('Error al eliminar la orden');
+    }
+  };
+
   const OrderDetails = ({ order }) => (
     <div className="mt-4 bg-gray-50 p-2 md:p-4 rounded-lg">
       <h3 className="font-medium text-gray-700 mb-3">Detalles del pedido</h3>
@@ -119,6 +144,12 @@ const Orders = ({token}) => {
               <option value="shipped">Enviado</option>
               <option value="delivered">Entregado</option>
             </select>
+            <button
+              onClick={() => handleDeleteOrder(order._id)}
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+            >
+              Eliminar
+            </button>
           </div>
         </div>
       </div>

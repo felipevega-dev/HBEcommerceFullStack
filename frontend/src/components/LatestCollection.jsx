@@ -37,10 +37,10 @@ const LatestCollection = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
       >
-        <h2 className='text-3xl md:text-4xl prata-regular'>
+        <h1 className='text-3xl font-medium'>
           Últimas Colecciones
-        </h2>
-        <p className='text-gray-600 text-sm md:text-base max-w-2xl mx-auto'>
+        </h1>
+        <p className='text-gray-600 text-sm max-w-2xl mx-auto'>
           Descubre nuestras últimas novedades, diseños exclusivos que reflejan las últimas tendencias en moda
         </p>
       </motion.div>

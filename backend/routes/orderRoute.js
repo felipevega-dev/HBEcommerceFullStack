@@ -1,5 +1,5 @@
 import express from 'express';
-import { placeOrder, placeOrderMercadoPago, placeOrderPaypal, allOrders, userOrders, updateStatus } from '../controllers/orderController.js';
+import { placeOrder, placeOrderMercadoPago, placeOrderPaypal, allOrders, userOrders, updateStatus, deleteOrder } from '../controllers/orderController.js';
 import adminAuth from '../middleware/adminAuth.js';
 import authUser from '../middleware/auth.js';
 
@@ -10,6 +10,7 @@ const orderRouter = express.Router();
 //Admin features
 orderRouter.get('/list', adminAuth, allOrders);
 orderRouter.put('/status', adminAuth, updateStatus);
+orderRouter.delete('/:orderId', adminAuth, deleteOrder);
 
 // Payment features
 orderRouter.post('/place', authUser, placeOrder);
