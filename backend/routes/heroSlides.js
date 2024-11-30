@@ -33,6 +33,76 @@ router.get('/', async (req, res) => {
   }
 });
 
+// IMPORTANTE: Poner la ruta de reorder ANTES de la ruta con :id
+router.put('/reorder', async (req, res) => {
+  try {
+    const { slides } = req.body;
+    console.log('Recibiendo orden nuevo:', slides);
+
+    // Actualizar el orden de cada slide
+    for (let i = 0; i < slides.length; i++) {
+      await HeroSlide.findByIdAndUpdate(
+        slides[i].id,
+        { order: i },
+        { new: true }
+      );
+    }
+
+    // Obtener los slides actualizados
+    const updatedSlides = await HeroSlide.find()
+      .sort({ order: 1, createdAt: -1 })
+      .populate('productId', 'name images _id price');
+
+    res.json({
+      success: true,
+      slides: updatedSlides,
+      message: 'Orden actualizado correctamente'
+    });
+  } catch (error) {
+    console.error('Error al reordenar slides:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Añadir nuevo slide
+router.post('/', async (req, res) => {
+  try {
+    const { title, subtitle, productId, image } = req.body;
+
+    // Obtener el último orden
+    const lastSlide = await HeroSlide.findOne().sort({ order: -1 });
+    const newOrder = lastSlide ? lastSlide.order + 1 : 0;
+
+    const slide = new HeroSlide({
+      title,
+      subtitle,
+      productId,
+      image,
+      order: newOrder // Asignar el nuevo orden
+    });
+
+    const savedSlide = await slide.save();
+    const populatedSlide = await HeroSlide.findById(savedSlide._id)
+      .populate('productId', 'name images _id');
+
+    res.json({ 
+      success: true, 
+      slide: populatedSlide,
+      message: 'Slide creado exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error al crear slide:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message
+    });
+  }
+});
+
 // Actualizar slide
 router.put('/:id', async (req, res) => {
   try {
@@ -62,78 +132,6 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message
-    });
-  }
-});
-
-// Actualizar orden de slides
-router.put('/reorder', async (req, res) => {
-  try {
-    const { slides } = req.body; // Array de { id, order }
-    
-    // Actualizar el orden de cada slide
-    await Promise.all(
-      slides.map(({ id, order }) => 
-        HeroSlide.findByIdAndUpdate(id, { order })
-      )
-    );
-
-    const updatedSlides = await HeroSlide.find()
-      .sort({ order: 1, createdAt: -1 })
-      .populate('productId', 'name images _id price');
-
-    res.json({
-      success: true,
-      slides: updatedSlides,
-      message: 'Orden actualizado correctamente'
-    });
-  } catch (error) {
-    console.error('Error al reordenar slides:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
-// Añadir nuevo slide
-router.post('/', async (req, res) => {
-  try {
-    const { title, subtitle, productId, image } = req.body;
-    console.log('Datos recibidos:', { title, subtitle, productId, image }); // Para debug
-
-    // Verificar que el producto existe
-    const product = await ProductModel.findById(productId);
-    if (!product) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'El producto seleccionado no existe' 
-      });
-    }
-
-    const slide = new HeroSlide({
-      title,
-      subtitle,
-      productId,
-      image
-    });
-
-    const savedSlide = await slide.save();
-    const populatedSlide = await HeroSlide.findById(savedSlide._id)
-      .populate('productId', 'name images _id');
-
-    res.json({ 
-      success: true, 
-      slide: populatedSlide,
-      message: 'Slide creado exitosamente'
-    });
-
-  } catch (error) {
-    console.error('Error al crear slide:', error); // Para debug
-    res.status(500).json({ 
-      success: false, 
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

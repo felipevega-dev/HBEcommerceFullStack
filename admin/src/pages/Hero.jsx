@@ -164,7 +164,7 @@ const Hero = ({ token }) => {
 
     // Enviar nuevo orden al servidor
     try {
-      await axios.put(
+      const response = await axios.put(
         `${backendUrl}/api/hero-slides/reorder`,
         {
           slides: items.map((slide, index) => ({
@@ -173,9 +173,18 @@ const Hero = ({ token }) => {
           }))
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
       );
+
+      if (response.data.success) {
+        toast.success('Orden actualizado correctamente');
+      } else {
+        throw new Error('Error al actualizar el orden');
+      }
     } catch (error) {
       console.error('Error al reordenar slides:', error);
       toast.error('Error al actualizar el orden');
