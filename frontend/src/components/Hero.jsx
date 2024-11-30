@@ -1,35 +1,42 @@
-import React, { useState, useEffect } from 'react'
-import { assets } from '../assets/assets'
+import React, { useState, useEffect, useContext } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { ShopContext } from '../context/ShopContext'
+import axios from 'axios'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { backendUrl } = useContext(ShopContext);
   
-  const slides = [
-    {
-      image: assets.barbie_hero1,
-      title: "Nueva Colección",
-      subtitle: "Primavera 2024"
-    },
-    {
-      image: assets.barbie_hero2,
-      title: "Tendencias",
-      subtitle: "Descubre lo nuevo"
-    },
-    {
-      image: assets.barbie_hero3,
-      title: "Exclusivos",
-      subtitle: "Diseños únicos"
-    },
-    {
-      image: assets.barbie_hero4,
-      title: "Ofertas",
-      subtitle: "Hasta 50% OFF"
-    }
-  ];
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        setIsLoading(true);
+        console.log('Fetching slides from:', `${backendUrl}/api/hero-slides`);
+        const response = await axios.get(`${backendUrl}/api/hero-slides`);
+        console.log('Slides response:', response.data);
+        
+        if (response.data.success && response.data.slides) {
+          setSlides(response.data.slides);
+        } else {
+          console.log('No slides found in response');
+        }
+      } catch (error) {
+        console.error('Error fetching slides:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, [backendUrl]);
 
   useEffect(() => {
+    if (slides.length === 0) return;
+    
     const timer = setInterval(() => {
       setCurrentSlide((prevSlide) => 
         prevSlide === slides.length - 1 ? 0 : prevSlide + 1
@@ -37,7 +44,23 @@ const Hero = () => {
     }, 5000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
+
+  if (isLoading) {
+    return (
+      <div className="h-[600px] sm:h-[500px] flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (slides.length === 0) {
+    return (
+      <div className="h-[600px] sm:h-[500px] flex items-center justify-center">
+        <p>No se encontraron productos</p>
+      </div>
+    );
+  }
 
   const handleSlideChange = (direction) => {
     if (direction === 'next') {
@@ -76,7 +99,7 @@ const Hero = () => {
               </h1>
               
               <Link 
-                to='/collection'
+                to={`/product/${slides[currentSlide].productId}`}
                 className='inline-flex items-center gap-3 group'
               >
                 <span className='text-sm font-semibold tracking-wider'>
@@ -94,11 +117,16 @@ const Hero = () => {
             <motion.img
               key={currentSlide}
               src={slides[currentSlide].image}
+              alt={slides[currentSlide].title}
               className='absolute inset-0 w-full h-full object-cover'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/placeholder-image.jpg'; // Asegúrate de tener una imagen de placeholder
+              }}
             />
           </AnimatePresence>
 
@@ -117,7 +145,7 @@ const Hero = () => {
                   {slides[currentSlide].title}
                 </h1>
                 <Link 
-                  to='/collection'
+                  to={`/product/${slides[currentSlide].productId}`}
                   className='inline-block px-6 py-2 border-2 border-white hover:bg-white hover:text-black transition-colors'
                 >
                   COMPRAR AHORA
@@ -166,7 +194,7 @@ const Hero = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

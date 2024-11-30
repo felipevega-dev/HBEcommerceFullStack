@@ -12,6 +12,9 @@ import uploadRouter from './routes/uploadRoute.js';
 import reviewRouter from './routes/reviewRoute.js';
 import categoryRouter from './routes/categoryRoute.js';
 import mercadoPagoRouter from './routes/mercadoPagoRoute.js';
+import heroSlidesRouter from './routes/heroSlides.js';
+import './models/productModel.js';
+import './models/HeroSlide.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -37,6 +40,7 @@ const initializeServer = async () => {
         app.use('/api/review', reviewRouter);
         app.use('/api/category', categoryRouter);
         app.use('/api/mercadopago', mercadoPagoRouter);
+        app.use('/api/hero-slides', heroSlidesRouter);
         app.get('/', (req, res) => res.send('API running'));
 
         // Inicializar algunas categorías por defecto si no existen
@@ -77,6 +81,7 @@ const initializeServer = async () => {
             console.log(chalk.yellow('→') + ' /api/review');
             console.log(chalk.yellow('→') + ' /api/category');
             console.log(chalk.yellow('→') + ' /api/mercadopago');
+            console.log(chalk.yellow('→') + ' /api/hero-slides');
             console.log('\n' + chalk.green('¡Servidor listo para recibir peticiones!') + '\n');
         });
 
