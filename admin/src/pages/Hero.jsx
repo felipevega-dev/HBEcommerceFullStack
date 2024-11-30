@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { backendUrl } from '../App'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 const Hero = ({ token }) => {
   const [slides, setSlides] = useState([])
@@ -14,6 +15,7 @@ const Hero = ({ token }) => {
     productId: '',
     image: ''
   })
+  const [editingSlide, setEditingSlide] = useState(null)
 
   useEffect(() => {
     fetchSlides()
@@ -118,6 +120,69 @@ const Hero = ({ token }) => {
     }
   }
 
+  const handleEdit = (slide) => {
+    setEditingSlide({
+      id: slide._id,
+      title: slide.title,
+      subtitle: slide.subtitle
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await axios.put(
+        `${backendUrl}/api/hero-slides/${editingSlide.id}`,
+        {
+          title: editingSlide.title,
+          subtitle: editingSlide.subtitle
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Slide actualizado correctamente');
+        setEditingSlide(null);
+        fetchSlides();
+      }
+    } catch (error) {
+      console.error('Error al actualizar slide:', error);
+      toast.error('Error al actualizar el slide');
+    }
+  };
+
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(slides);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // Actualizar orden localmente
+    setSlides(items);
+
+    // Enviar nuevo orden al servidor
+    try {
+      await axios.put(
+        `${backendUrl}/api/hero-slides/reorder`,
+        {
+          slides: items.map((slide, index) => ({
+            id: slide._id,
+            order: index
+          }))
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+    } catch (error) {
+      console.error('Error al reordenar slides:', error);
+      toast.error('Error al actualizar el orden');
+      fetchSlides(); // Recargar orden original en caso de error
+    }
+  };
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Gestionar Hero Slides</h1>
@@ -191,28 +256,106 @@ const Hero = ({ token }) => {
         {isLoading ? (
           <p>Cargando...</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {slides.map((slide) => (
-              <div key={slide._id} className="border rounded-lg p-4">
-                <img
-                  src={slide.image}
-                  alt={slide.title}
-                  className="w-full h-48 object-cover rounded mb-2"
-                />
-                <h3 className="font-semibold">{slide.title}</h3>
-                <p className="text-gray-600">{slide.subtitle}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Producto: {slide.productId?.name || 'No disponible'}
-                </p>
-                <button
-                  onClick={() => handleDelete(slide._id)}
-                  className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="slides">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="space-y-4"
                 >
-                  Eliminar
-                </button>
-              </div>
-            ))}
-          </div>
+                  {slides.map((slide, index) => (
+                    <Draggable
+                      key={slide._id}
+                      draggableId={slide._id}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="border rounded-lg p-4 bg-white"
+                        >
+                          <div className="flex items-start gap-4">
+                            <img
+                              src={slide.image}
+                              alt={slide.title}
+                              className="w-48 h-32 object-cover rounded"
+                            />
+                            <div className="flex-grow">
+                              {editingSlide?.id === slide._id ? (
+                                <div className="space-y-2">
+                                  <input
+                                    type="text"
+                                    value={editingSlide.title}
+                                    onChange={(e) => setEditingSlide(prev => ({
+                                      ...prev,
+                                      title: e.target.value
+                                    }))}
+                                    className="w-full p-2 border rounded"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={editingSlide.subtitle}
+                                    onChange={(e) => setEditingSlide(prev => ({
+                                      ...prev,
+                                      subtitle: e.target.value
+                                    }))}
+                                    className="w-full p-2 border rounded"
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={handleSaveEdit}
+                                      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      onClick={() => setEditingSlide(null)}
+                                      className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <h3 className="font-semibold">{slide.title}</h3>
+                                  <p className="text-gray-600">{slide.subtitle}</p>
+                                  <p className="text-sm text-gray-500">
+                                    Producto: {slide.productId?.name || 'No disponible'}
+                                  </p>
+                                  <div className="flex gap-2 mt-2">
+                                    <button
+                                      onClick={() => handleEdit(slide)}
+                                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                      Editar
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(slide._id)}
+                                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                            <div className="text-gray-400 cursor-move">
+                              ⋮⋮
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
       </div>
     </div>

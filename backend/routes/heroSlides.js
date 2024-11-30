@@ -4,13 +4,13 @@ import ProductModel from '../models/productModel.js';
 
 const router = express.Router();
 
-// Obtener todos los slides
+// Obtener todos los slides ordenados
 router.get('/', async (req, res) => {
   try {
     console.log('Recibida petición GET para slides');
     
     const slides = await HeroSlide.find()
-      .sort({ createdAt: -1 })
+      .sort({ order: 1, createdAt: -1 })
       .populate({
         path: 'productId',
         model: 'product',
@@ -28,6 +28,69 @@ router.get('/', async (req, res) => {
     console.error('Error al obtener slides:', error);
     res.status(500).json({ 
       success: false, 
+      error: error.message
+    });
+  }
+});
+
+// Actualizar slide
+router.put('/:id', async (req, res) => {
+  try {
+    const { title, subtitle } = req.body;
+    const slideId = req.params.id;
+
+    const updatedSlide = await HeroSlide.findByIdAndUpdate(
+      slideId,
+      { title, subtitle },
+      { new: true }
+    ).populate('productId', 'name images _id price');
+
+    if (!updatedSlide) {
+      return res.status(404).json({
+        success: false,
+        error: 'Slide no encontrado'
+      });
+    }
+
+    res.json({
+      success: true,
+      slide: updatedSlide,
+      message: 'Slide actualizado correctamente'
+    });
+  } catch (error) {
+    console.error('Error al actualizar slide:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Actualizar orden de slides
+router.put('/reorder', async (req, res) => {
+  try {
+    const { slides } = req.body; // Array de { id, order }
+    
+    // Actualizar el orden de cada slide
+    await Promise.all(
+      slides.map(({ id, order }) => 
+        HeroSlide.findByIdAndUpdate(id, { order })
+      )
+    );
+
+    const updatedSlides = await HeroSlide.find()
+      .sort({ order: 1, createdAt: -1 })
+      .populate('productId', 'name images _id price');
+
+    res.json({
+      success: true,
+      slides: updatedSlides,
+      message: 'Orden actualizado correctamente'
+    });
+  } catch (error) {
+    console.error('Error al reordenar slides:', error);
+    res.status(500).json({
+      success: false,
       error: error.message
     });
   }

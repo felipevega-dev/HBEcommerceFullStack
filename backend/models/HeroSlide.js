@@ -17,6 +17,10 @@ const heroSlideSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'product',
     required: true
+  },
+  order: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true, versionKey: false });
 
