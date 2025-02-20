@@ -92,4 +92,3 @@ const initializeServer = async () => {
 };
 
 initializeServer();
-export default app;
