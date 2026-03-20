@@ -1,94 +1,89 @@
-import CategoryModel from '../models/categoryModel.js';
+import CategoryModel from '../models/categoryModel.js'
 
-// Obtener todas las categorías
-const getCategories = async (req, res) => {
-    try {
-        const categories = await CategoryModel.find();
-        res.json({
-            success: true,
-            categories
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener categorías'
-        });
-    }
-};
+const getCategories = async (_req, res) => {
+  try {
+    const categories = await CategoryModel.find()
+    res.json({
+      success: true,
+      categories,
+    })
+  } catch {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener categorias',
+    })
+  }
+}
 
-// Añadir nueva categoría
 const addCategory = async (req, res) => {
-    try {
-        const { name, subcategories } = req.body;
-        
-        // Verificar si la categoría ya existe
-        const existingCategory = await CategoryModel.findOne({ name });
-        if (existingCategory) {
-            // Si existe, actualizar subcategorías
-            const updatedCategory = await CategoryModel.findOneAndUpdate(
-                { name },
-                { 
-                    $addToSet: { 
-                        subcategories: { 
-                            $each: subcategories 
-                        } 
-                    } 
-                },
-                { new: true }
-            );
-            return res.json({
-                success: true,
-                category: updatedCategory
-            });
-        }
+  try {
+    const { name, subcategories } = req.body
 
-        // Si no existe, crear nueva
-        const newCategory = new CategoryModel({
-            name,
-            subcategories
-        });
-        await newCategory.save();
+    const existingCategory = await CategoryModel.findOne({ name })
+    if (existingCategory) {
+      const updatedCategory = await CategoryModel.findOneAndUpdate(
+        { name },
+        {
+          $addToSet: {
+            subcategories: {
+              $each: subcategories,
+            },
+          },
+        },
+        { new: true },
+      )
 
-        res.json({
-            success: true,
-            category: newCategory
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al añadir categoría'
-        });
+      return res.json({
+        success: true,
+        category: updatedCategory,
+      })
     }
-};
 
-// Añadir subcategoría a una categoría existente
+    const newCategory = new CategoryModel({
+      name,
+      subcategories,
+    })
+    await newCategory.save()
+
+    res.json({
+      success: true,
+      category: newCategory,
+    })
+  } catch {
+    res.status(500).json({
+      success: false,
+      message: 'Error al anadir categoria',
+    })
+  }
+}
+
 const addSubcategory = async (req, res) => {
-    try {
-        const { categoryName, subcategoryName } = req.body;
-        
-        const updatedCategory = await CategoryModel.findOneAndUpdate(
-            { name: categoryName },
-            { $addToSet: { subcategories: subcategoryName } },
-            { new: true }
-        );
+  try {
+    const { categoryName, subcategoryName } = req.body
 
-        if (!updatedCategory) {
-            return res.status(404).json({
-                success: false,
-                message: 'Categoría no encontrada'
-            });
-        }
+    const updatedCategory = await CategoryModel.findOneAndUpdate(
+      { name: categoryName },
+      { $addToSet: { subcategories: subcategoryName } },
+      { new: true },
+    )
 
-        res.json({
-            success: true,
-            category: updatedCategory
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error al añadir subcategoría'
-        });
+    if (!updatedCategory) {
+      return res.status(404).json({
+        success: false,
+        message: 'Categoria no encontrada',
+      })
     }
-};
 
-export { getCategories, addCategory, addSubcategory }; 
+    res.json({
+      success: true,
+      category: updatedCategory,
+    })
+  } catch {
+    res.status(500).json({
+      success: false,
+      message: 'Error al anadir subcategoria',
+    })
+  }
+}
+
+export { getCategories, addCategory, addSubcategory }

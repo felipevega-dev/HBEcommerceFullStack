@@ -1,186 +1,175 @@
-import orderModel from '../models/orderModel.js';
-import userModel from '../models/userModel.js';
-
-// placing order using COD method
+import orderModel from '../models/orderModel.js'
+import userModel from '../models/userModel.js'
 
 const placeOrder = async (req, res) => {
-    try {
-        console.log('Usuario autenticado:', req.user); // Debug user
-        console.log('Datos recibidos:', req.body); // Debug request body
-        
-        const {items, amount, address} = req.body;
-        const userId = req.user.id;
+  try {
+    console.log('Usuario autenticado:', req.user)
+    console.log('Datos recibidos:', req.body)
 
-        const orderData = {
-            userId,
-            items,
-            address,
-            amount,
-            status: 'pending',
-            paymentMethod: 'COD',
-            payment: false,
-            date: Date.now()
-        }
+    const { items, amount, address } = req.body
+    const userId = req.user.id
 
-        console.log('Order data a guardar:', orderData); // Debug order data
-
-        const newOrder = new orderModel(orderData);
-        await newOrder.save();
-
-        await userModel.findByIdAndUpdate(userId, {cartData: {}});
-
-        res.json({
-            success: true,
-            message: 'Order placed successfully'
-        });
-
-    } catch (error) {
-        console.error('Error en placeOrder:', error); // Debug error
-        res.status(500).json({
-            success: false,
-            message: error.message || 'Internal server error'
-        });
+    const orderData = {
+      userId,
+      items,
+      address,
+      amount,
+      status: 'pending',
+      paymentMethod: 'COD',
+      payment: false,
+      date: Date.now(),
     }
+
+    console.log('Order data a guardar:', orderData)
+
+    const newOrder = new orderModel(orderData)
+    await newOrder.save()
+
+    await userModel.findByIdAndUpdate(userId, { cartData: {} })
+
+    res.json({
+      success: true,
+      message: 'Order placed successfully',
+    })
+  } catch (error) {
+    console.error('Error en placeOrder:', error)
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Internal server error',
+    })
+  }
 }
 
-// placing order using mercadopago
-const placeOrderMercadoPago = async (req, res) => {
-    try {
-        const {items, amount, address} = req.body;
-    } catch (error) {
-        
-    }
+const placeOrderMercadoPago = async (_req, res) => {
+  res.status(501).json({
+    success: false,
+    message: 'placeOrderMercadoPago no implementado',
+  })
 }
 
-// placing order using paypal
-const placeOrderPaypal = async (req, res) => {
-    try {
-        const {items, amount, address} = req.body;
-    } catch (error) {
-        
-    }
+const placeOrderPaypal = async (_req, res) => {
+  res.status(501).json({
+    success: false,
+    message: 'placeOrderPaypal no implementado',
+  })
 }
 
-// All order data for admin panel
-const allOrders = async (req, res) => {
-    try {
-        const orders = await orderModel.find();
-        res.json({
-            success: true,
-            orders
-        });
-    } catch (error) {
-        console.error('Error al obtener todas las órdenes:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener todas las órdenes'
-        });
-    }
+const allOrders = async (_req, res) => {
+  try {
+    const orders = await orderModel.find()
+    res.json({
+      success: true,
+      orders,
+    })
+  } catch (error) {
+    console.error('Error al obtener todas las ordenes:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener todas las ordenes',
+    })
+  }
 }
 
-// User order data for frontend
 const userOrders = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        
-        const orders = await orderModel.find({ userId })
-            .sort({ date: -1 }); // Ordenar por fecha, más reciente primero
-        
-        res.json({
-            success: true,
-            orders
-        });
-        
-    } catch (error) {
-        console.error('Error al obtener órdenes:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener las órdenes'
-        });
-    }
+  try {
+    const userId = req.user.id
+
+    const orders = await orderModel.find({ userId }).sort({ date: -1 })
+
+    res.json({
+      success: true,
+      orders,
+    })
+  } catch (error) {
+    console.error('Error al obtener ordenes:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener las ordenes',
+    })
+  }
 }
 
-// Update order status from admin panel
 const updateStatus = async (req, res) => {
-    try {
-        const { orderId, status } = req.body;
-        
-        if (!orderId || !status) {
-            return res.status(400).json({
-                success: false,
-                message: 'Order ID and status are required'
-            });
-        }
+  try {
+    const { orderId, status } = req.body
 
-        const validStatuses = ['pending', 'processing', 'shipped', 'delivered'];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid status value'
-            });
-        }
-
-        const updatedOrder = await orderModel.findByIdAndUpdate(
-            orderId,
-            { status },
-            { new: true } // Retorna el documento actualizado
-        );
-
-        if (!updatedOrder) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Order status updated successfully',
-            order: updatedOrder
-        });
-
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error updating order status'
-        });
+    if (!orderId || !status) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID and status are required',
+      })
     }
+
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered']
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status value',
+      })
+    }
+
+    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { status }, { new: true })
+
+    if (!updatedOrder) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      })
+    }
+
+    res.json({
+      success: true,
+      message: 'Order status updated successfully',
+      order: updatedOrder,
+    })
+  } catch (error) {
+    console.error('Error updating order status:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error updating order status',
+    })
+  }
 }
 
-// Delete order from admin panel
 const deleteOrder = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        
-        if (!orderId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Order ID is required'
-            });
-        }
+  try {
+    const { orderId } = req.params
 
-        const deletedOrder = await orderModel.findByIdAndDelete(orderId);
-
-        if (!deletedOrder) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Order deleted successfully'
-        });
-
-    } catch (error) {
-        console.error('Error deleting order:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error deleting order'
-        });
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID is required',
+      })
     }
+
+    const deletedOrder = await orderModel.findByIdAndDelete(orderId)
+
+    if (!deletedOrder) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      })
+    }
+
+    res.json({
+      success: true,
+      message: 'Order deleted successfully',
+    })
+  } catch (error) {
+    console.error('Error deleting order:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting order',
+    })
+  }
 }
 
-export { placeOrder, placeOrderMercadoPago, placeOrderPaypal, allOrders, userOrders, updateStatus, deleteOrder };
+export {
+  placeOrder,
+  placeOrderMercadoPago,
+  placeOrderPaypal,
+  allOrders,
+  userOrders,
+  updateStatus,
+  deleteOrder,
+}

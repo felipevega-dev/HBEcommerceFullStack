@@ -1,6 +1,5 @@
 import express from 'express';
 import HeroSlide from '../models/HeroSlide.js';
-import ProductModel from '../models/productModel.js';
 
 const router = express.Router();
 

@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { backendUrl } from '../App';
-import { toast } from 'react-toastify';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { StrictMode } from 'react';
+import React, { StrictMode, useEffect, useRef, useState } from 'react'
+import axios from 'axios'
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { backendUrl } from '../App'
+
+const UPLOAD_SLOTS = [0, 1, 2, 3]
 
 const EditProduct = ({ token }) => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const fileInputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [categories, setCategories] = useState([])
+  const [subcategories, setSubcategories] = useState([])
+  const fileInputRefs = useRef([])
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -21,35 +22,35 @@ const EditProduct = ({ token }) => {
     color: '',
     sizes: [],
     bestseller: false,
-    currentImages: []
-  });
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
-  const [showNewSubcategoryInput, setShowNewSubcategoryInput] = useState(false);
-  const [newCategory, setNewCategory] = useState('');
-  const [newSubcategory, setNewSubcategory] = useState('');
-  const [selectedColors, setSelectedColors] = useState([]);
+    currentImages: [],
+  })
+  const [imagePreviews, setImagePreviews] = useState([])
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false)
+  const [showNewSubcategoryInput, setShowNewSubcategoryInput] = useState(false)
+  const [newCategory, setNewCategory] = useState('')
+  const [newSubcategory, setNewSubcategory] = useState('')
+  const [selectedColors, setSelectedColors] = useState([])
 
   const colorMap = {
-    'Negro': '#000000',
-    'Blanco': '#FFFFFF',
-    'Gris': '#808080',
-    'Rojo': '#FF0000',
-    'Azul': '#0000FF',
-    'Verde': '#008000',
-    'Amarillo': '#FFFF00',
-    'Rosa': '#FFC0CB',
-    'Morado': '#800080',
-    'Naranja': '#FFA500',
-    'Marrón': '#8B4513',
-    'Beige': '#F5F5DC'
-  };
+    Negro: '#000000',
+    Blanco: '#FFFFFF',
+    Gris: '#808080',
+    Rojo: '#FF0000',
+    Azul: '#0000FF',
+    Verde: '#008000',
+    Amarillo: '#FFFF00',
+    Rosa: '#FFC0CB',
+    Morado: '#800080',
+    Naranja: '#FFA500',
+    Marron: '#8B4513',
+    Beige: '#F5F5DC',
+  }
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/product/single/${id}`);
+      const response = await axios.get(`${backendUrl}/api/product/single/${id}`)
       if (response.data.success) {
-        const product = response.data.product;
+        const product = response.data.product
         setFormData({
           name: product.name,
           description: product.description,
@@ -58,304 +59,309 @@ const EditProduct = ({ token }) => {
           subcategory: product.subCategory,
           sizes: product.sizes,
           bestseller: product.bestSeller,
-          currentImages: product.images
-        });
-        setSelectedColors(product.colors || []);
+          currentImages: product.images,
+        })
+        setSelectedColors(product.colors || [])
       }
-    } catch (error) {
-      toast.error('Error al cargar el producto');
-      navigate('/list');
+    } catch {
+      toast.error('Error al cargar el producto')
+      navigate('/list')
     }
-  };
+  }
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/category`);
+      const response = await axios.get(`${backendUrl}/api/category`)
       if (response.data.success) {
-        setCategories(response.data.categories);
+        setCategories(response.data.categories)
       }
-    } catch (error) {
-      toast.error('Error al cargar categorías');
+    } catch {
+      toast.error('Error al cargar categorias')
     }
-  };
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     try {
       if (selectedColors.length === 0) {
-        toast.error('Por favor selecciona al menos un color');
-        return;
+        toast.error('Por favor selecciona al menos un color')
+        return
       }
 
-      const formDataToSend = new FormData();
-      formDataToSend.append('id', id);
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('price', formData.price);
-      formDataToSend.append('category', formData.category);
-      formDataToSend.append('subcategory', formData.subcategory);
-      formDataToSend.append('colors', JSON.stringify(selectedColors));
-      formDataToSend.append('bestseller', formData.bestseller);
-      formDataToSend.append('sizes', JSON.stringify(formData.sizes));
-      formDataToSend.append('currentImages', JSON.stringify(formData.currentImages));
+      const formDataToSend = new FormData()
+      formDataToSend.append('id', id)
+      formDataToSend.append('name', formData.name)
+      formDataToSend.append('description', formData.description)
+      formDataToSend.append('price', formData.price)
+      formDataToSend.append('category', formData.category)
+      formDataToSend.append('subcategory', formData.subcategory)
+      formDataToSend.append('colors', JSON.stringify(selectedColors))
+      formDataToSend.append('bestseller', formData.bestseller)
+      formDataToSend.append('sizes', JSON.stringify(formData.sizes))
+      formDataToSend.append('currentImages', JSON.stringify(formData.currentImages))
 
-      fileInputRefs.forEach((ref, index) => {
-        if (ref.current?.files[0]) {
-          formDataToSend.append(`image${index + 1}`, ref.current.files[0]);
+      fileInputRefs.current.forEach((input, index) => {
+        if (input?.files?.[0]) {
+          formDataToSend.append(`image${index + 1}`, input.files[0])
         }
-      });
+      })
 
-      const response = await axios.put(
-        `${backendUrl}/api/product/update`,
-        formDataToSend,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
+      const response = await axios.put(`${backendUrl}/api/product/update`, formDataToSend, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
 
       if (response.data.success) {
-        toast.success('Producto actualizado exitosamente');
-        navigate('/list');
+        toast.success('Producto actualizado exitosamente')
+        navigate('/list')
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data.message)
       }
-    } catch (error) {
-      toast.error('Error al actualizar el producto');
+    } catch {
+      toast.error('Error al actualizar el producto')
     }
-  };
+  }
 
   const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    
-    const items = Array.from(formData.currentImages);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    
-    setFormData(prev => ({
+    if (!result.destination) return
+
+    const items = Array.from(formData.currentImages)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
+
+    setFormData((prev) => ({
       ...prev,
-      currentImages: items
-    }));
-  };
+      currentImages: items,
+    }))
+  }
 
   const handleImageChange = (e, index) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreviews(prev => {
-          const newPreviews = [...prev];
-          newPreviews[index] = reader.result;
-          return newPreviews;
-        });
-      };
-      reader.readAsDataURL(file);
+        setImagePreviews((prev) => {
+          const newPreviews = [...prev]
+          newPreviews[index] = reader.result
+          return newPreviews
+        })
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
+
+  const clearPreviewAt = (index) => {
+    const input = fileInputRefs.current[index]
+    if (input) {
+      input.value = ''
+    }
+    setImagePreviews((prev) => {
+      const newPreviews = [...prev]
+      newPreviews[index] = null
+      return newPreviews
+    })
+  }
 
   const handleAddNewCategory = () => {
     if (newCategory.trim()) {
-      if (!categories.includes(newCategory.trim())) {
-        setCategories(prev => [...prev, newCategory.trim()]);
-        setFormData(prev => ({...prev, category: newCategory.trim()}));
+      const trimmedCategory = newCategory.trim()
+      if (!categories.includes(trimmedCategory)) {
+        setCategories((prev) => [...prev, trimmedCategory])
+        setFormData((prev) => ({ ...prev, category: trimmedCategory }))
       }
-      setNewCategory('');
-      setShowNewCategoryInput(false);
+      setNewCategory('')
+      setShowNewCategoryInput(false)
     }
-  };
-
-  const handleColorToggle = (color) => {
-    setSelectedColors(prev => 
-      prev.includes(color)
-        ? prev.filter(c => c !== color)
-        : [...prev, color]
-    );
-  };
+  }
 
   const handleAddNewSubcategory = async () => {
-    if (!newSubcategory.trim() || !formData.category) return;
+    if (!newSubcategory.trim() || !formData.category) return
 
     try {
       const response = await axios.post(
         `${backendUrl}/api/category/subcategory/add`,
         {
           categoryName: formData.category,
-          subcategoryName: newSubcategory
+          subcategoryName: newSubcategory,
         },
         {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
 
       if (response.data.success) {
-        setCategories(categories.map(cat => 
-          cat.name === formData.category 
-            ? response.data.category 
-            : cat
-        ));
-        setFormData(prev => ({...prev, subcategory: newSubcategory}));
-        setNewSubcategory('');
-        setShowNewSubcategoryInput(false);
-        toast.success('Subcategoría añadida exitosamente');
+        setCategories(
+          categories.map((cat) => (cat.name === formData.category ? response.data.category : cat)),
+        )
+        setFormData((prev) => ({ ...prev, subcategory: newSubcategory }))
+        setNewSubcategory('')
+        setShowNewSubcategoryInput(false)
+        toast.success('Subcategoria anadida exitosamente')
       }
-    } catch (error) {
-      toast.error('Error al añadir subcategoría');
+    } catch {
+      toast.error('Error al anadir subcategoria')
     }
-  };
+  }
 
   useEffect(() => {
     const initialize = async () => {
-      await fetchCategories();
-      await fetchProduct();
-    };
-    initialize();
-  }, [id]);
+      await fetchCategories()
+      await fetchProduct()
+    }
+    initialize()
+  }, [id])
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Editar Producto</h1>
+    <div className='p-6'>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-2xl font-bold'>Editar Producto</h1>
         <button
           onClick={() => navigate('/list')}
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          className='px-4 py-2 bg-gray-200 rounded hover:bg-gray-300'
         >
           Volver
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className='space-y-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Nombre</label>
+            <label className='block text-sm font-medium text-gray-700'>Nombre</label>
             <input
-              type="text"
+              type='text'
               value={formData.name}
-              onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+              className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Precio</label>
+            <label className='block text-sm font-medium text-gray-700'>Precio</label>
             <input
-              type="number"
+              type='number'
               value={formData.price}
-              onChange={(e) => setFormData(prev => ({...prev, price: e.target.value}))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+              className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Categoría</label>
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700'>Categoria</label>
             {!showNewCategoryInput ? (
-              <div className="flex gap-2">
-                <select 
+              <div className='flex gap-2'>
+                <select
                   value={formData.category}
-                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
+                  className='w-full px-3 py-2 border rounded-md'
                   required
                 >
-                  <option value="">Selecciona una categoría</option>
+                  <option value=''>Selecciona una categoria</option>
                   {categories.map((cat) => (
-                    <option key={cat.name} value={cat.name}>{cat.name}</option>
+                    <option key={cat.name} value={cat.name}>
+                      {cat.name}
+                    </option>
                   ))}
                 </select>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => setShowNewCategoryInput(true)}
-                  className="px-3 py-2 bg-black text-white rounded"
+                  className='px-3 py-2 bg-black text-white rounded'
                 >
                   +
                 </button>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className='flex gap-2'>
                 <input
-                  type="text"
+                  type='text'
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Nueva categoría"
-                  className="w-full px-3 py-2 border rounded"
+                  placeholder='Nueva categoria'
+                  className='w-full px-3 py-2 border rounded'
                 />
                 <button
-                  type="button"
+                  type='button'
                   onClick={handleAddNewCategory}
-                  className="px-3 py-2 bg-green-600 text-white rounded"
+                  className='px-3 py-2 bg-green-600 text-white rounded'
                 >
-                  ✓
+                  OK
                 </button>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => {
-                    setShowNewCategoryInput(false);
-                    setNewCategory('');
+                    setShowNewCategoryInput(false)
+                    setNewCategory('')
                   }}
-                  className="px-3 py-2 bg-red-600 text-white rounded"
+                  className='px-3 py-2 bg-red-600 text-white rounded'
                 >
-                  ×
+                  X
                 </button>
               </div>
             )}
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Subcategoría</label>
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700'>Subcategoria</label>
             {!showNewSubcategoryInput ? (
-              <div className="flex gap-2">
-                <select 
+              <div className='flex gap-2'>
+                <select
                   value={formData.subcategory}
-                  onChange={(e) => setFormData(prev => ({ ...prev, subcategory: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md"
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, subcategory: e.target.value }))
+                  }
+                  className='w-full px-3 py-2 border rounded-md'
                   required
                 >
-                  <option value="">Selecciona una subcategoría</option>
+                  <option value=''>Selecciona una subcategoria</option>
                   {categories
-                    .find(cat => cat.name === formData.category)
+                    .find((cat) => cat.name === formData.category)
                     ?.subcategories.map((subcat) => (
-                      <option key={subcat} value={subcat}>{subcat}</option>
+                      <option key={subcat} value={subcat}>
+                        {subcat}
+                      </option>
                     ))}
                 </select>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => setShowNewSubcategoryInput(true)}
-                  className="px-3 py-2 bg-black text-white rounded"
+                  className='px-3 py-2 bg-black text-white rounded'
                   disabled={!formData.category}
                 >
                   +
                 </button>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className='flex gap-2'>
                 <input
-                  type="text"
+                  type='text'
                   value={newSubcategory}
                   onChange={(e) => setNewSubcategory(e.target.value)}
-                  placeholder="Nueva subcategoría"
-                  className="w-full px-3 py-2 border rounded"
+                  placeholder='Nueva subcategoria'
+                  className='w-full px-3 py-2 border rounded'
                 />
                 <button
-                  type="button"
+                  type='button'
                   onClick={handleAddNewSubcategory}
-                  className="px-3 py-2 bg-green-600 text-white rounded"
+                  className='px-3 py-2 bg-green-600 text-white rounded'
                 >
-                  ✓
+                  OK
                 </button>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => {
-                    setShowNewSubcategoryInput(false);
-                    setNewSubcategory('');
+                    setShowNewSubcategoryInput(false)
+                    setNewSubcategory('')
                   }}
-                  className="px-3 py-2 bg-red-600 text-white rounded"
+                  className='px-3 py-2 bg-red-600 text-white rounded'
                 >
-                  ×
+                  X
                 </button>
               </div>
             )}
@@ -363,33 +369,37 @@ const EditProduct = ({ token }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Descripción</label>
+          <label className='block text-sm font-medium text-gray-700'>Descripcion</label>
           <textarea
             value={formData.description}
-            onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
             rows={3}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
             required
           />
         </div>
 
-        <div className="space-y-2">
-          <p className="text-lg font-medium">Tallas Disponibles</p>
-          <div className="flex gap-3">
+        <div className='space-y-2'>
+          <p className='text-lg font-medium'>Tallas Disponibles</p>
+          <div className='flex gap-3'>
             {['XS', 'S', 'M', 'L', 'XL'].map((size) => (
-              <div 
+              <div
                 key={size}
-                onClick={() => setFormData(prev => ({
-                  ...prev,
-                  sizes: prev.sizes.includes(size) 
-                    ? prev.sizes.filter(s => s !== size)
-                    : [...prev.sizes, size]
-                }))}
-                className="cursor-pointer"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    sizes: prev.sizes.includes(size)
+                      ? prev.sizes.filter((s) => s !== size)
+                      : [...prev.sizes, size],
+                  }))
+                }
+                className='cursor-pointer'
               >
-                <p className={`${
-                  formData.sizes.includes(size) ? 'bg-pink-100' : 'bg-slate-100'
-                } px-3 py-1`}>
+                <p
+                  className={`${
+                    formData.sizes.includes(size) ? 'bg-pink-100' : 'bg-slate-100'
+                  } px-3 py-1`}
+                >
                   {size}
                 </p>
               </div>
@@ -397,34 +407,30 @@ const EditProduct = ({ token }) => {
           </div>
         </div>
 
-        <div className="flex items-center">
+        <div className='flex items-center'>
           <input
-            type="checkbox"
+            type='checkbox'
             checked={formData.bestseller}
-            onChange={(e) => setFormData(prev => ({...prev, bestseller: e.target.checked}))}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            onChange={(e) => setFormData((prev) => ({ ...prev, bestseller: e.target.checked }))}
+            className='h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded'
           />
-          <label className="ml-2 block text-sm text-gray-900">Best Seller</label>
+          <label className='ml-2 block text-sm text-gray-900'>Best Seller</label>
         </div>
 
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Imágenes actuales (arrastra para reordenar)
+        <div className='space-y-4'>
+          <label className='block text-sm font-medium text-gray-700'>
+            Imagenes actuales (arrastra para reordenar)
           </label>
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="droppable" direction="horizontal">
+            <Droppable droppableId='droppable' direction='horizontal'>
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="flex gap-4 flex-wrap"
+                  className='flex gap-4 flex-wrap'
                 >
                   {formData.currentImages.map((image, index) => (
-                    <Draggable
-                      key={image}
-                      draggableId={image}
-                      index={index}
-                    >
+                    <Draggable key={image} draggableId={image} index={index}>
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
@@ -432,29 +438,29 @@ const EditProduct = ({ token }) => {
                           {...provided.dragHandleProps}
                           className={`relative ${snapshot.isDragging ? 'z-10' : ''}`}
                         >
-                          <div className="relative group">
+                          <div className='relative group'>
                             <img
                               src={image}
                               alt={`Imagen ${index + 1}`}
-                              className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
+                              className='w-32 h-32 object-cover rounded-lg border-2 border-gray-200'
                             />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg">
-                              <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded">
-                                {index === 0 ? 'Principal' : `${index + 1}º`}
+                            <div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg'>
+                              <div className='absolute top-2 left-2 text-white text-sm font-medium bg-black bg-opacity-50 px-2 py-1 rounded'>
+                                {index === 0 ? 'Principal' : `${index + 1}o`}
                               </div>
                             </div>
                             <button
-                              type="button"
+                              type='button'
                               onClick={() => {
-                                const newImages = formData.currentImages.filter((_, i) => i !== index);
-                                setFormData(prev => ({
+                                const newImages = formData.currentImages.filter((_, i) => i !== index)
+                                setFormData((prev) => ({
                                   ...prev,
-                                  currentImages: newImages
-                                }));
+                                  currentImages: newImages,
+                                }))
                               }}
-                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                              className='absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200'
                             >
-                              ×
+                              X
                             </button>
                           </div>
                         </div>
@@ -469,40 +475,37 @@ const EditProduct = ({ token }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Agregar nuevas imágenes</label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {fileInputRefs.map((ref, index) => (
-              <div key={index} className="relative">
+          <label className='block text-sm font-medium text-gray-700 mb-2'>
+            Agregar nuevas imagenes
+          </label>
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+            {UPLOAD_SLOTS.map((index) => (
+              <div key={index} className='relative'>
                 <input
-                  type="file"
-                  ref={ref}
-                  accept="image/*"
+                  type='file'
+                  ref={(element) => {
+                    fileInputRefs.current[index] = element
+                  }}
+                  accept='image/*'
                   onChange={(e) => handleImageChange(e, index)}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                  className='block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100'
                 />
                 {imagePreviews[index] && (
-                  <div className="mt-2 relative">
-                    <div className="absolute top-0 left-0 right-0 bg-indigo-600 text-white text-xs py-1 px-2 text-center rounded-t">
+                  <div className='mt-2 relative'>
+                    <div className='absolute top-0 left-0 right-0 bg-indigo-600 text-white text-xs py-1 px-2 text-center rounded-t'>
                       Vista previa
                     </div>
                     <img
                       src={imagePreviews[index]}
                       alt={`Preview ${index + 1}`}
-                      className="w-full h-32 object-contain bg-gray-50 rounded-b border-t-0 border border-gray-200"
+                      className='w-full h-32 object-contain bg-gray-50 rounded-b border-t-0 border border-gray-200'
                     />
                     <button
-                      type="button"
-                      onClick={() => {
-                        ref.current.value = '';
-                        setImagePreviews(prev => {
-                          const newPreviews = [...prev];
-                          newPreviews[index] = null;
-                          return newPreviews;
-                        });
-                      }}
-                      className="absolute top-8 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      type='button'
+                      onClick={() => clearPreviewAt(index)}
+                      className='absolute top-8 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600'
                     >
-                      ×
+                      X
                     </button>
                   </div>
                 )}
@@ -511,56 +514,63 @@ const EditProduct = ({ token }) => {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Colores</label>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        <div className='space-y-2'>
+          <label className='block text-sm font-medium text-gray-700'>Colores</label>
+          <div className='grid grid-cols-3 sm:grid-cols-4 gap-2'>
             {Object.keys(colorMap).map((colorOption) => (
               <button
                 key={colorOption}
-                type="button"
-                onClick={() => {
-                  setSelectedColors(prev => 
+                type='button'
+                onClick={() =>
+                  setSelectedColors((prev) =>
                     prev.includes(colorOption)
-                      ? prev.filter(c => c !== colorOption)
-                      : [...prev, colorOption]
-                  );
-                }}
-                className={`px-4 py-2 rounded-md transition-all`}
+                      ? prev.filter((c) => c !== colorOption)
+                      : [...prev, colorOption],
+                  )
+                }
+                className='px-4 py-2 rounded-md transition-all'
                 style={{
-                  backgroundColor: selectedColors.includes(colorOption) ? colorMap[colorOption] : 'white',
-                  color: selectedColors.includes(colorOption) ? 
-                    ['Blanco', 'Amarillo', 'Beige'].includes(colorOption) ? 'black' : 'white' 
+                  backgroundColor: selectedColors.includes(colorOption)
+                    ? colorMap[colorOption]
+                    : 'white',
+                  color: selectedColors.includes(colorOption)
+                    ? ['Blanco', 'Amarillo', 'Beige'].includes(colorOption)
+                      ? 'black'
+                      : 'white'
                     : 'black',
-                  border: selectedColors.includes(colorOption) && colorOption === 'Blanco' 
-                    ? '2px solid black'
-                    : '1px solid #e5e7eb'
+                  border:
+                    selectedColors.includes(colorOption) && colorOption === 'Blanco'
+                      ? '2px solid black'
+                      : '1px solid #e5e7eb',
                 }}
               >
                 {colorOption}
               </button>
             ))}
           </div>
-          <p className="text-sm text-gray-500">Colores seleccionados: {selectedColors.join(', ')}</p>
+          <p className='text-sm text-gray-500'>
+            Colores seleccionados: {selectedColors.join(', ')}
+          </p>
         </div>
 
-        <div className="flex justify-end gap-4">
+        <div className='flex justify-end gap-4'>
           <button
-            type="button"
+            type='button'
             onClick={() => navigate('/list')}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className='px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300'
           >
             Cancelar
           </button>
           <button
-            type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+            type='submit'
+            className='px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700'
           >
             Guardar cambios
           </button>
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default EditProduct; 
+export default EditProduct

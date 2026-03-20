@@ -1,15 +1,15 @@
-import React, { Suspense, useEffect, useContext } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import SearchBar from './components/SearchBar'
-import LoadingSpinner from './components/LoadingSpinner'
+import React, { Suspense, useContext, useEffect } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import Footer from './components/Footer'
+import LoadingSpinner from './components/LoadingSpinner'
+import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
+import SearchBar from './components/SearchBar'
 import { ShopContext } from './context/ShopContext'
+import 'react-toastify/dist/ReactToastify.css'
 
-// Lazy loading de páginas
+// Lazy loading de paginas
 const Home = React.lazy(() => import('./pages/Home'))
 const Collections = React.lazy(() => import('./pages/Collections'))
 const About = React.lazy(() => import('./pages/About'))
@@ -35,9 +35,8 @@ const App = () => {
     if (storedToken) {
       setToken(storedToken)
     }
-  }, [])
+  }, [setToken])
 
-  // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [location.pathname])
@@ -45,7 +44,7 @@ const App = () => {
   return (
     <div className='min-h-screen flex flex-col'>
       <ToastContainer
-        position="top-right"
+        position='top-right'
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop
@@ -54,12 +53,12 @@ const App = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme='light'
       />
-      
+
       <Navbar />
       <SearchBar />
-      
+
       <main className='flex-grow px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] xl:px-[8vw] 2xl:px-[8vw]'>
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
@@ -72,22 +71,20 @@ const App = () => {
             <Route path='/login' element={<Login />} />
             <Route path='/delivery' element={<Delivery />} />
             <Route path='/politicas' element={<Politicas />} />
-            
-            {/* Rutas protegidas */}
+
             <Route element={<ProtectedRoute />}>
               <Route path='/place-order' element={<PlaceOrder />} />
               <Route path='/orders' element={<Orders />} />
               <Route path='/profile' element={<Profile />} />
             </Route>
-            
-            {/* Rutas de pago */}
+
             <Route path='/payment/success' element={<PaymentSuccess />} />
             <Route path='/payment/failure' element={<PaymentFailure />} />
             <Route path='/payment/pending' element={<PaymentPending />} />
           </Routes>
         </Suspense>
       </main>
-      
+
       <Footer />
     </div>
   )

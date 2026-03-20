@@ -6,7 +6,6 @@ import { ShopContext } from '../context/ShopContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react'
-import LoadingSpinner from '../components/LoadingSpinner'
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
@@ -207,7 +206,7 @@ const PlaceOrder = () => {
 
         // Proceder con la orden según el método de pago
         switch (method) {
-          case 'cod':
+          case 'cod': {
             const response = await axios.post(`${backendUrl}/api/order/place`, orderData, {
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -223,6 +222,7 @@ const PlaceOrder = () => {
               toast.error(response.data.message);
             }
             break;
+          }
           default:
             break;
         }
