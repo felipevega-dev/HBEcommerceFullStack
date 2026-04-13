@@ -1,0 +1,77 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: harrys_mongodb
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: Harrysboutique
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    container_name: harrys_backend
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    env_file:
+      - ./backend/.env
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      NODE_ENV: development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: harrys_frontend
+    restart: unless-stopped
+    ports:
+      - '5173:5173'
+    env_file:
+      - ./frontend/.env
+    environment:
+      VITE_BACKEND_URL: http://localhost:4000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  admin:
+    build:
+      context: ./admin
+      target: dev
+    container_name: harrys_admin
+    restart: unless-stopped
+    ports:
+      - '5174:5174'
+    env_file:
+      - ./admin/.env
+    environment:
+      VITE_BACKEND_URL: http://localhost:4000
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

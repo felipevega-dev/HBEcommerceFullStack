@@ -1,15 +1,13 @@
 import orderModel from '../models/orderModel.js'
 import userModel from '../models/userModel.js'
+import logger from '../config/logger.js'
 
-const placeOrder = async (req, res) => {
+const placeOrder = async (req, res, next) => {
   try {
-    console.log('Usuario autenticado:', req.user)
-    console.log('Datos recibidos:', req.body)
-
     const { items, amount, address } = req.body
     const userId = req.user.id
 
-    const orderData = {
+    const newOrder = new orderModel({
       userId,
       items,
       address,
@@ -18,149 +16,119 @@ const placeOrder = async (req, res) => {
       paymentMethod: 'COD',
       payment: false,
       date: Date.now(),
-    }
+    })
 
-    console.log('Order data a guardar:', orderData)
-
-    const newOrder = new orderModel(orderData)
     await newOrder.save()
-
     await userModel.findByIdAndUpdate(userId, { cartData: {} })
 
-    res.json({
-      success: true,
-      message: 'Order placed successfully',
-    })
+    res.json({ success: true, message: 'Order placed successfully' })
   } catch (error) {
-    console.error('Error en placeOrder:', error)
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Internal server error',
-    })
+    next(error)
   }
 }
 
 const placeOrderMercadoPago = async (_req, res) => {
-  res.status(501).json({
-    success: false,
-    message: 'placeOrderMercadoPago no implementado',
-  })
+  res.status(501).json({ success: false, message: 'placeOrderMercadoPago no implementado' })
 }
 
 const placeOrderPaypal = async (_req, res) => {
-  res.status(501).json({
-    success: false,
-    message: 'placeOrderPaypal no implementado',
-  })
+  res.status(501).json({ success: false, message: 'placeOrderPaypal no implementado' })
 }
 
-const allOrders = async (_req, res) => {
+const allOrders = async (req, res, next) => {
   try {
-    const orders = await orderModel.find()
-    res.json({
-      success: true,
-      orders,
-    })
+    const { page, limit } = req.query
+
+    if (page && limit) {
+      const skip = (Number(page) - 1) * Number(limit)
+      const [orders, total] = await Promise.all([
+        orderModel.find().sort({ date: -1 }).skip(skip).limit(Number(limit)),
+        orderModel.countDocuments(),
+      ])
+      return res.json({
+        success: true,
+        orders,
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      })
+    }
+
+    const orders = await orderModel.find().sort({ date: -1 })
+    res.json({ success: true, orders })
   } catch (error) {
-    console.error('Error al obtener todas las ordenes:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener todas las ordenes',
-    })
+    next(error)
   }
 }
 
-const userOrders = async (req, res) => {
+const userOrders = async (req, res, next) => {
   try {
     const userId = req.user.id
+    const { page, limit } = req.query
+
+    if (page && limit) {
+      const skip = (Number(page) - 1) * Number(limit)
+      const [orders, total] = await Promise.all([
+        orderModel.find({ userId }).sort({ date: -1 }).skip(skip).limit(Number(limit)),
+        orderModel.countDocuments({ userId }),
+      ])
+      return res.json({
+        success: true,
+        orders,
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      })
+    }
 
     const orders = await orderModel.find({ userId }).sort({ date: -1 })
-
-    res.json({
-      success: true,
-      orders,
-    })
+    res.json({ success: true, orders })
   } catch (error) {
-    console.error('Error al obtener ordenes:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener las ordenes',
-    })
+    next(error)
   }
 }
 
-const updateStatus = async (req, res) => {
+const updateStatus = async (req, res, next) => {
   try {
     const { orderId, status } = req.body
 
     if (!orderId || !status) {
-      return res.status(400).json({
-        success: false,
-        message: 'Order ID and status are required',
-      })
+      return res.status(400).json({ success: false, message: 'Order ID and status are required' })
     }
 
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered']
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid status value',
-      })
+      return res.status(400).json({ success: false, message: 'Invalid status value' })
     }
 
     const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { status }, { new: true })
-
     if (!updatedOrder) {
-      return res.status(404).json({
-        success: false,
-        message: 'Order not found',
-      })
+      return res.status(404).json({ success: false, message: 'Order not found' })
     }
 
-    res.json({
-      success: true,
-      message: 'Order status updated successfully',
-      order: updatedOrder,
-    })
+    res.json({ success: true, message: 'Order status updated successfully', order: updatedOrder })
   } catch (error) {
-    console.error('Error updating order status:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Error updating order status',
-    })
+    next(error)
   }
 }
 
-const deleteOrder = async (req, res) => {
+const deleteOrder = async (req, res, next) => {
   try {
     const { orderId } = req.params
-
     if (!orderId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Order ID is required',
-      })
+      return res.status(400).json({ success: false, message: 'Order ID is required' })
     }
 
     const deletedOrder = await orderModel.findByIdAndDelete(orderId)
-
     if (!deletedOrder) {
-      return res.status(404).json({
-        success: false,
-        message: 'Order not found',
-      })
+      return res.status(404).json({ success: false, message: 'Order not found' })
     }
 
-    res.json({
-      success: true,
-      message: 'Order deleted successfully',
-    })
+    res.json({ success: true, message: 'Order deleted successfully' })
   } catch (error) {
-    console.error('Error deleting order:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Error deleting order',
-    })
+    next(error)
   }
 }
 

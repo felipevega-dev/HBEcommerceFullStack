@@ -1,21 +1,25 @@
-import mongoose from 'mongoose';
-import chalk from 'chalk';
+import mongoose from 'mongoose'
+import logger from './logger.js'
 
 const connectDB = async () => {
-    try {
-        mongoose.connection.on('connected', () => {
-            console.log(chalk.green('✓') + ' MongoDB conectado exitosamente');
-        });
+  try {
+    mongoose.connection.on('connected', () => {
+      logger.info('MongoDB conectado exitosamente')
+    })
 
-        mongoose.connection.on('error', (err) => {
-            console.error(chalk.red('✗') + ' Error de MongoDB:', err);
-        });
-        
-        await mongoose.connect(`${process.env.MONGO_URI}/Harrysboutique`);
-    } catch (error) {
-        console.error(chalk.red('✗') + ' Error al conectar MongoDB:', error);
-        process.exit(1);
-    }
+    mongoose.connection.on('error', (err) => {
+      logger.error('Error de MongoDB', { error: err.message })
+    })
+
+    mongoose.connection.on('disconnected', () => {
+      logger.warn('MongoDB desconectado')
+    })
+
+    await mongoose.connect(`${process.env.MONGO_URI}/Harrysboutique`)
+  } catch (error) {
+    logger.error('Error al conectar MongoDB', { error: error.message })
+    process.exit(1)
+  }
 }
 
-export default connectDB;
+export default connectDB
