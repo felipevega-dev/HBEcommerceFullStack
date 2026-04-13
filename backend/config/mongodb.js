@@ -15,7 +15,7 @@ const connectDB = async () => {
       logger.warn('MongoDB desconectado')
     })
 
-    await mongoose.connect(`${process.env.MONGO_URI}/Harrysboutique`)
+    await mongoose.connect(process.env.MONGO_URI, { dbName: 'Harrysboutique' })
   } catch (error) {
     logger.error('Error al conectar MongoDB', { error: error.message })
     process.exit(1)

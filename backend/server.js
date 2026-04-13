@@ -20,6 +20,9 @@ import errorHandler from './middleware/errorHandler.js'
 import './models/productModel.js'
 import './models/HeroSlide.js'
 
+import dns from 'dns'
+dns.setDefaultResultOrder('ipv4first')
+
 const app = express()
 const port = Number(process.env.PORT || 4000)
 
