@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, getPagination, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
+import { buildProductWhere, buildProductOrderBy } from '@/lib/collection-params'
 
 const createProductSchema = z.object({
   name: z.string().min(1),
@@ -22,46 +23,19 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const { page, limit, skip } = getPagination(searchParams)
-
-    const search = searchParams.get('search') ?? ''
-    const category = searchParams.get('category') ?? ''
-    const subCategory = searchParams.get('subCategory') ?? ''
-    const bestSeller = searchParams.get('bestSeller')
-    const minPrice = searchParams.get('minPrice')
-    const maxPrice = searchParams.get('maxPrice')
     const sort = searchParams.get('sort') ?? 'latest'
 
-    const where = {
-      active: true,
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' as const } },
-          { description: { contains: search, mode: 'insensitive' as const } },
-        ],
-      }),
-      ...(category && { category: { name: { equals: category } } }),
-      ...(subCategory && { subCategory }),
-      ...(bestSeller === 'true' && { bestSeller: true }),
-      ...(minPrice || maxPrice
-        ? {
-            price: {
-              ...(minPrice && { gte: parseFloat(minPrice) }),
-              ...(maxPrice && { lte: parseFloat(maxPrice) }),
-            },
-          }
-        : {}),
+    const params = {
+      search: searchParams.get('search') ?? undefined,
+      category: searchParams.get('category') ?? undefined,
+      subCategory: searchParams.get('subCategory') ?? undefined,
+      bestSeller: searchParams.get('bestSeller') ?? undefined,
+      minPrice: searchParams.get('minPrice') ?? undefined,
+      maxPrice: searchParams.get('maxPrice') ?? undefined,
     }
 
-    const orderBy =
-      sort === 'price_asc'
-        ? { price: 'asc' as const }
-        : sort === 'price_desc'
-          ? { price: 'desc' as const }
-          : sort === 'rating'
-            ? { ratingAverage: 'desc' as const }
-            : sort === 'oldest'
-              ? { createdAt: 'asc' as const }
-              : { createdAt: 'desc' as const }
+    const where = buildProductWhere(params)
+    const orderBy = buildProductOrderBy(sort)
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({

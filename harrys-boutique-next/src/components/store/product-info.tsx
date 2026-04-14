@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useCartStore } from '@/store/cart-store'
 import { toast } from 'react-toastify'
+import { colorToHex } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -168,7 +169,7 @@ export function ProductInfo({
                 onClick={() => setSelectedColor(color)}
                 title={color}
                 className={`w-8 h-8 rounded-full border-2 transition-all ${selectedColor === color ? 'border-[var(--color-accent)] scale-110' : 'border-gray-200 hover:border-gray-400'}`}
-                style={{ backgroundColor: color.toLowerCase() }}
+                style={{ backgroundColor: colorToHex(color) }}
               />
             ))}
           </div>

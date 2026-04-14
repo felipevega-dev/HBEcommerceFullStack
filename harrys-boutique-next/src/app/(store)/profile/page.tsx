@@ -1,3 +1,4 @@
+import type { UserWithAddresses } from '@/components/store/profile-page-client'
 import type { Metadata } from 'next'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
@@ -22,7 +23,7 @@ export default async function ProfilePage() {
 
   if (!raw) redirect('/login')
 
-  const user = serialize(raw)
+  const user = serialize(raw) as unknown as UserWithAddresses
 
   return <ProfilePageClient user={user} />
 }

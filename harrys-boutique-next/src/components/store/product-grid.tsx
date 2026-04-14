@@ -3,11 +3,16 @@ import { ProductCard } from './product-card'
 
 interface Product {
   id: string
+  slug?: string
   name: string
   price: number | { toNumber: () => number }
   images: string[]
   ratingAverage: number
   ratingCount: number
+  wishlisted?: boolean
+  showWishlist?: boolean
+  bestSeller?: boolean
+  originalPrice?: number
 }
 
 interface Props {
@@ -41,16 +46,20 @@ export function ProductGrid({
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={{
-              ...product,
-              wishlisted: wishlistSet?.has(product.id) ?? false,
-              showWishlist: !!wishlistSet,
-            }}
-          />
-        ))}
+      {products.map((product) => {
+          const price = typeof product.price === 'number' ? product.price : product.price.toNumber()
+          return (
+            <ProductCard
+              key={product.id}
+              product={{
+                ...product,
+                price,
+                wishlisted: wishlistSet?.has(product.id) ?? false,
+                showWishlist: !!wishlistSet,
+              }}
+            />
+          )
+        })}
       </div>
 
       {totalPages > 1 && (

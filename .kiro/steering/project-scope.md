@@ -9,10 +9,8 @@ All work must be done exclusively in the `harrys-boutique-next/` directory. This
 
 ## Ignored Directories
 
-The following folders are **legacy** and must be completely ignored. Do not read, modify, reference, or suggest changes to any files inside them:
+The following folder contains **legacy** code and must be completely ignored. Do not read, modify, reference, or suggest changes to any files inside it:
 
-- `frontend/` — legacy React frontend (replaced by `harrys-boutique-next/src/app/(store)/`)
-- `admin/` — legacy React admin panel (replaced by `harrys-boutique-next/src/app/(admin)/`)
-- `backend/` — legacy Express.js backend (replaced by `harrys-boutique-next/src/app/api/`)
+- `legacy/` — contains the old React frontend, React admin panel, and Express.js backend, along with their original config files (package.json, docker-compose.yml, .env, etc.)
 
 When exploring the codebase, gathering context, or making changes, always scope your work to `harrys-boutique-next/` only.

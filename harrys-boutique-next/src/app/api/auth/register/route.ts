@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/email'
-import { WelcomeEmail } from '../../../../../emails/WelcomeEmail'
+import { WelcomeEmail } from '@/lib/email/templates/welcome'
 import React from 'react'
 
 const registerSchema = z.object({

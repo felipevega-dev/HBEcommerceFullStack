@@ -1,3 +1,4 @@
+import type { WishlistWithProduct } from '@/components/store/wishlist-page-client'
 import type { Metadata } from 'next'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
@@ -20,7 +21,7 @@ export default async function WishlistPage() {
     orderBy: { createdAt: 'desc' },
   })
 
-  const wishlist = serialize(raw)
+  const wishlist = serialize(raw) as unknown as WishlistWithProduct[]
 
   return <WishlistPageClient wishlist={wishlist} />
 }

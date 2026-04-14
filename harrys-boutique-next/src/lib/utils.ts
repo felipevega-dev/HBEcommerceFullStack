@@ -51,3 +51,33 @@ export function generateSlug(name: string): string {
     .replace(/\s+/g, '-') // spaces to hyphens
     .replace(/-+/g, '-') // collapse multiple hyphens
 }
+
+/** Shared shipping fee constant — used in checkout, orders API, and webhook */
+export const SHIPPING_FEE = 10
+
+/**
+ * Maps Spanish color names (as stored in DB) to CSS hex values.
+ * Falls back to the name itself so CSS named colors (e.g. "red") still work.
+ */
+export const COLOR_MAP: Record<string, string> = {
+  negro: '#000000',
+  blanco: '#FFFFFF',
+  gris: '#808080',
+  rojo: '#FF0000',
+  azul: '#0000FF',
+  verde: '#008000',
+  amarillo: '#FFFF00',
+  rosa: '#FFC0CB',
+  morado: '#800080',
+  naranja: '#FFA500',
+  marrón: '#8B4513',
+  marron: '#8B4513',
+  beige: '#F5F5DC',
+}
+
+export function colorToHex(name: string): string {
+  return COLOR_MAP[name.toLowerCase()] ?? name.toLowerCase()
+}
+
+/** Free shipping threshold in ARS */
+export const FREE_SHIPPING_THRESHOLD = 50000

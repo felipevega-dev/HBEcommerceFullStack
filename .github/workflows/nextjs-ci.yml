@@ -1,0 +1,90 @@
+name: Next.js CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'harrys-boutique-next/**'
+      - '.github/workflows/nextjs-ci.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'harrys-boutique-next/**'
+
+jobs:
+  quality:
+    name: Type-check, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: harrys-boutique-next/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: harrys-boutique-next
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: harrys-boutique-next
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/harrys_boutique_test
+
+      - name: Type check
+        run: npm run type-check
+        working-directory: harrys-boutique-next
+
+      - name: Lint
+        run: npm run lint
+        working-directory: harrys-boutique-next
+
+      - name: Test
+        run: npm run test
+        working-directory: harrys-boutique-next
+        env:
+          NODE_ENV: test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: harrys-boutique-next/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: harrys-boutique-next
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: harrys-boutique-next
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/harrys_boutique_test
+
+      - name: Build
+        run: npm run build
+        working-directory: harrys-boutique-next
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/harrys_boutique_test
+          NEXTAUTH_SECRET: ci-secret-min-32-chars-for-testing-only
+          NEXTAUTH_URL: http://localhost:3000
+          CLOUDINARY_NAME: ci
+          CLOUDINARY_API_KEY: ci
+          CLOUDINARY_SECRET_KEY: ci
+          MERCADOPAGO_ACCESS_TOKEN: ci
+          RESEND_API_KEY: ci
+          NEXT_PUBLIC_FRONTEND_URL: http://localhost:3000

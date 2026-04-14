@@ -1,6 +1,21 @@
 import type { NextConfig } from 'next'
 import path from 'path'
 
+const productionUrl = process.env.NEXTAUTH_URL ?? ''
+const allowedOrigins = ['localhost:3000', 'localhost:3001']
+
+// Add production domain to allowed origins if set
+if (productionUrl) {
+  try {
+    const { host } = new URL(productionUrl)
+    if (host && !allowedOrigins.includes(host)) {
+      allowedOrigins.push(host)
+    }
+  } catch {
+    // Invalid URL — skip
+  }
+}
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -9,7 +24,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    serverActions: { allowedOrigins: ['localhost:3000'] },
+    serverActions: { allowedOrigins },
   },
   turbopack: {
     root: path.resolve(__dirname),

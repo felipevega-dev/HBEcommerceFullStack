@@ -8,6 +8,7 @@ import { formatPrice } from '@/lib/utils'
 
 interface Product {
   id: string
+  slug?: string
   name: string
   price: number
   originalPrice?: number
@@ -23,9 +24,12 @@ export function ProductCard({ product }: { product: Product }) {
   const price = product.price
   const image = product.images[0]
   const secondImage = product.images[1]
+  // Only use slug if it's a valid slug (non-empty, no spaces, no UUID format)
+  const isValidSlug = product.slug && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(product.slug)
+  const href = isValidSlug ? `/product/${product.slug}` : `/product/${product.id}`
 
   return (
-    <Link href={`/product/${product.id}`} className="group block">
+    <Link href={href} className="group block">
       <div className="space-y-2">
         <div className="relative overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface)] aspect-[3/4] shadow-[var(--shadow-sm)] group-hover:shadow-[var(--shadow-hover)] transition-shadow duration-300">
           {/* Badge Best Seller */}
@@ -42,7 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
                 alt={product.name}
                 fill
                 loading="lazy"
-                className="object-cover object-center opacity-100 group-hover:opacity-0 transition-opacity duration-300"
+                className={`object-cover object-center transition-opacity duration-300 ${secondImage ? 'group-hover:opacity-0' : ''}`}
               />
               {secondImage && (
                 <Image

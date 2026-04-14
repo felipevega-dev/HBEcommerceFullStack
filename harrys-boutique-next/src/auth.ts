@@ -19,9 +19,7 @@ declare module 'next-auth' {
       profileImage?: string | null
     }
   }
-}
-
-declare module 'next-auth/jwt' {
+  // JWT is extended here to avoid module augmentation issues with next-auth v5 beta
   interface JWT {
     id: string
     role: Role
@@ -73,9 +71,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      session.user.id = token.id
-      session.user.role = token.role
-      session.user.profileImage = token.profileImage
+      session.user.id = token.id as string
+      session.user.role = token.role as Role
+      session.user.profileImage = token.profileImage as string | null | undefined
       return session
     },
   },

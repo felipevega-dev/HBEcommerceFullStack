@@ -8,6 +8,7 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().min(1, 'CLOUDINARY_API_KEY is required'),
   CLOUDINARY_SECRET_KEY: z.string().min(1, 'CLOUDINARY_SECRET_KEY is required'),
   MERCADOPAGO_ACCESS_TOKEN: z.string().min(1, 'MERCADOPAGO_ACCESS_TOKEN is required'),
+  MERCADOPAGO_WEBHOOK_SECRET: z.string().min(1, 'MERCADOPAGO_WEBHOOK_SECRET is required'),
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
   NEXT_PUBLIC_FRONTEND_URL: z.string().url('NEXT_PUBLIC_FRONTEND_URL must be a valid URL'),
 })

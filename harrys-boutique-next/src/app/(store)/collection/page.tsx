@@ -4,6 +4,12 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { serialize } from '@/lib/serialize'
 import { auth } from '@/auth'
+import {
+  buildProductOrderBy,
+  buildProductWhere,
+  splitParam,
+  type CollectionParams,
+} from '@/lib/collection-params'
 import { CollectionFilters } from '@/components/store/collection-filters'
 import { ProductGrid } from '@/components/store/product-grid'
 import { SortSelect } from '@/components/store/sort-select'
@@ -14,63 +20,24 @@ export const metadata: Metadata = {
   description: 'Explora toda nuestra colección de ropa y accesorios para mascotas.',
 }
 
-interface SearchParams {
-  category?: string
-  subCategory?: string
-  colors?: string
-  sizes?: string
-  minPrice?: string
-  maxPrice?: string
-  sort?: string
-  page?: string
-  search?: string
-  bestSeller?: string
-}
-
 export default async function CollectionPage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>
+  searchParams: Promise<CollectionParams>
 }) {
   const params = await searchParams
   const session = await auth()
+
   const page = Math.max(1, parseInt(params.page ?? '1'))
   const limit = 12
   const skip = (page - 1) * limit
-
-  const selectedCategories = params.category ? params.category.split(',') : []
-  const selectedSubcategories = params.subCategory ? params.subCategory.split(',') : []
-  const selectedColors = params.colors ? params.colors.split(',') : []
-  const selectedSizes = params.sizes ? params.sizes.split(',') : []
-
-  const where = {
-    active: true,
-    ...(params.search && {
-      OR: [
-        { name: { contains: params.search, mode: 'insensitive' as const } },
-        { description: { contains: params.search, mode: 'insensitive' as const } },
-      ],
-    }),
-    ...(selectedCategories.length > 0 && { category: { name: { in: selectedCategories } } }),
-    ...(selectedSubcategories.length > 0 && { subCategory: { in: selectedSubcategories } }),
-    ...(params.bestSeller === 'true' && { bestSeller: true }),
-    ...((params.minPrice || params.maxPrice) && {
-      price: {
-        ...(params.minPrice && { gte: parseFloat(params.minPrice) }),
-        ...(params.maxPrice && { lte: parseFloat(params.maxPrice) }),
-      },
-    }),
-  }
-
   const sort = params.sort ?? 'latest'
-  const orderBy =
-    sort === 'price_asc'
-      ? { price: 'asc' as const }
-      : sort === 'price_desc'
-        ? { price: 'desc' as const }
-        : sort === 'rating'
-          ? { ratingAverage: 'desc' as const }
-          : { createdAt: 'desc' as const }
+
+  const selectedColors = splitParam(params.colors)
+  const selectedSizes = splitParam(params.sizes)
+
+  const where = buildProductWhere(params)
+  const orderBy = buildProductOrderBy(sort)
 
   const [products, total, categories, allProducts, wishlistIds] = await Promise.all([
     prisma.product.findMany({ where, orderBy, skip, take: limit }),
@@ -88,7 +55,7 @@ export default async function CollectionPage({
       : Promise.resolve([]),
   ])
 
-  // Filter by colors/sizes after fetching (since they're arrays in JSON)
+  // Filter by colors/sizes after fetching (stored as JSON arrays in DB)
   const filteredProducts =
     selectedColors.length > 0 || selectedSizes.length > 0
       ? products.filter((p) => {
@@ -101,17 +68,20 @@ export default async function CollectionPage({
         })
       : products
 
-  // Serialize Decimal fields before passing to Client Components
-  const serializedProducts = serialize(filteredProducts).map((p) => ({
-    ...p,
-    price: Number(p.price),
+  const serializedProducts = filteredProducts.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    price: p.price.toNumber(),
+    originalPrice: p.originalPrice != null ? p.originalPrice.toNumber() : undefined,
+    images: p.images,
+    ratingAverage: p.ratingAverage,
+    ratingCount: p.ratingCount,
+    bestSeller: p.bestSeller,
   }))
   const serializedCategories = serialize(categories)
-
-  // Build wishlist set for fast lookup
   const wishlistSet = new Set(wishlistIds.map((w) => w.productId))
 
-  // Extract unique colors and sizes from all products
   const uniqueColors = [...new Set(allProducts.flatMap((p) => p.colors))].sort()
   const uniqueSizes = [
     ...new Set(allProducts.flatMap((p) => (Array.isArray(p.sizes) ? (p.sizes as string[]) : []))),
@@ -136,7 +106,6 @@ export default async function CollectionPage({
         </ol>
       </nav>
 
-      {/* Page header */}
       <div className="mb-8 border-b border-[var(--color-border)] pb-6">
         <h1 className="text-3xl font-medium mb-2">Colecciones</h1>
         <p className="text-[var(--color-text-secondary)]">

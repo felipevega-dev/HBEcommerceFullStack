@@ -4,6 +4,8 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { FilterChip } from '@/components/ui/filter-chip'
+import type { CollectionParams } from '@/lib/collection-params'
+import { colorToHex } from '@/lib/utils'
 
 interface Category {
   id: string
@@ -15,7 +17,7 @@ interface Props {
   categories: Category[]
   colors: string[]
   sizes: string[]
-  currentParams: Record<string, string | undefined>
+  currentParams: CollectionParams
 }
 
 function AccordionSection({
@@ -142,7 +144,7 @@ function FilterContent({
             />
             <span
               className="w-4 h-4 rounded-full inline-block border border-[var(--color-border)]"
-              style={{ backgroundColor: color.toLowerCase() }}
+              style={{ backgroundColor: colorToHex(color) }}
             />
             <span className="text-sm">{color}</span>
           </label>

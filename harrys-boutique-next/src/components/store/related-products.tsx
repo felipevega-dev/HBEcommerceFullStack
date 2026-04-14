@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma'
-import { serialize } from '@/lib/serialize'
 import { ProductCard } from './product-card'
 
 interface Props {
@@ -11,6 +10,7 @@ interface Props {
 export async function RelatedProducts({ categoryId, subCategory, excludeId }: Props) {
   let products: {
     id: string
+    slug: string
     name: string
     price: number
     images: string[]
@@ -28,10 +28,11 @@ export async function RelatedProducts({ categoryId, subCategory, excludeId }: Pr
       take: 5,
       orderBy: { ratingAverage: 'desc' },
     })
-    products = serialize(raw).map((p) => ({
+    products = raw.map((p) => ({
       id: p.id,
+      slug: p.slug,
       name: p.name,
-      price: Number(p.price),
+      price: p.price.toNumber(),
       images: p.images,
       ratingAverage: p.ratingAverage,
       ratingCount: p.ratingCount,

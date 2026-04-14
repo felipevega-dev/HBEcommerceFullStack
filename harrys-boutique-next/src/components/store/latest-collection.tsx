@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { serialize } from '@/lib/serialize'
 import { ProductCard } from './product-card'
 
 export async function LatestCollection() {
@@ -18,15 +17,15 @@ export async function LatestCollection() {
       orderBy: { createdAt: 'desc' },
       take: 10,
     })
-    products = serialize(raw).map((p) => ({
+    products = raw.map((p) => ({
       id: p.id,
+      slug: p.slug,
       name: p.name,
-      price: Number(p.price),
+      price: p.price.toNumber(),
       images: p.images,
       ratingAverage: p.ratingAverage,
       ratingCount: p.ratingCount,
     }))
-    console.log('[LatestCollection] first product sample:', JSON.stringify(products[0]))
   } catch {
     // DB not connected
   }

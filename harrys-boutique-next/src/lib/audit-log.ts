@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Prisma } from '@prisma/client'
 
 export async function logAuditAction(
   userId: string,
@@ -11,7 +12,18 @@ export async function logAuditAction(
 ) {
   try {
     await prisma.auditLog.create({
-      data: { userId, action, resource, resourceId, changes, ip, userAgent },
+      data: {
+        userId,
+        action,
+        resource,
+        resourceId,
+        // Cast to Prisma's InputJsonValue — safe because Record<string, unknown> is JSON-serializable
+        changes: changes !== null && changes !== undefined
+          ? (changes as Prisma.InputJsonValue)
+          : undefined,
+        ip,
+        userAgent,
+      },
     })
   } catch (error) {
     // Audit log failures should never crash the main flow

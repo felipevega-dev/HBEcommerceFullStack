@@ -10,3 +10,6 @@ coverage/
 .DS_Store
 .idea/
 .vscode/
+
+# Legacy — ignored by agents
+legacy/

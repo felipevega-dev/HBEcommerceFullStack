@@ -31,7 +31,7 @@ interface OrderItem {
   image?: string | null
 }
 
-interface OrderWithItems {
+export interface OrderWithItems {
   id: string
   amount: number
   status: OrderStatus

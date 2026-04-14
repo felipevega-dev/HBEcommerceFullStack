@@ -13,7 +13,7 @@ interface WishlistProduct {
   ratingCount: number
 }
 
-interface WishlistWithProduct {
+export interface WishlistWithProduct {
   id: string
   productId: string
   product: WishlistProduct

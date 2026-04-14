@@ -13,6 +13,7 @@ const itemSchema = z.object({
 const preferenceSchema = z.object({
   items: z.array(itemSchema).min(1),
   amount: z.number().positive(),
+  orderId: z.string().uuid(),
   address: z.object({
     firstname: z.string(),
     lastname: z.string().optional(),
@@ -62,11 +63,16 @@ export async function POST(req: NextRequest) {
           pending: `${process.env.NEXTAUTH_URL}/orders?payment=pending`,
         },
         auto_return: 'approved',
-        external_reference: session!.user.id,
+        external_reference: data!.orderId,
       },
     })
 
-    return NextResponse.json({ success: true, preferenceId: result.id })
+    return NextResponse.json({
+      success: true,
+      preferenceId: result.id,
+      initPoint: result.init_point,        // production redirect URL
+      sandboxInitPoint: result.sandbox_init_point, // sandbox redirect URL
+    })
   } catch (e) {
     return handleApiError(e)
   }

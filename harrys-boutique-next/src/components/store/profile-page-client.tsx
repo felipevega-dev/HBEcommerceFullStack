@@ -18,7 +18,7 @@ interface Address {
   isDefault: boolean
 }
 
-interface UserWithAddresses {
+export interface UserWithAddresses {
   id: string
   name: string
   email: string
