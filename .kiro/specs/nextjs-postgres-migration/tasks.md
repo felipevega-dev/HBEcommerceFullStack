@@ -1,0 +1,277 @@
+# Implementation Plan: Next.js + PostgreSQL Migration
+
+## Overview
+
+Migración del stack actual (React + Vite + Node.js/Express + MongoDB, tres apps separadas) a una única aplicación Next.js 15 con App Router, TypeScript estricto, PostgreSQL en Railway y Prisma como ORM. Las tareas siguen un orden incremental: primero la base del proyecto, luego el schema de datos, la migración de datos, las API Routes, la autenticación, el frontend público, el panel de administración, los emails transaccionales y finalmente el deploy.
+
+## Tasks
+
+- [x] 1. Inicializar proyecto Next.js 15 y configurar entorno
+  - [x] 1.1 Crear la aplicación Next.js 15 con App Router, TypeScript estricto y Tailwind CSS v4
+    - Ejecutar `create-next-app` con flags `--typescript --tailwind --app --src-dir`
+    - Configurar `tsconfig.json` con `strict: true` y path aliases
+    - Crear estructura de directorios: `app/(store)/`, `app/(admin)/`, `app/api/`, `lib/`, `components/`, `types/`
+    - _Requirements: 1.1, 1.6_
+  - [x] 1.2 Instalar y configurar Prisma con provider PostgreSQL
+    - Instalar `prisma` y `@prisma/client`
+    - Ejecutar `prisma init --datasource-provider postgresql`
+    - Crear `lib/prisma.ts` con el singleton del Prisma Client que evita conexiones duplicadas en hot-reload
+    - _Requirements: 1.2, 1.4_
+  - [x] 1.3 Crear `.env.example` y validación de variables de entorno al inicio
+    - Crear `.env.example` con todas las variables requeridas: `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_SECRET_KEY`, `MERCADOPAGO_ACCESS_TOKEN`, `RESEND_API_KEY`, `NEXT_PUBLIC_FRONTEND_URL`
+    - Crear `lib/env.ts` que valide con Zod las variables de entorno al iniciar y registre error descriptivo si falta alguna
+    - _Requirements: 1.3, 1.5_
+
+- [x] 2. Definir schema Prisma completo
+  - [x] 2.1 Definir modelos de usuario, dirección y autenticación
+    - Definir modelo `User` con campos `id` (UUID), `name`, `email` (único), `password`, `role` (enum `OWNER|ADMIN|MODERATOR|USER`), `profileImage`, `createdAt`, `updatedAt`
+    - Definir modelo `Address` con campos `id`, `userId`, `firstname`, `lastname`, `phone`, `street`, `city`, `region`, `postalCode`, `country`, `isDefault`
+    - _Requirements: 2.1, 2.2_
+  - [x] 2.2 Definir modelos de catálogo: Product y Category
+    - Definir modelo `Category` con campos `id`, `name` (único), `subcategories` (String[]), `createdAt`
+    - Definir modelo `Product` con campos `id` (UUID), `name`, `description`, `price` (Decimal), `images` (String[]), `categoryId`, `subCategory`, `colors` (String[]), `sizes` (Json), `bestSeller`, `ratingAverage`, `ratingCount`, `createdAt`
+    - _Requirements: 2.3, 2.4_
+  - [x] 2.3 Definir modelos de órdenes y carrito
+    - Definir modelo `Order` con campos `id` (UUID), `userId`, `amount` (Decimal), `addressSnapshot` (Json), `status` (enum `PENDING|PROCESSING|SHIPPED|DELIVERED|CANCELLED`), `paymentMethod`, `payment`, `createdAt`
+    - Definir modelo `OrderItem` con campos `id`, `orderId`, `productId`, `name`, `price`, `quantity`, `size`, `color`, `image`
+    - Definir modelo `Cart` con `id`, `userId` (único), `updatedAt` y modelo `CartItem` con `id`, `cartId`, `productId`, `quantity`, `size`, `color`
+    - _Requirements: 2.5, 2.6, 2.10, 2.11_
+  - [x] 2.4 Definir modelos de reviews, wishlist, cupones y auxiliares
+    - Definir modelo `Review` con índice único compuesto `(userId, productId)` y validación de rating 1–5
+    - Definir modelo `Wishlist` con índice único compuesto `(userId, productId)`
+    - Definir modelo `Coupon` con enum `PERCENTAGE|FIXED`, campos `maxUses`, `usedCount`, `expiresAt`, `active`
+    - Definir modelos `AuditLog`, `Settings`, `HeroSlide`
+    - _Requirements: 2.6, 2.7, 2.8, 2.9, 2.12, 2.13_
+  - [x] 2.5 Generar y aplicar migración inicial de Prisma
+    - Ejecutar `prisma migrate dev --name init` para generar el SQL de migración inicial
+    - Verificar que `prisma migrate deploy` aplica sin errores en un entorno PostgreSQL limpio
+    - _Requirements: 2.14_
+
+- [ ] 3. Checkpoint — Verificar schema y conexión a base de datos
+  - Asegurarse de que `prisma db push` o `prisma migrate dev` completa sin errores
+  - Verificar que el singleton de Prisma Client se conecta correctamente
+  - Preguntar al usuario si hay dudas antes de continuar.
+
+- [x] 4. Script de migración de datos MongoDB → PostgreSQL
+  - [x] 4.1 Crear estructura base del script de migración
+    - Crear `scripts/migrate-from-mongo.ts` con conexión a MongoDB (mongoose o driver nativo) y al Prisma Client
+    - Implementar función de mapeo de ObjectId a UUID v4 determinístico
+    - Implementar sistema de logging con reporte final (documentos leídos, registros insertados, errores)
+    - _Requirements: 3.1, 3.2, 3.7_
+  - [x] 4.2 Migrar colecciones de usuarios, direcciones y carritos
+    - Migrar colección `users` a tabla `User`, preservando hashes bcrypt sin modificación
+    - Migrar array `billingAddresses` embebido a registros individuales en tabla `Address`, preservando `isDefault`
+    - Migrar campo `cartData` embebido a registros normalizados en tablas `Cart` y `CartItem`
+    - _Requirements: 3.3, 3.4, 3.5_
+  - [x] 4.3 Migrar colecciones de catálogo y órdenes
+    - Migrar colecciones `categories` y `products` resolviendo referencias entre documentos
+    - Migrar colección `orders` con sus `orderItems` embebidos, resolviendo referencias a `userId` y `productId`
+    - _Requirements: 3.1, 3.6_
+  - [x] 4.4 Migrar colecciones auxiliares y validar integridad
+    - Migrar colecciones `reviews`, `auditlogs`, `settings`, `heroslides` resolviendo todas las referencias FK
+    - Implementar lógica de manejo de errores: registrar documentos inválidos con su `_id` y continuar sin detener la migración
+    - Implementar consultas de validación que comparen conteos MongoDB vs PostgreSQL por entidad
+    - _Requirements: 3.6, 3.7, 3.8, 3.9, 3.10_
+  - [ ]* 4.5 Escribir tests de integración para el script de migración
+    - Testear mapeo determinístico de ObjectId a UUID
+    - Testear idempotencia: ejecutar migración dos veces no crea duplicados
+    - Testear manejo de documentos con referencias rotas
+    - _Requirements: 3.2, 3.9_
+
+- [ ] 5. Checkpoint — Ejecutar script de migración en entorno de desarrollo
+  - Ejecutar `scripts/migrate-from-mongo.ts` contra una copia de la base de datos de desarrollo
+  - Verificar el reporte de validación: conteos MongoDB vs PostgreSQL deben coincidir
+  - Preguntar al usuario si hay dudas antes de continuar.
+
+- [x] 6. Autenticación con NextAuth.js v5
+  - [x] 6.1 Instalar y configurar NextAuth.js v5 con provider Credentials
+    - Instalar `next-auth@beta`
+    - Crear `auth.ts` en la raíz con configuración de NextAuth v5, provider `Credentials` que valide email/password contra PostgreSQL con bcrypt
+    - Configurar JWT con expiración de 7 días e incluir campos `id`, `email`, `name`, `role`, `profileImage` en el token
+    - _Requirements: 5.1, 5.2, 5.4_
+  - [x] 6.2 Implementar middleware de protección de rutas
+    - Crear `middleware.ts` en la raíz que proteja rutas `/admin/*`, `/checkout`, `/orders`, `/profile`, `/wishlist`
+    - Redirigir a `/login` con `callbackUrl` si no hay sesión activa
+    - Redirigir a `/` si usuario sin rol admin intenta acceder a `/admin/*`
+    - _Requirements: 5.5, 5.6, 5.7_
+  - [x] 6.3 Implementar endpoint de registro `/api/auth/register`
+    - Crear `app/api/auth/register/route.ts` con validación Zod del body
+    - Hashear contraseña con bcrypt (salt rounds: 12) antes de persistir
+    - Retornar HTTP 409 si el email ya existe
+    - _Requirements: 5.8, 5.9_
+  - [ ]* 6.4 Escribir tests unitarios para la lógica de autenticación
+    - Testear validación de credenciales correctas e incorrectas
+    - Testear que el error de login no revela si el email existe
+    - Testear registro con email duplicado retorna 409
+    - _Requirements: 5.3, 5.9_
+
+- [x] 7. API Routes — migración de endpoints Express
+  - [x] 7.1 Crear utilidades compartidas para API Routes
+    - Crear `lib/api-utils.ts` con helpers: `withAuth()`, `withAdminAuth()`, `handleApiError()`, `validateBody(schema)`
+    - Implementar rate limiting middleware usando `lib/rate-limiter.ts` (100 req/min general, 10 req/min para auth)
+    - _Requirements: 4.5, 4.6, 4.7, 4.8_
+  - [x] 7.2 Implementar API Routes de productos y categorías
+    - Crear `app/api/products/route.ts` (GET lista, POST crear) y `app/api/products/[id]/route.ts` (GET, PUT, DELETE)
+    - Crear `app/api/categories/route.ts` con CRUD completo
+    - Validar bodies con schemas Zod específicos por endpoint
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [x] 7.3 Implementar API Routes de carrito y wishlist
+    - Crear `app/api/cart/route.ts` con GET (obtener carrito), POST (agregar item), PUT (actualizar cantidad), DELETE (eliminar item)
+    - Crear `app/api/wishlist/route.ts` con GET, POST (agregar), DELETE (eliminar)
+    - _Requirements: 4.1, 4.2_
+  - [x] 7.4 Implementar API Routes de órdenes y reviews
+    - Crear `app/api/orders/route.ts` (GET lista del usuario, POST crear orden) y `app/api/orders/[id]/route.ts` (GET detalle, PUT actualizar estado)
+    - Crear `app/api/reviews/route.ts` (GET por producto, POST crear) y `app/api/reviews/[id]/route.ts` (PUT, DELETE)
+    - _Requirements: 4.1, 4.2_
+  - [x] 7.5 Implementar API Routes de cupones, settings y upload
+    - Crear `app/api/coupons/route.ts` con CRUD y endpoint de validación `/api/coupons/validate`
+    - Crear `app/api/settings/route.ts` con GET y PUT
+    - Crear `app/api/upload/route.ts` que suba imágenes a Cloudinary y retorne las URLs
+    - _Requirements: 4.1, 4.2_
+  - [x] 7.6 Implementar webhook de MercadoPago
+    - Crear `app/api/mercadopago/webhook/route.ts` que verifique la firma del payload antes de procesar
+    - Actualizar estado de orden a `PROCESSING` y `payment: true` en una única transacción de base de datos cuando el pago es aprobado
+    - _Requirements: 4.9, 4.10_
+  - [x] 7.7 Implementar endpoint de health check
+    - Crear `app/api/health/route.ts` que retorne `{ status: "ok", db: "connected" }` con HTTP 200
+    - Verificar conectividad con PostgreSQL en el handler
+    - _Requirements: 9.6_
+  - [ ]* 7.8 Escribir tests de integración para las API Routes críticas
+    - Testear autenticación y autorización en endpoints protegidos
+    - Testear validación Zod retorna HTTP 400 con campo `errors`
+    - Testear webhook de MercadoPago con firma válida e inválida
+    - _Requirements: 4.3, 4.4, 4.5, 4.6, 4.9_
+
+- [ ] 8. Checkpoint — Verificar que todas las API Routes responden correctamente
+  - Ejecutar tests de integración de API Routes
+  - Verificar rate limiting, autenticación y manejo de errores
+  - Preguntar al usuario si hay dudas antes de continuar.
+
+- [x] 9. Frontend público — Store (App Router)
+  - [x] 9.1 Configurar Zustand store con slices de cart, auth y ui
+    - Instalar `zustand` y `@tanstack/react-query`
+    - Crear `store/cart-slice.ts`, `store/auth-slice.ts`, `store/ui-slice.ts`
+    - Implementar lógica de fusión de carrito localStorage + base de datos al iniciar sesión
+    - _Requirements: 6.5, 6.6, 6.7_
+  - [x] 9.2 Implementar páginas Home, About, Contact y páginas estáticas
+    - Crear `app/(store)/page.tsx` (Home con hero slides y productos destacados como Server Component)
+    - Crear páginas `/about`, `/contact`, `/delivery`, `/politicas` como Server Components
+    - Usar Metadata API de Next.js para `title`, `description` y `openGraph` en cada página
+    - _Requirements: 6.1, 6.3_
+  - [x] 9.3 Implementar página de colección con filtros
+    - Crear `app/(store)/collection/page.tsx` como Server Component que obtenga productos desde Prisma
+    - Crear componente Client `CollectionFilters` para filtros de categoría, subcategoría, precio, color, talla y ordenamiento que actualicen URL params sin recargar
+    - _Requirements: 6.2, 6.8_
+  - [x] 9.4 Implementar página de detalle de producto
+    - Crear `app/(store)/product/[id]/page.tsx` como Server Component con datos desde Prisma
+    - Usar `next/image` para todas las imágenes del producto
+    - Implementar selector de talla/color y botón de agregar al carrito como Client Component
+    - _Requirements: 6.2, 6.4_
+  - [x] 9.5 Implementar páginas de carrito y checkout
+    - Crear `app/(store)/cart/page.tsx` con listado de items, actualización de cantidades y total
+    - Crear `app/(store)/checkout/page.tsx` con formulario React Hook Form + Zod para dirección de envío e integración con MercadoPago
+    - _Requirements: 6.1, 6.10_
+  - [x] 9.6 Implementar páginas de perfil, órdenes y wishlist
+    - Crear `app/(store)/profile/page.tsx` con formulario de edición de perfil (React Hook Form + Zod)
+    - Crear `app/(store)/orders/page.tsx` con listado de órdenes del usuario usando TanStack Query v5
+    - Crear `app/(store)/wishlist/page.tsx` con listado de productos guardados
+    - _Requirements: 6.1, 6.9, 6.10_
+  - [x] 9.7 Implementar páginas de resultado de pago
+    - Crear `app/(store)/payment/success/page.tsx`, `/payment/failure/page.tsx`, `/payment/pending/page.tsx`
+    - Implementar búsqueda de productos con debounce de 300ms usando TanStack Query v5
+    - _Requirements: 6.1, 6.9_
+  - [ ]* 9.8 Escribir tests unitarios para componentes del Store
+    - Testear lógica del Zustand store (agregar/eliminar items del carrito, fusión al login)
+    - Testear componente de filtros actualiza URL params correctamente
+    - _Requirements: 6.5, 6.6, 6.7, 6.8_
+
+- [x] 10. Panel de administración integrado
+  - [x] 10.1 Implementar layout y dashboard del admin
+    - Crear `app/(admin)/layout.tsx` con sidebar de navegación y verificación de rol
+    - Crear `app/(admin)/admin/dashboard/page.tsx` como Server Component con métricas: total órdenes, ingresos del mes, productos activos, clientes registrados, últimas 5 órdenes
+    - _Requirements: 7.1, 7.2_
+  - [x] 10.2 Implementar gestión de productos en el admin
+    - Crear `app/(admin)/admin/products/page.tsx` con listado y paginación
+    - Crear `app/(admin)/admin/products/new/page.tsx` y `app/(admin)/admin/products/[id]/edit/page.tsx` con formulario React Hook Form + Zod
+    - Integrar subida de imágenes a Cloudinary via `/api/upload`
+    - _Requirements: 7.1, 7.3_
+  - [x] 10.3 Implementar gestión de órdenes y clientes
+    - Crear `app/(admin)/admin/orders/page.tsx` con listado, filtros por estado y actualización de estado
+    - Crear `app/(admin)/admin/customers/page.tsx` con listado paginado (20 por página) mostrando nombre, email, fecha de registro, cantidad de órdenes y monto total
+    - _Requirements: 7.1, 7.5, 7.9_
+  - [x] 10.4 Implementar gestión de cupones y hero slides
+    - Crear `app/(admin)/admin/coupons/page.tsx` con CRUD de cupones (código, tipo, valor, monto mínimo, máximo usos, expiración)
+    - Crear `app/(admin)/admin/hero/page.tsx` con gestión de slides y previsualización en tiempo real del orden
+    - _Requirements: 7.1, 7.4, 7.6_
+  - [x] 10.5 Implementar gestión de categorías y settings
+    - Crear `app/(admin)/admin/settings/page.tsx` con formulario de configuraciones clave-valor
+    - Implementar CRUD de categorías y subcategorías en la sección correspondiente
+    - _Requirements: 7.1, 7.7_
+  - [x] 10.6 Implementar registro de AuditLog en acciones de escritura del admin
+    - Crear `lib/audit-log.ts` con función `logAuditAction(userId, action, resource, resourceId, changes, ip, userAgent)`
+    - Integrar llamada a `logAuditAction` en todas las API Routes de escritura del admin (crear, editar, eliminar productos, órdenes, cupones, categorías)
+    - _Requirements: 7.8_
+  - [ ]* 10.7 Escribir tests unitarios para el panel de administración
+    - Testear que rutas `/admin/*` redirigen a `/` para usuarios sin rol admin
+    - Testear que el AuditLog se registra correctamente en acciones de escritura
+    - _Requirements: 7.10, 7.8_
+
+- [ ] 11. Checkpoint — Verificar funcionalidad completa del Store y Admin Panel
+  - Ejecutar tests unitarios e integración del frontend y admin
+  - Verificar flujo completo: registro → login → agregar al carrito → checkout → pago → actualización de estado desde admin
+  - Preguntar al usuario si hay dudas antes de continuar.
+
+- [x] 12. Emails transaccionales con Resend + React Email
+  - [x] 12.1 Instalar y configurar Resend + React Email
+    - Instalar `resend` y `@react-email/components`
+    - Crear `lib/email.ts` con función `sendEmail()` que use Resend y maneje errores sin interrumpir el flujo principal
+    - _Requirements: 8.5, 8.6_
+  - [x] 12.2 Crear plantillas de email en JSX
+    - Crear `emails/OrderConfirmation.tsx` con número de orden, lista de productos con imágenes y precios, subtotal, total y dirección de envío
+    - Crear `emails/OrderStatusUpdate.tsx` con número de orden, estado anterior, nuevo estado y enlace a `/orders`
+    - Crear `emails/WelcomeEmail.tsx` para nuevos usuarios registrados
+    - _Requirements: 8.1, 8.7, 8.8_
+  - [x] 12.3 Integrar envío de emails en los flujos de negocio
+    - Disparar `OrderConfirmation` desde el webhook de MercadoPago cuando el pago es aprobado (dentro de 60 segundos)
+    - Disparar `OrderStatusUpdate` desde la API Route de actualización de estado de orden
+    - Disparar `WelcomeEmail` desde el endpoint `/api/auth/register` al crear un nuevo usuario
+    - _Requirements: 8.2, 8.3, 8.4_
+  - [ ]* 12.4 Escribir tests unitarios para el Email Service
+    - Testear que el fallo de envío de email no interrumpe el flujo principal
+    - Testear que los errores de envío se registran en el sistema de logs con tipo, destinatario y mensaje
+    - _Requirements: 8.6_
+
+- [x] 13. Configuración de deploy en Railway
+  - [x] 13.1 Crear configuración de Railway y scripts de deploy
+    - Crear `railway.toml` con comando de build (`next build`) y comando de start (`next start`)
+    - Modificar el script de start en `package.json` para ejecutar `prisma migrate deploy` antes de `next start`
+    - _Requirements: 9.1, 9.2_
+  - [x] 13.2 Configurar variables de entorno por ambiente
+    - Documentar en `.env.example` las variables para `development`, `staging` y `production`
+    - Verificar que la app maneja correctamente `DATABASE_URL` en formato de connection string de Railway
+    - Implementar lógica de detención del servidor si `prisma migrate deploy` falla al iniciar
+    - _Requirements: 9.3, 9.4, 9.5_
+
+- [x] 14. Documentación de migración y plan de cutover
+  - [x] 14.1 Crear documento MIGRATION_PLAN.md
+    - Documentar los 5 pasos del cutover: (1) ejecutar script de migración, (2) verificar integridad, (3) actualizar variables de entorno, (4) redirigir DNS/deploy en Railway, (5) verificar post-cutover
+    - Documentar procedimiento de rollback que permita revertir en menos de 15 minutos
+    - _Requirements: 10.5, 10.7_
+  - [x] 14.2 Verificar estrategia de rama git y aislamiento
+    - Confirmar que todo el desarrollo ocurre en la rama `migration/nextjs-postgres` sin afectar `main`
+    - Verificar que la app actual en `main` sigue siendo desplegable de forma independiente
+    - _Requirements: 10.1, 10.2_
+
+- [x] 15. Checkpoint final — Verificar paridad funcional y preparación para cutover
+  - Ejecutar todos los tests (unitarios, integración, propiedades)
+  - Ejecutar script de migración completo y verificar reporte de validación sin discrepancias
+  - Verificar que el health check `/api/health` retorna 200 con db conectada
+  - Preguntar al usuario si hay dudas antes de proceder al cutover.
+
+## Notes
+
+- Las tareas marcadas con `*` son opcionales y pueden omitirse para un MVP más rápido
+- Cada tarea referencia requisitos específicos para trazabilidad
+- Los checkpoints garantizan validación incremental antes de avanzar a la siguiente fase
+- El lenguaje de implementación es TypeScript (Next.js 15 con App Router)
+- La rama de trabajo es `migration/nextjs-postgres`, nunca `main`

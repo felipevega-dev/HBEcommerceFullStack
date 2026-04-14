@@ -1,0 +1,305 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  ADMIN
+  MODERATOR
+  USER
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+// ─── User & Auth ──────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(USER)
+  profileImage String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+  reviews   Review[]
+  wishlist  Wishlist[]
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Address {
+  id         String  @id @default(uuid())
+  userId     String
+  firstname  String
+  lastname   String
+  phone      String
+  street     String
+  city       String
+  region     String
+  postalCode String
+  country    String
+  isDefault  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+// ─── Catalog ──────────────────────────────────────────────────────────────────
+
+model Category {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  subcategories String[]
+  createdAt     DateTime @default(now())
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  slug          String   @unique @default("")
+  name          String
+  description   String
+  price         Decimal  @db.Decimal(10, 2)
+  originalPrice Decimal? @db.Decimal(10, 2)
+  images        String[]
+  categoryId    String
+  subCategory   String
+  colors        String[]
+  sizes         Json
+  bestSeller    Boolean  @default(false)
+  active        Boolean  @default(true)
+  stock         Int      @default(0)
+  ratingAverage Float    @default(0)
+  ratingCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category   Category    @relation(fields: [categoryId], references: [id])
+  reviews    Review[]
+  orderItems OrderItem[]
+  wishlist   Wishlist[]
+  heroSlides HeroSlide[]
+  cartItems  CartItem[]
+
+  @@index([slug])
+  @@index([categoryId, subCategory])
+  @@index([bestSeller])
+  @@index([createdAt(sort: Desc)])
+  @@index([ratingAverage(sort: Desc)])
+  @@map("products")
+}
+
+// ─── Cart ─────────────────────────────────────────────────────────────────────
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  cartId    String
+  productId String
+  quantity  Int
+  size      String
+  color     String @default("")
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  amount          Decimal     @db.Decimal(10, 2)
+  addressSnapshot Json
+  status          OrderStatus @default(PENDING)
+  paymentMethod   String
+  payment         Boolean     @default(false)
+  couponCode      String?
+  discountAmount  Decimal?    @db.Decimal(10, 2)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String?
+  name      String
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int
+  size      String
+  color     String  @default("")
+  image     String  @default("")
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@map("order_items")
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  rating    Int
+  comment   String   @db.VarChar(500)
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("reviews")
+}
+
+// ─── Wishlist ─────────────────────────────────────────────────────────────────
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("wishlists")
+}
+
+// ─── Coupons ──────────────────────────────────────────────────────────────────
+
+model Coupon {
+  id              String       @id @default(uuid())
+  code            String       @unique
+  discountType    DiscountType
+  discountValue   Decimal      @db.Decimal(10, 2)
+  minOrderAmount  Decimal?     @db.Decimal(10, 2)
+  maxUses         Int?
+  usedCount       Int          @default(0)
+  expiresAt       DateTime?
+  active          Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+
+  @@map("coupons")
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  action     String
+  resource   String
+  resourceId String?
+  changes    Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([resource, createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String   @default("")
+  comment   String   @db.VarChar(500)
+  rating    Int      @default(5)
+  avatar    String?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+model Settings {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
+
+// ─── Hero Slides ──────────────────────────────────────────────────────────────
+
+model HeroSlide {
+  id        String   @id @default(uuid())
+  title     String
+  subtitle  String
+  image     String
+  productId String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("hero_slides")
+}
