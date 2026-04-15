@@ -35,7 +35,13 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
                 : 'border-transparent hover:border-gray-300'
             }`}
           >
-            <Image src={img} alt={`${name} ${i + 1}`} fill className="object-cover" />
+              <Image
+                src={img}
+                alt={`${name} ${i + 1}`}
+                fill
+                sizes="(max-width: 768px) 80px, 100px"
+                className="object-cover"
+              />
           </button>
         ))}
       </div>
@@ -56,7 +62,14 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
                 transformOrigin: `${origin.x}% ${origin.y}%`,
               }}
             >
-              <Image src={images[current]} alt={name} fill className="object-contain" priority />
+              <Image
+                src={images[current]}
+                alt={name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                className="object-contain"
+                priority
+              />
             </div>
           )}
         </div>

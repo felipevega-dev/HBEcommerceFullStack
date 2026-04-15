@@ -185,7 +185,13 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
             <div className="relative">
               <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100">
                 {user.profileImage ? (
-                  <Image src={user.profileImage} alt="Profile" fill className="object-cover" />
+                  <Image
+                    src={user.profileImage}
+                    alt="Profile"
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400 text-3xl font-medium">
                     {user.name.charAt(0).toUpperCase()}

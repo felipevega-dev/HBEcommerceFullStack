@@ -131,7 +131,13 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                       >
                         {item.image && (
                           <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
-                            <Image src={item.image} alt={item.name} fill className="object-cover" />
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
                           </div>
                         )}
                         <div className="flex-1">

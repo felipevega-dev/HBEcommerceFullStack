@@ -45,6 +45,7 @@ export function ProductCard({ product }: { product: Product }) {
                 src={image}
                 alt={product.name}
                 fill
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                 loading="lazy"
                 className={`object-cover object-center transition-opacity duration-300 ${secondImage ? 'group-hover:opacity-0' : ''}`}
               />
@@ -53,6 +54,7 @@ export function ProductCard({ product }: { product: Product }) {
                   src={secondImage}
                   alt={`${product.name} - vista alternativa`}
                   fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                   loading="lazy"
                   className="object-cover object-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute inset-0"
                 />

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
@@ -35,6 +36,11 @@ export async function POST(req: NextRequest) {
       data: { ...data!, order: count },
       include: { product: { select: { id: true, name: true } } },
     })
+    
+    // Revalidate pages to show new slide
+    revalidatePath('/', 'page')
+    revalidatePath('/admin/hero', 'page')
+    
     return NextResponse.json({ success: true, slide }, { status: 201 })
   } catch (e) {
     return handleApiError(e)

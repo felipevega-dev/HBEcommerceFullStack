@@ -182,7 +182,13 @@ export function ProductForm({ categories, product }: Props) {
               {currentImages.map((img, i) => (
                 <div key={i} className="relative group">
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
-                    <Image src={img} alt={`img-${i}`} fill className="object-cover" />
+                    <Image
+                      src={img}
+                      alt={`img-${i}`}
+                      fill
+                      sizes="96px"
+                      className="object-cover"
+                    />
                   </div>
                   <button
                     type="button"

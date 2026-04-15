@@ -295,7 +295,13 @@ export function ProductInfo({
             <div className="flex items-center gap-4 mb-6">
               {product.images[0] && (
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                  />
                 </div>
               )}
               <div className="flex-1">

@@ -39,8 +39,9 @@ export function Navbar() {
               src="/harrys_logo.png"
               alt="Harry's Boutique"
               width={120}
-              height={40}
+              height={120}
               className="object-contain"
+              priority
             />
           </Link>
 
@@ -191,7 +192,7 @@ export function Navbar() {
                     src="/harrys_logo.png"
                     alt="Harry's Boutique"
                     width={100}
-                    height={34}
+                    height={100}
                     className="object-contain"
                   />
                 </Link>
