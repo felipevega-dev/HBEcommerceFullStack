@@ -16,6 +16,7 @@ const createProductSchema = z.object({
   colors: z.array(z.string()).min(1),
   sizes: z.array(z.string()).min(1),
   bestSeller: z.boolean().optional(),
+  active: z.boolean().optional(),
   stock: z.number().int().min(0).optional(),
 })
 
@@ -67,9 +68,14 @@ export async function POST(req: NextRequest) {
   if (error) return error
 
   const { data, error: validationError } = await validateBody(req, createProductSchema)
-  if (validationError) return validationError
+  if (validationError) {
+    console.error('Validation error:', validationError)
+    return validationError
+  }
 
   try {
+    console.log('Creating product with data:', JSON.stringify(data, null, 2))
+    
     // Generate unique slug from name
     const baseSlug = generateSlug(data!.name)
     const existing = await prisma.product.findFirst({ where: { slug: { startsWith: baseSlug } } })
@@ -78,6 +84,7 @@ export async function POST(req: NextRequest) {
     const product = await prisma.product.create({ data: { ...data!, slug } })
     return NextResponse.json({ success: true, product }, { status: 201 })
   } catch (e) {
+    console.error('Product creation error:', e)
     return handleApiError(e)
   }
 }

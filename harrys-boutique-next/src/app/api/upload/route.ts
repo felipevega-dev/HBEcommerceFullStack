@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { v2 as cloudinary } from 'cloudinary'
+import { put } from '@vercel/blob'
 import { handleApiError, requireAdminAuth } from '@/lib/api-utils'
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET_KEY,
-})
 
 export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
@@ -23,18 +17,19 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Upload files to Vercel Blob Storage
     const uploadPromises = files.map(async (file) => {
-      const bytes = await file.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const base64 = `data:${file.type};base64,${buffer.toString('base64')}`
-
-      const result = await cloudinary.uploader.upload(base64, {
-        resource_type: 'image',
-        folder: 'harrys-boutique/products',
-        transformation: [{ width: 800, quality: 'auto', fetch_format: 'auto' }],
+      // Generate unique filename with timestamp
+      const timestamp = Date.now()
+      const filename = `products/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+      
+      // Upload to Vercel Blob (works with both public and private stores)
+      const blob = await put(filename, file, {
+        access: 'public',
+        addRandomSuffix: true,
       })
 
-      return result.secure_url
+      return blob.url
     })
 
     const urls = await Promise.all(uploadPromises)

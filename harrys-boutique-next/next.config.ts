@@ -19,8 +19,10 @@ if (productionUrl) {
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
       { protocol: 'https', hostname: 'ui-avatars.com' },
+      // Legacy Cloudinary images (for backward compatibility with old products)
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
   experimental: {

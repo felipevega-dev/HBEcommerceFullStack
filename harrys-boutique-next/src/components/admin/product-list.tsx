@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
 
 interface Product {
   id: string
+  slug: string
   name: string
   price: number
   images: string[]
@@ -15,6 +16,7 @@ interface Product {
   bestSeller: boolean
   category: { name: string } | null
   subCategory: string
+  stock: number
 }
 
 interface Props {
@@ -27,9 +29,138 @@ interface Props {
 
 export function AdminProductList({ products, total, page, limit, categories }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
+  
   const [deleting, setDeleting] = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkAction, setBulkAction] = useState<string>('')
+  const [bulkValue, setBulkValue] = useState<string>('')
+  const [processing, setProcessing] = useState(false)
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
+  
   const totalPages = Math.ceil(total / limit)
+
+  // Real-time search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (searchQuery) {
+        params.set('search', searchQuery)
+      } else {
+        params.delete('search')
+      }
+      params.delete('page') // Reset to page 1 on search
+      
+      startTransition(() => {
+        router.push(`/admin/products?${params.toString()}`)
+      })
+    }, 300) // 300ms debounce
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === products.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(products.map((p) => p.id)))
+    }
+  }
+
+  const handleBulkAction = async () => {
+    if (selectedIds.size === 0) {
+      toast.error('Seleccioná al menos un producto')
+      return
+    }
+
+    if (!bulkAction) {
+      toast.error('Seleccioná una acción')
+      return
+    }
+
+    setProcessing(true)
+    try {
+      const ids = Array.from(selectedIds)
+      
+      let body: any = { ids }
+      
+      switch (bulkAction) {
+        case 'activate':
+          body.active = true
+          break
+        case 'deactivate':
+          body.active = false
+          break
+        case 'setBestSeller':
+          body.bestSeller = true
+          break
+        case 'unsetBestSeller':
+          body.bestSeller = false
+          break
+        case 'updateStock':
+          if (!bulkValue || isNaN(parseInt(bulkValue))) {
+            toast.error('Ingresá un stock válido')
+            setProcessing(false)
+            return
+          }
+          body.stock = parseInt(bulkValue)
+          break
+        case 'updatePrice':
+          if (!bulkValue || isNaN(parseFloat(bulkValue))) {
+            toast.error('Ingresá un precio válido')
+            setProcessing(false)
+            return
+          }
+          body.price = parseFloat(bulkValue)
+          break
+        case 'applyDiscount':
+          if (!bulkValue || isNaN(parseFloat(bulkValue))) {
+            toast.error('Ingresá un porcentaje válido')
+            setProcessing(false)
+            return
+          }
+          body.discountPercent = parseFloat(bulkValue)
+          break
+        default:
+          toast.error('Acción no válida')
+          setProcessing(false)
+          return
+      }
+
+      const res = await fetch('/api/products/bulk', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+
+      const data = await res.json()
+      
+      if (data.success) {
+        toast.success(`${data.updated} productos actualizados`)
+        setSelectedIds(new Set())
+        setBulkAction('')
+        setBulkValue('')
+        router.refresh()
+      } else {
+        toast.error(data.message || 'Error al actualizar productos')
+      }
+    } catch (error) {
+      toast.error('Error al procesar la acción')
+    } finally {
+      setProcessing(false)
+    }
+  }
 
   const handleDelete = async (id: string) => {
     setDeleting(id)
@@ -53,13 +184,29 @@ export function AdminProductList({ products, total, page, limit, categories }: P
   return (
     <div className="space-y-4">
       {/* Search bar */}
-      <form className="flex gap-2">
-        <input
-          name="search"
-          placeholder="Buscar productos..."
-          defaultValue=""
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-        />
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar productos..."
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black pr-10"
+          />
+          {isPending && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+            </div>
+          )}
+          {searchQuery && !isPending && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         {categories && categories.length > 0 && (
           <select
             name="category"
@@ -73,24 +220,87 @@ export function AdminProductList({ products, total, page, limit, categories }: P
             ))}
           </select>
         )}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm hover:opacity-90"
-        >
-          Buscar
-        </button>
-      </form>
+      </div>
+
+      {/* Bulk actions */}
+      {selectedIds.size > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-blue-900">
+              {selectedIds.size} producto{selectedIds.size > 1 ? 's' : ''} seleccionado{selectedIds.size > 1 ? 's' : ''}
+            </span>
+            
+            <select
+              value={bulkAction}
+              onChange={(e) => {
+                setBulkAction(e.target.value)
+                setBulkValue('')
+              }}
+              className="border border-blue-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccionar acción...</option>
+              <option value="activate">Activar</option>
+              <option value="deactivate">Desactivar</option>
+              <option value="setBestSeller">Marcar como Best Seller</option>
+              <option value="unsetBestSeller">Quitar Best Seller</option>
+              <option value="updateStock">Actualizar stock</option>
+              <option value="updatePrice">Actualizar precio</option>
+              <option value="applyDiscount">Aplicar descuento (%)</option>
+            </select>
+
+            {['updateStock', 'updatePrice', 'applyDiscount'].includes(bulkAction) && (
+              <input
+                type="number"
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                placeholder={
+                  bulkAction === 'updateStock' ? 'Stock' :
+                  bulkAction === 'updatePrice' ? 'Precio' :
+                  'Porcentaje'
+                }
+                className="border border-blue-300 rounded-lg px-3 py-1.5 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            )}
+
+            <button
+              onClick={handleBulkAction}
+              disabled={!bulkAction || processing}
+              className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {processing ? 'Procesando...' : 'Aplicar'}
+            </button>
+
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="px-4 py-1.5 border border-blue-300 text-blue-700 rounded-lg text-sm hover:bg-blue-100"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
             <tr>
+              <th className="px-4 py-3 text-left">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === products.length && products.length > 0}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 cursor-pointer"
+                />
+              </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Producto</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">
                 Categoría
               </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Precio</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-600 hidden lg:table-cell">
+                Stock
+              </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">
                 Estado
               </th>
@@ -100,6 +310,14 @@ export function AdminProductList({ products, total, page, limit, categories }: P
           <tbody className="divide-y">
             {products.map((product) => (
               <tr key={product.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(product.id)}
+                    onChange={() => toggleSelect(product.id)}
+                    className="w-4 h-4 cursor-pointer"
+                  />
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     {product.images[0] && (
@@ -124,7 +342,12 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                   {product.category?.name ?? '—'} / {product.subCategory}
                 </td>
                 <td className="px-4 py-3 font-medium">
-                  ${Number(product.price).toLocaleString('es-CL')}
+                  ${typeof product.price === 'number' && !isNaN(product.price) 
+                    ? product.price.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                    : '0'}
+                </td>
+                <td className="px-4 py-3 text-gray-600 hidden lg:table-cell">
+                  {product.stock ?? 0}
                 </td>
                 <td className="px-4 py-3 hidden sm:table-cell">
                   <span
@@ -135,6 +358,14 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
+                    <Link
+                      href={`/product/${product.slug || product.id}`}
+                      target="_blank"
+                      className="px-3 py-1 text-xs border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50"
+                      title="Ver en tienda"
+                    >
+                      👁️ Ver
+                    </Link>
                     <Link
                       href={`/admin/products/${product.id}/edit`}
                       className="px-3 py-1 text-xs border rounded-lg hover:bg-gray-100"
@@ -171,8 +402,8 @@ export function AdminProductList({ products, total, page, limit, categories }: P
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-gray-500">
-                  No hay productos
+                <td colSpan={7} className="text-center py-12 text-gray-500">
+                  {searchQuery ? 'No se encontraron productos' : 'No hay productos'}
                 </td>
               </tr>
             )}

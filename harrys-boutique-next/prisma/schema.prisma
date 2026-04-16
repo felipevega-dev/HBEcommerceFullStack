@@ -88,6 +88,7 @@ model Category {
 model Product {
   id            String   @id @default(uuid())
   slug          String   @unique @default("")
+  sku           String?  @unique
   name          String
   description   String
   price         Decimal  @db.Decimal(10, 2)
