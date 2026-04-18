@@ -117,8 +117,14 @@ export const useCartStore = create<CartStore>()(
         try {
           if (localItems.length === 0) {
             const res = await fetch('/api/cart')
-            const { cart } = await res.json()
-            get().setItems(mapDbCartToStoreItems(cart.items ?? []))
+            if (!res.ok) {
+              console.error('[Cart] Failed to fetch cart:', res.status)
+              return
+            }
+            const data = await res.json()
+            if (data.success && data.cart) {
+              get().setItems(mapDbCartToStoreItems(data.cart.items ?? []))
+            }
           } else {
             const res = await fetch('/api/cart/merge', {
               method: 'POST',

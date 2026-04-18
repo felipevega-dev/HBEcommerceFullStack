@@ -1,0 +1,92 @@
+# ─── Docker Compose for Local Development ────────────────────────────────────
+# Usage:
+#   docker-compose up -d          # Start services
+#   docker-compose down           # Stop services
+#   docker-compose logs -f app    # View app logs
+#   docker-compose exec db psql -U postgres -d harrys_boutique  # Access DB
+
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: harrys-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: harrys_boutique
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: harrys-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/harrys_boutique
+      
+      # NextAuth (generate with: openssl rand -base64 32)
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: http://localhost:3000
+      
+      # Vercel Blob Storage
+      BLOB_READ_WRITE_TOKEN: ${BLOB_READ_WRITE_TOKEN}
+      
+      # MercadoPago
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN}
+      NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}
+      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET}
+      
+      # Resend
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+      
+      # App
+      NEXT_PUBLIC_FRONTEND_URL: http://localhost:3000
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Mount .env file for local development
+      - ./.env:/app/.env:ro
+
+  # pgAdmin (optional - database management UI)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: harrys-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@harrys.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    profiles:
+      - tools  # Only start with: docker-compose --profile tools up
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: harrys-network

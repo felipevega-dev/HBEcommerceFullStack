@@ -17,6 +17,9 @@ if (productionUrl) {
 }
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker deployments
+  output: 'standalone',
+  
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
