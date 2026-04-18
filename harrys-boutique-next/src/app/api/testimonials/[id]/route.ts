@@ -10,6 +10,7 @@ const patchSchema = z.object({
   role: z.string().optional(),
   comment: z.string().min(1).max(500).optional(),
   rating: z.number().int().min(1).max(5).optional(),
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
 })
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

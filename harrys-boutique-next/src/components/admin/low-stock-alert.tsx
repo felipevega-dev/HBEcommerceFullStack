@@ -6,7 +6,7 @@ interface LowStockProduct {
   id: string
   name: string
   stock: number
-  images: string[]
+  images: string[] | null
 }
 
 export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
@@ -50,7 +50,7 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
         {products.slice(0, 5).map((product) => (
           <div key={product.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
             <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-              {product.images[0] && (
+              {product.images?.[0] && (
                 <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
               )}
             </div>

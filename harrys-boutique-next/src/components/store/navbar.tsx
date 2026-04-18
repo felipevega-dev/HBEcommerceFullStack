@@ -7,6 +7,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useCartStore } from '@/store/cart-store'
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import type { Role } from '@prisma/client'
 
 const navItems = [
   { href: '/', label: 'INICIO' },
@@ -91,6 +92,17 @@ export function Navbar() {
                 </button>
                 <div className="absolute right-0 pt-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
                   <div className="bg-[var(--color-surface)] rounded-lg shadow-lg border border-[var(--color-border)] overflow-hidden min-w-[160px]">
+                    {(session.user.role === 'OWNER' || session.user.role === 'ADMIN' || session.user.role === 'MODERATOR') && (
+                      <>
+                        <Link
+                          href="/admin/dashboard"
+                          className="block px-4 py-2 text-sm text-blue-600 hover:bg-[var(--color-surface-2)] transition-colors font-medium"
+                        >
+                          Panel Admin
+                        </Link>
+                        <div className="border-t border-[var(--color-border)]" />
+                      </>
+                    )}
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors"

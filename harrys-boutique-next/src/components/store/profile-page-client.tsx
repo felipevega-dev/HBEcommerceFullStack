@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
+import { AddressForm } from './address-form'
 
 interface Address {
   id: string
@@ -31,6 +32,7 @@ export interface UserWithAddresses {
 const emptyAddress = {
   firstname: '',
   lastname: '',
+  email: '',
   phone: '',
   street: '',
   city: '',
@@ -148,6 +150,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
     setCurrentAddress({
       firstname: addr.firstname,
       lastname: addr.lastname,
+      email: user.email,
       phone: addr.phone,
       street: addr.street,
       city: addr.city,
@@ -165,7 +168,11 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
     }
     setIsAddingNew(true)
     setEditingAddress(null)
-    setCurrentAddress({ ...emptyAddress, isDefault: user.addresses.length === 0 })
+    setCurrentAddress({ ...emptyAddress, email: user.email, isDefault: user.addresses.length === 0 })
+  }
+
+  const handleAddressChange = (updates: Partial<typeof currentAddress>) => {
+    setCurrentAddress((prev) => ({ ...prev, ...updates }))
   }
 
   const inputClass =
@@ -313,94 +320,13 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               <h4 className="font-medium">
                 {isAddingNew ? 'Nueva dirección de facturación' : 'Editar dirección de facturación'}
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                  <input
-                    type="text"
-                    value={currentAddress.firstname}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, firstname: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Apellido</label>
-                  <input
-                    type="text"
-                    value={currentAddress.lastname}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, lastname: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Teléfono</label>
-                  <input
-                    type="tel"
-                    value={currentAddress.phone}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, phone: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Dirección</label>
-                  <input
-                    type="text"
-                    value={currentAddress.street}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, street: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Ciudad</label>
-                  <input
-                    type="text"
-                    value={currentAddress.city}
-                    onChange={(e) => setCurrentAddress({ ...currentAddress, city: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Región</label>
-                  <input
-                    type="text"
-                    value={currentAddress.region}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, region: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Código Postal</label>
-                  <input
-                    type="text"
-                    value={currentAddress.postalCode}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, postalCode: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">País</label>
-                  <input
-                    type="text"
-                    value={currentAddress.country}
-                    onChange={(e) =>
-                      setCurrentAddress({ ...currentAddress, country: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-              </div>
+              
+              <AddressForm
+                formData={currentAddress}
+                onChange={handleAddressChange}
+                showEmail={false}
+              />
+
               <div className="flex gap-2">
                 <button
                   type="submit"

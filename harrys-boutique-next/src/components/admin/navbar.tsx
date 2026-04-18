@@ -22,6 +22,24 @@ export function AdminNavbar({ user }: Props) {
         />
       </Link>
       <div className="flex items-center gap-4 text-sm text-gray-600">
+        <Link
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 hover:text-black transition-colors text-blue-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Ver tienda
+        </Link>
         <span>
           {user.name} ({user.role})
         </span>

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { AddressForm } from './address-form'
 
 interface Address {
   id: string
@@ -54,8 +55,12 @@ export function CheckoutPageClient() {
   const [loading, setLoading] = useState(false)
   const [method, setMethod] = useState<'cod' | 'mercadopago'>('mercadopago')
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false)
+  const [saveAddress, setSaveAddress] = useState(true)
   const [mpInitUrl, setMpInitUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
+  const [userEmail, setUserEmail] = useState('')
 
   // Show payment result feedback from MP redirect
   useEffect(() => {
@@ -66,8 +71,20 @@ export function CheckoutPageClient() {
     }
   }, [paymentStatus])
 
-  // Load saved addresses
+  // Load user email and saved addresses
   useEffect(() => {
+    // Get user email
+    fetch('/api/user/profile')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.user?.email) {
+          setUserEmail(data.user.email)
+          setFormData((prev) => ({ ...prev, email: data.user.email }))
+        }
+      })
+      .catch(() => {})
+
+    // Get saved addresses
     fetch('/api/user/addresses')
       .then((r) => r.json())
       .then((data) => {
@@ -75,6 +92,7 @@ export function CheckoutPageClient() {
           setSavedAddresses(data.addresses)
           const def = data.addresses.find((a: Address) => a.isDefault) ?? data.addresses[0]
           if (def) {
+            setSelectedAddressId(def.id)
             setFormData((prev) => ({
               ...prev,
               firstname: def.firstname,
@@ -87,12 +105,18 @@ export function CheckoutPageClient() {
               country: def.country,
             }))
           }
+        } else {
+          setShowNewAddressForm(true)
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setShowNewAddressForm(true)
+      })
   }, [])
 
   const handleUseSavedAddress = (addr: Address) => {
+    setSelectedAddressId(addr.id)
+    setShowNewAddressForm(false)
     setFormData((prev) => ({
       ...prev,
       firstname: addr.firstname,
@@ -106,8 +130,17 @@ export function CheckoutPageClient() {
     }))
   }
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleUseNewAddress = () => {
+    setSelectedAddressId(null)
+    setShowNewAddressForm(true)
+    setFormData((prev) => ({
+      ...EMPTY_FORM,
+      email: prev.email || userEmail,
+    }))
+  }
+
+  const onChange = (updates: Partial<FormData>) => {
+    setFormData((prev) => ({ ...prev, ...updates }))
   }
 
   const validate = (): boolean => {
@@ -135,6 +168,33 @@ export function CheckoutPageClient() {
 
     setLoading(true)
     try {
+      // Save address if checkbox is checked and it's a new address
+      if (saveAddress && !selectedAddressId && savedAddresses.length < 2) {
+        try {
+          const addressRes = await fetch('/api/user/addresses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firstname: formData.firstname,
+              lastname: formData.lastname,
+              phone: formData.phone,
+              street: formData.street,
+              city: formData.city,
+              region: formData.region,
+              postalCode: formData.postalCode,
+              country: formData.country,
+              isDefault: savedAddresses.length === 0,
+            }),
+          })
+          const addressData = await addressRes.json()
+          if (addressData.success) {
+            setSavedAddresses((prev) => [...prev, addressData.address])
+          }
+        } catch {
+          // Non-blocking error, continue with order
+        }
+      }
+
       // Step 1: Always create the order first
       const orderRes = await fetch('/api/orders', {
         method: 'POST',
@@ -248,99 +308,155 @@ export function CheckoutPageClient() {
 
         {/* Saved addresses */}
         {savedAddresses.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-[var(--color-text-secondary)]">
-              Direcciones guardadas
-            </p>
-            {savedAddresses.map((addr) => (
-              <button
-                key={addr.id}
-                type="button"
-                onClick={() => handleUseSavedAddress(addr)}
-                className="w-full p-4 text-left border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] transition-colors bg-[var(--color-surface)]"
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                Mis direcciones guardadas
+              </p>
+              <Link
+                href="/profile"
+                className="text-xs text-[var(--color-accent)] hover:underline"
               >
-                <p className="font-medium text-sm text-[var(--color-text-primary)]">
-                  {addr.street}, {addr.city}
-                </p>
-                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                  {addr.firstname} {addr.lastname} · {addr.phone}
-                </p>
-                {addr.isDefault && (
-                  <span className="text-xs bg-[var(--color-accent-light)] text-[var(--color-accent-dark)] px-2 py-0.5 rounded-full mt-1 inline-block">
-                    Predeterminada
-                  </span>
-                )}
-              </button>
-            ))}
+                Gestionar direcciones
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {savedAddresses.map((addr) => (
+                <button
+                  key={addr.id}
+                  type="button"
+                  onClick={() => handleUseSavedAddress(addr)}
+                  className={`w-full p-4 text-left border rounded-lg transition-all ${
+                    selectedAddressId === addr.id
+                      ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)] ring-2 ring-[var(--color-accent)] ring-opacity-20'
+                      : 'border-[var(--color-border)] hover:border-[var(--color-accent)] bg-[var(--color-surface)]'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-[var(--color-text-primary)]">
+                        {addr.firstname} {addr.lastname}
+                      </p>
+                      <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+                        {addr.street}
+                      </p>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                        {addr.city}, {addr.region} {addr.postalCode}
+                      </p>
+                      <p className="text-xs text-[var(--color-text-muted)]">{addr.phone}</p>
+                    </div>
+                    {selectedAddressId === addr.id && (
+                      <svg
+                        className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  {addr.isDefault && (
+                    <span className="text-xs bg-[var(--color-success-light)] text-[var(--color-success-dark)] px-2 py-0.5 rounded-full mt-2 inline-block">
+                      Predeterminada
+                    </span>
+                  )}
+                </button>
+              ))}
+              {savedAddresses.length < 2 && (
+                <button
+                  type="button"
+                  onClick={handleUseNewAddress}
+                  className={`w-full p-4 text-left border-2 border-dashed rounded-lg transition-all ${
+                    showNewAddressForm
+                      ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]'
+                      : 'border-[var(--color-border)] hover:border-[var(--color-accent)] bg-[var(--color-surface)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-accent-light)] flex items-center justify-center flex-shrink-0">
+                      <svg
+                        className="w-4 h-4 text-[var(--color-accent)]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                        Usar nueva dirección
+                      </p>
+                      <p className="text-xs text-[var(--color-text-muted)]">
+                        Agregar una dirección diferente
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              )}
+            </div>
           </div>
         )}
 
         {/* Address form */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Nombre *
-            </label>
-            <input required onChange={onChange} name="firstname" value={formData.firstname}
-              className={inputClass} type="text" placeholder="Tu nombre" />
+        {(showNewAddressForm || savedAddresses.length === 0) && (
+          <div className="space-y-4">
+            {savedAddresses.length > 0 && (
+              <div className="flex items-center justify-between pb-2 border-b border-[var(--color-border)]">
+                <h3 className="text-base font-medium text-[var(--color-text-primary)]">
+                  Nueva dirección de envío
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewAddressForm(false)
+                    if (savedAddresses.length > 0) {
+                      handleUseSavedAddress(savedAddresses[0])
+                    }
+                  }}
+                  className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
+
+            <AddressForm
+              formData={formData}
+              onChange={onChange}
+              showEmail={true}
+              emailReadOnly={!!userEmail}
+            />
+
+            {/* Save address checkbox */}
+            {!selectedAddressId && savedAddresses.length < 2 && (
+              <div className="flex items-start gap-2 p-3 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)]">
+                <input
+                  type="checkbox"
+                  id="saveAddress"
+                  checked={saveAddress}
+                  onChange={(e) => setSaveAddress(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 text-[var(--color-accent)] border-gray-300 rounded focus:ring-[var(--color-accent)]"
+                />
+                <label
+                  htmlFor="saveAddress"
+                  className="text-sm text-[var(--color-text-secondary)] cursor-pointer"
+                >
+                  Guardar esta dirección en mi perfil para futuras compras
+                </label>
+              </div>
+            )}
           </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Apellido
-            </label>
-            <input onChange={onChange} name="lastname" value={formData.lastname}
-              className={inputClass} type="text" placeholder="Tu apellido" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Email *
-            </label>
-            <input required onChange={onChange} name="email" value={formData.email}
-              className={inputClass} type="email" placeholder="tu@email.com" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Teléfono *
-            </label>
-            <input required onChange={onChange} name="phone" value={formData.phone}
-              className={inputClass} type="tel" placeholder="+54 11 1234-5678" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Dirección *
-            </label>
-            <input required onChange={onChange} name="street" value={formData.street}
-              className={inputClass} type="text" placeholder="Calle y número" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Ciudad *
-            </label>
-            <input required onChange={onChange} name="city" value={formData.city}
-              className={inputClass} type="text" placeholder="Ciudad" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Provincia / Región
-            </label>
-            <input onChange={onChange} name="region" value={formData.region}
-              className={inputClass} type="text" placeholder="Provincia" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Código Postal
-            </label>
-            <input onChange={onChange} name="postalCode" value={formData.postalCode}
-              className={inputClass} type="text" placeholder="1234" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              País *
-            </label>
-            <input required onChange={onChange} name="country" value={formData.country}
-              className={inputClass} type="text" placeholder="Argentina" />
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Right: Summary + payment */}

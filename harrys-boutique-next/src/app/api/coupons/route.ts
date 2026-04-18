@@ -5,12 +5,12 @@ import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { DiscountType } from '@prisma/client'
 
 const createCouponSchema = z.object({
-  code: z.string().min(3).max(20).toUpperCase(),
+  code: z.string().min(3).max(20).transform((val) => val.toUpperCase()),
   discountType: z.nativeEnum(DiscountType),
   discountValue: z.number().positive(),
-  minOrderAmount: z.number().positive().optional(),
-  maxUses: z.number().int().positive().optional(),
-  expiresAt: z.string().datetime().optional(),
+  minOrderAmount: z.number().positive().nullable().optional(),
+  maxUses: z.number().int().positive().nullable().optional(),
+  expiresAt: z.string().nullable().optional(),
 })
 
 export async function GET() {
@@ -35,8 +35,12 @@ export async function POST(req: NextRequest) {
   try {
     const coupon = await prisma.coupon.create({
       data: {
-        ...data!,
-        expiresAt: data!.expiresAt ? new Date(data!.expiresAt) : undefined,
+        code: data!.code,
+        discountType: data!.discountType,
+        discountValue: data!.discountValue,
+        minOrderAmount: data!.minOrderAmount ?? null,
+        maxUses: data!.maxUses ?? null,
+        expiresAt: data!.expiresAt ? new Date(data!.expiresAt) : null,
       },
     })
     return NextResponse.json({ success: true, coupon }, { status: 201 })

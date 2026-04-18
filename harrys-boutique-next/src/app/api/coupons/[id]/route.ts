@@ -6,7 +6,7 @@ import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
 const updateSchema = z.object({
   active: z.boolean().optional(),
   maxUses: z.number().int().positive().nullable().optional(),
-  expiresAt: z.string().datetime().nullable().optional(),
+  expiresAt: z.string().nullable().optional(),
 })
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -18,7 +18,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const { id } = await params
-    const coupon = await prisma.coupon.update({ where: { id }, data: data! })
+    const updateData: any = {}
+    
+    if (data!.active !== undefined) updateData.active = data!.active
+    if (data!.maxUses !== undefined) updateData.maxUses = data!.maxUses
+    if (data!.expiresAt !== undefined) {
+      updateData.expiresAt = data!.expiresAt ? new Date(data!.expiresAt) : null
+    }
+    
+    const coupon = await prisma.coupon.update({ where: { id }, data: updateData })
     return NextResponse.json({ success: true, coupon })
   } catch (e) {
     return handleApiError(e)

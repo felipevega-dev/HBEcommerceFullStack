@@ -49,15 +49,20 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
     }
 
     if (newFiles.length > 0) {
-      const currentImages = Array.isArray(images) ? images : []
-      const totalImages = currentImages.length + newFiles.length
+      const currentImages = images as (string[] | File[]) | undefined
+      const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
+      const totalImages = existing.length + newFiles.length
 
       if (totalImages > maxImages) {
         alert(`Solo podés subir hasta ${maxImages} imágenes. Seleccionaste ${totalImages}.`)
         return
       }
 
-      updateField('images', [...currentImages, ...newFiles])
+      if (existing.length === 0 || typeof existing[0] === 'object') {
+        updateField('images', [...(existing as File[]), ...newFiles])
+      } else {
+        updateField('images', [...(existing as string[]), ...newFiles.map(f => f.name)])
+      }
     }
   }, [images, updateField])
 
@@ -77,9 +82,13 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
   }, [handleFileSelect])
 
   const handleDeleteImage = useCallback((index: number) => {
-    const currentImages = Array.isArray(images) ? images : []
-    const newImages = currentImages.filter((_, i) => i !== index)
-    updateField('images', newImages)
+    const currentImages = images as (string[] | File[]) | undefined
+    const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
+    if (existing.length === 0 || typeof existing[0] === 'object') {
+      updateField('images', (existing as File[]).filter((_, i) => i !== index))
+    } else {
+      updateField('images', (existing as string[]).filter((_, i) => i !== index))
+    }
   }, [images, updateField])
 
   const getImageUrl = (image: File | string): string => {

@@ -128,7 +128,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
       transition: {
         delay: i * 0.15,
         duration: 0.6,
-        ease: 'easeOut',
+        ease: [0.25, 0.1, 0.25, 1] as const,
       },
     }),
   }
@@ -167,7 +167,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const }}
             className="relative w-full h-full max-w-4xl max-h-[80%] mx-auto"
           >
             <Image
@@ -304,7 +304,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
                     className="absolute top-0 left-0 h-1 sm:h-1.5 bg-white/50 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
-                    transition={{ duration: 6, ease: 'linear' }}
+                    transition={{ duration: 6, ease: 'linear' as const }}
                   />
                 )}
               </button>

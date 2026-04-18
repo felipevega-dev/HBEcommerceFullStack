@@ -62,25 +62,29 @@ export default async function AdminDashboardPage() {
     prisma.orderItem.groupBy({
       by: ['productId'],
       _sum: { quantity: true },
-      where: { order: { payment: true } },
+      where: { order: { payment: true }, productId: { not: null } },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
     }),
     prisma.review.count({ where: { approved: false } }),
   ])
 
-  const topProductsWithDetails = await Promise.all(
-    topProducts.map(async (t) => {
-      const product = await prisma.product.findUnique({
-        where: { id: t.productId },
-        select: { id: true, name: true, images: true, price: true },
+  const topProductsWithDetails = (await Promise.all(
+      topProducts.filter((t): t is typeof t & { productId: string } => !!t.productId).map(async (t) => {
+        const product = await prisma.product.findUnique({
+          where: { id: t.productId },
+          select: { id: true, name: true, images: true, price: true },
+        })
+        if (!product) return null
+        return {
+          id: product.id,
+          name: product.name,
+          images: product.images,
+          price: Number(product.price),
+          totalSold: t._sum.quantity ?? 0,
+        }
       })
-      return {
-        ...product,
-        totalSold: t._sum.quantity,
-      }
-    })
-  )
+    )).filter((p): p is { id: string; name: string; images: string[]; price: number; totalSold: number } => p !== null)
 
   const monthlyRevenueValue = Number(monthlyRevenue._sum.amount ?? 0)
   const lastMonthRevenueValue = Number(lastMonthRevenue._sum.amount ?? 0)
@@ -122,7 +126,7 @@ export default async function AdminDashboardPage() {
         <LowStockAlert products={lowStockProducts} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TopProducts products={topProductsWithDetails.filter(p => p.id)} />
+        <TopProducts products={topProductsWithDetails.filter(Boolean) as { id: string; name: string; images: string[]; price: number; totalSold: number }[]} />
         <RecentOrders
           orders={recentOrders.map((o) => ({
             id: o.id,
