@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 
 interface Slide {
   id: string
@@ -17,6 +17,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [direction, setDirection] = useState(0)
+  const shouldReduceMotion = useReducedMotion()
 
   const nextSlide = useCallback(() => {
     setDirection(1)
@@ -105,7 +106,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+      x: shouldReduceMotion ? 0 : direction > 0 ? 1000 : -1000,
       opacity: 0,
     }),
     center: {
@@ -115,19 +116,19 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
     },
     exit: (direction: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
+      x: shouldReduceMotion ? 0 : direction < 0 ? 1000 : -1000,
       opacity: 0,
     }),
   }
 
   const textVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 30 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.15,
-        duration: 0.6,
+        delay: shouldReduceMotion ? 0 : i * 0.15,
+        duration: shouldReduceMotion ? 0.3 : 0.6,
         ease: [0.25, 0.1, 0.25, 1] as const,
       },
     }),

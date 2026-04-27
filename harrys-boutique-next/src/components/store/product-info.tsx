@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import { useCartStore } from '@/store/cart-store'
 import { toast } from 'react-toastify'
 import { colorToHex } from '@/lib/utils'
+import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 
 interface Product {
   id: string
@@ -34,7 +35,6 @@ export function ProductInfo({
   const [selectedSize, setSelectedSize] = useState('')
   const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? '')
   const [quantity, setQuantity] = useState(1)
-  const [isAdding, setIsAdding] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
 
@@ -44,10 +44,12 @@ export function ProductInfo({
   const handleAddToCart = async () => {
     if (!selectedSize) {
       toast.warning('Por favor selecciona una talla')
-      return
+      throw new Error('No size selected')
     }
-    setIsAdding(true)
-    await new Promise((r) => setTimeout(r, 600))
+    
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    
     addItem({
       productId: product.id,
       name: product.name,
@@ -57,7 +59,7 @@ export function ProductInfo({
       color: selectedColor,
       image: product.images[0] ?? '',
     })
-    setIsAdding(false)
+    
     setShowModal(true)
   }
 
@@ -215,48 +217,23 @@ export function ProductInfo({
       </div>
 
       {/* Add to cart */}
-      <motion.button
-        onClick={handleAddToCart}
-        disabled={isAdding || product.stock === 0}
-        whileTap={{ scale: 0.97 }}
-        className={`w-full py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-          product.stock === 0
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : isAdding
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-black text-white hover:bg-gray-800'
-        }`}
-      >
-        {product.stock === 0 ? (
-          'Sin stock'
-        ) : isAdding ? (
-          <>
-            <svg
-              className="w-4 h-4 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-            Agregando...
-          </>
-        ) : (
-          'Añadir al carrito'
-        )}
-      </motion.button>
+      {product.stock === 0 ? (
+        <button
+          disabled
+          className="w-full py-3 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+        >
+          Sin stock
+        </button>
+      ) : (
+        <ButtonWithFeedback
+          onClick={handleAddToCart}
+          variant="primary"
+          size="lg"
+          className="w-full !bg-black !text-white hover:!bg-gray-800"
+        >
+          Añadir al carrito
+        </ButtonWithFeedback>
+      )}
 
       {/* Features */}
       <div className="pt-4 border-t space-y-2 text-sm text-gray-500">
@@ -321,6 +298,7 @@ export function ProductInfo({
                 onClick={() => setShowModal(false)}
                 className="flex-1 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
                 style={{ border: '1px solid var(--color-border)' }}
+                autoFocus
               >
                 Seguir comprando
               </button>

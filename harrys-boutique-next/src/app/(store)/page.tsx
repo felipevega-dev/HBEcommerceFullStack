@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { serialize } from '@/lib/serialize'
-import { HeroSection } from '@/components/store/hero-section'
-import { LatestCollection } from '@/components/store/latest-collection'
+import { HeroEpic } from '@/components/store/hero-epic'
+import { CategoryShowcase } from '@/components/store/category-showcase'
+import { ProductsShowcase } from '@/components/store/products-showcase'
 import { BestSeller } from '@/components/store/best-seller'
+import { Testimonials } from '@/components/store/testimonials'
 import { OurPolicy } from '@/components/store/our-policy'
 import { NewsletterBox } from '@/components/store/newsletter-box'
-import { CategoryGrid } from '@/components/store/category-grid'
-import { Testimonials } from '@/components/store/testimonials'
 import { SkeletonCard } from '@/components/ui/skeleton-card'
 
 export const revalidate = 60
@@ -24,14 +24,40 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [heroSlidesResult, categoriesResult] = await Promise.allSettled([
+  const [heroSlidesResult, categoriesResult, productsResult] = await Promise.allSettled([
     prisma.heroSlide.findMany({
       orderBy: { order: 'asc' },
       include: { product: { select: { id: true, name: true } } },
     }),
     prisma.category.findMany({
       orderBy: { name: 'asc' },
-      select: { id: true, name: true, subcategories: true },
+      select: {
+        id: true,
+        name: true,
+        subcategories: true,
+        products: {
+          where: { active: true },
+          select: { images: true },
+          take: 1,
+          orderBy: { createdAt: 'desc' },
+        },
+        _count: { select: { products: { where: { active: true } } } },
+      },
+    }),
+    prisma.product.findMany({
+      where: { active: true },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        price: true,
+        images: true,
+        ratingAverage: true,
+        ratingCount: true,
+        categoryId: true,
+      },
     }),
   ])
 
@@ -51,12 +77,28 @@ export default async function HomePage() {
         })
       : []
 
-  const categories: { id: string; name: string; subcategories: string[] }[] =
+  const categories =
     categoriesResult.status === 'fulfilled'
       ? serialize(categoriesResult.value).map((c) => ({
           id: c.id,
           name: c.name,
           subcategories: c.subcategories ?? [],
+          productImage: c.products?.[0]?.images?.[0] ?? null,
+          productCount: c._count?.products ?? 0,
+        }))
+      : []
+
+  const products =
+    productsResult.status === 'fulfilled'
+      ? productsResult.value.map((p) => ({
+          id: p.id,
+          slug: p.slug || '',
+          name: p.name,
+          price: p.price.toNumber(),
+          images: p.images || [],
+          ratingAverage: p.ratingAverage || 0,
+          ratingCount: p.ratingCount || 0,
+          categoryId: p.categoryId || '',
         }))
       : []
 
@@ -69,20 +111,41 @@ export default async function HomePage() {
   )
 
   return (
-    <main className="flex flex-col gap-16 md:gap-24">
-      <HeroSection slides={heroSlides} />
-      <section aria-label="Contenido principal de la tienda" className="space-y-16 md:space-y-24">
-        <CategoryGrid categories={categories} />
-        <Suspense fallback={skeletonFallback}>
-          <LatestCollection />
-        </Suspense>
-        <Suspense fallback={skeletonFallback}>
-          <BestSeller />
-        </Suspense>
-        <Testimonials />
-        <OurPolicy />
-        <NewsletterBox />
-      </section>
+    <main className="flex flex-col">
+      {/* Hero Section */}
+      <HeroEpic
+        slides={heroSlides}
+        stats={{
+          customers: 5000,
+          products: 500,
+          rating: 4.9,
+        }}
+      />
+
+      {/* Main content - Orden: Categorías → Productos (como Almitas) */}
+      <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 md:px-12 lg:px-16">
+        <div className="space-y-16 md:space-y-20 py-12 md:py-16">
+          {/* Categorías Destacadas */}
+          <CategoryShowcase categories={categories} />
+
+          {/* Productos con Tabs (como Almitas) */}
+          <ProductsShowcase products={products} categories={categories} />
+
+          {/* Más Vendidos */}
+          <Suspense fallback={skeletonFallback}>
+            <BestSeller />
+          </Suspense>
+
+          {/* Testimonios */}
+          <Testimonials />
+
+          {/* Políticas */}
+          <OurPolicy />
+
+          {/* Newsletter */}
+          <NewsletterBox />
+        </div>
+      </div>
     </main>
   )
 }

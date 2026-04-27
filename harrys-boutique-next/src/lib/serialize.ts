@@ -6,7 +6,17 @@ import { Decimal } from '@prisma/client/runtime/library'
  */
 export function serialize<T>(data: T): T {
   if (data === null || data === undefined) return data
+  // Handle Decimal — check both instanceof and duck-typing (s/e/d structure)
+  // because instanceof can fail when there are multiple module instances
   if (data instanceof Decimal) return Number(data) as unknown as T
+  if (
+    typeof data === 'object' &&
+    !Array.isArray(data) &&
+    !(data instanceof Date) &&
+    typeof (data as Record<string, unknown>).toNumber === 'function'
+  ) {
+    return (data as unknown as { toNumber: () => number }).toNumber() as unknown as T
+  }
   if (data instanceof Date) return data.toISOString() as unknown as T
   if (Array.isArray(data)) return data.map(serialize) as unknown as T
   if (typeof data === 'object') {

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
+import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 
 const FREE_SHIPPING_THRESHOLD = 50000
 
@@ -172,23 +173,31 @@ export function CartDrawer() {
                           ${(item.price * item.quantity).toLocaleString('es-CL')}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
-                          <button
-                            onClick={() =>
+                          <ButtonWithFeedback
+                            onClick={async () => {
+                              await new Promise((resolve) => setTimeout(resolve, 200))
                               updateQuantity(item.productId, item.size, item.quantity - 1)
-                            }
-                            className="w-6 h-6 rounded border border-[var(--color-border)] flex items-center justify-center text-sm hover:bg-[var(--color-surface)] transition-colors"
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="!w-6 !h-6 !p-0 !text-sm !min-w-0"
+                            showFeedback={false}
                           >
                             −
-                          </button>
+                          </ButtonWithFeedback>
                           <span className="text-sm w-4 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() =>
+                          <ButtonWithFeedback
+                            onClick={async () => {
+                              await new Promise((resolve) => setTimeout(resolve, 200))
                               updateQuantity(item.productId, item.size, item.quantity + 1)
-                            }
-                            className="w-6 h-6 rounded border border-[var(--color-border)] flex items-center justify-center text-sm hover:bg-[var(--color-surface)] transition-colors"
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="!w-6 !h-6 !p-0 !text-sm !min-w-0"
+                            showFeedback={false}
                           >
                             +
-                          </button>
+                          </ButtonWithFeedback>
                         </div>
                       </div>
                       <button

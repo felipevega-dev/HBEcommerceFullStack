@@ -3,9 +3,12 @@
 import { useCartStore } from '@/store/cart-store'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { AddressForm } from './address-form'
+import { CheckoutProgress } from './checkout-progress'
+import { TrustBadges } from './trust-badges'
+import { ShieldCheck, Truck, CreditCard, Lock, Check } from 'lucide-react'
 
 interface Address {
   id: string
@@ -61,6 +64,9 @@ export function CheckoutPageClient() {
   const [mpInitUrl, setMpInitUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
   const [userEmail, setUserEmail] = useState('')
+  const [currentStep, setCurrentStep] = useState(1) // 1: Dirección, 2: Pago, 3: Confirmación
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Show payment result feedback from MP redirect
   useEffect(() => {
@@ -71,23 +77,78 @@ export function CheckoutPageClient() {
     }
   }, [paymentStatus])
 
-  // Load user email and saved addresses
+  // Load from localStorage on mount
   useEffect(() => {
-    // Get user email
-    fetch('/api/user/profile')
-      .then((r) => r.json())
-      .then((data) => {
+    const saved = localStorage.getItem('checkout-progress')
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        const timestamp = data.timestamp || 0
+        const hoursSince = (Date.now() - timestamp) / (1000 * 60 * 60)
+        
+        // Only restore if less than 24 hours old
+        if (hoursSince < 24 && data.formData && !selectedAddressId) {
+          setFormData(data.formData)
+          setMethod(data.method || 'mercadopago')
+          toast.info('Recuperamos tu progreso anterior', { autoClose: 2000 })
+        } else if (hoursSince >= 24) {
+          localStorage.removeItem('checkout-progress')
+        }
+      } catch (e) {
+        localStorage.removeItem('checkout-progress')
+      }
+    }
+  }, [selectedAddressId])
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+    }
+
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      if (formData.firstname || formData.email || formData.street) {
+        localStorage.setItem(
+          'checkout-progress',
+          JSON.stringify({
+            formData,
+            method,
+            timestamp: Date.now(),
+          })
+        )
+      }
+    }, 1000) // Save 1 second after user stops typing
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+    }
+  }, [formData, method])
+
+  // Load user email and saved addresses
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    abortControllerRef.current = new AbortController()
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/user/profile', {
+          signal: abortControllerRef.current?.signal,
+        })
+        const data = await res.json()
         if (data.success && data.user?.email) {
           setUserEmail(data.user.email)
           setFormData((prev) => ({ ...prev, email: data.user.email }))
         }
-      })
-      .catch(() => {})
+      } catch {}
 
-    // Get saved addresses
-    fetch('/api/user/addresses')
-      .then((r) => r.json())
-      .then((data) => {
+      try {
+        const res = await fetch('/api/user/addresses', {
+          signal: abortControllerRef.current?.signal,
+        })
+        const data = await res.json()
         if (data.success && data.addresses?.length) {
           setSavedAddresses(data.addresses)
           const def = data.addresses.find((a: Address) => a.isDefault) ?? data.addresses[0]
@@ -108,10 +169,16 @@ export function CheckoutPageClient() {
         } else {
           setShowNewAddressForm(true)
         }
-      })
-      .catch(() => {
+      } catch {
         setShowNewAddressForm(true)
-      })
+      }
+    }
+
+    fetchProfile()
+
+    return () => {
+      abortControllerRef.current?.abort()
+    }
   }, [])
 
   const handleUseSavedAddress = (addr: Address) => {
@@ -141,6 +208,40 @@ export function CheckoutPageClient() {
 
   const onChange = (updates: Partial<FormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }))
+    
+    // Real-time validation
+    const newErrors = { ...formErrors }
+    Object.keys(updates).forEach((key) => {
+      const field = key as keyof FormData
+      const value = updates[field]
+      
+      if (value && typeof value === 'string') {
+        // Clear error if field is filled
+        if (value.trim()) {
+          delete newErrors[field]
+        }
+        
+        // Email validation
+        if (field === 'email' && value.trim()) {
+          if (!/\S+@\S+\.\S+/.test(value)) {
+            newErrors.email = 'Email inválido'
+          } else {
+            delete newErrors.email
+          }
+        }
+        
+        // Phone validation (basic)
+        if (field === 'phone' && value.trim()) {
+          if (value.length < 8) {
+            newErrors.phone = 'Teléfono muy corto'
+          } else {
+            delete newErrors.phone
+          }
+        }
+      }
+    })
+    
+    setFormErrors(newErrors)
   }
 
   const validate = (): boolean => {
@@ -225,6 +326,7 @@ export function CheckoutPageClient() {
       // Step 2a: COD — done
       if (method === 'cod') {
         clearCart()
+        localStorage.removeItem('checkout-progress') // Clear saved progress
         toast.success('¡Pedido realizado! Te contactaremos para coordinar la entrega.')
         router.push('/orders')
         return
@@ -262,6 +364,7 @@ export function CheckoutPageClient() {
 
       // Clear cart optimistically and redirect to MP
       clearCart()
+      localStorage.removeItem('checkout-progress') // Clear saved progress
       setMpInitUrl(prefData.initPoint ?? null)
 
       // Redirect to MercadoPago checkout
@@ -299,9 +402,16 @@ export function CheckoutPageClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8 py-8">
-      {/* Left: Shipping info */}
-      <div className="flex-1 space-y-6">
+    <div className="py-8">
+      {/* Progress Indicator */}
+      <CheckoutProgress currentStep={currentStep} />
+
+      {/* Trust Badges */}
+      <TrustBadges />
+
+      <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
+        {/* Left: Shipping info */}
+        <div className="flex-1 space-y-6">
         <h2 className="text-2xl font-medium text-[var(--color-text-primary)]">
           Información de Envío
         </h2>
@@ -590,5 +700,19 @@ export function CheckoutPageClient() {
         </p>
       </div>
     </form>
+
+    {/* Security footer */}
+    <div className="mt-8 text-center">
+      <div className="flex items-center justify-center gap-2 text-sm text-[var(--color-text-muted)]">
+        <Lock className="w-4 h-4" />
+        <span>Conexión segura SSL • Tus datos están protegidos</span>
+      </div>
+      <div className="flex items-center justify-center gap-4 mt-4">
+        <img src="/visa.svg" alt="Visa" className="h-6 opacity-50" onError={(e) => e.currentTarget.style.display = 'none'} />
+        <img src="/mastercard.svg" alt="Mastercard" className="h-6 opacity-50" onError={(e) => e.currentTarget.style.display = 'none'} />
+        <span className="text-xs text-[var(--color-text-muted)]">MercadoPago</span>
+      </div>
+    </div>
+  </div>
   )
 }

@@ -82,10 +82,10 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           )}
 
-          {/* Wishlist button */}
+          {/* Wishlist button - Siempre visible en móvil, hover en desktop */}
           {product.showWishlist && (
             <div
-              className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              className="absolute top-2 right-2 z-10 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200"
               onClick={(e) => e.preventDefault()}
             >
               <WishlistButton

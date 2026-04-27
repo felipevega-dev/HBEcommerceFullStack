@@ -2,34 +2,25 @@
 
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 
 export function NewsletterBox() {
   const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     if (!email) {
       toast.error('Por favor ingresa tu correo electrónico')
-      return
+      throw new Error('Email required')
     }
 
     if (!/\S+@\S+\.\S+/.test(email)) {
       toast.error('Por favor ingresa un correo electrónico válido')
-      return
+      throw new Error('Invalid email')
     }
 
-    setIsLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success('¡Gracias por suscribirte!')
-      setEmail('')
-    } catch {
-      toast.error('Hubo un error al suscribirte. Por favor intenta nuevamente.')
-    } finally {
-      setIsLoading(false)
-    }
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    toast.success('¡Gracias por suscribirte!')
+    setEmail('')
   }
 
   return (
@@ -48,7 +39,13 @@ export function NewsletterBox() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit()
+          }}
+          className="max-w-md mx-auto"
+        >
           <div className="flex gap-3">
             <input
               type="email"
@@ -57,39 +54,14 @@ export function NewsletterBox() {
               placeholder="Ingresa tu correo electrónico"
               className="flex-1 px-4 py-3 rounded-lg border border-[var(--color-border)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-colors outline-none bg-white"
             />
-            <button
+            <ButtonWithFeedback
               type="submit"
-              disabled={isLoading}
-              className={`px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-medium transition-all duration-200 ${
-                isLoading
-                  ? 'opacity-70 cursor-not-allowed'
-                  : 'hover:bg-[var(--color-primary-hover)] active:scale-95'
-              }`}
+              onClick={handleSubmit}
+              variant="primary"
+              className="px-6 !bg-[var(--color-primary)] hover:!bg-[var(--color-primary-hover)]"
             >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Suscribiendo...
-                </span>
-              ) : (
-                'Suscribirse'
-              )}
-            </button>
+              Suscribirse
+            </ButtonWithFeedback>
           </div>
         </form>
 

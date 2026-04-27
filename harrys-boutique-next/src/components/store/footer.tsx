@@ -115,22 +115,14 @@ export function Footer() {
           <div>
             <p className="font-semibold text-[var(--color-text-primary)] mb-3">Newsletter</p>
             <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-              Suscribite para recibir novedades
+              Suscribite para recibir novedades y ofertas exclusivas
             </p>
-            <form action="#" className="flex flex-col gap-2">
-              <input
-                type="email"
-                placeholder="tu@email.com"
-                aria-label="Tu correo electrónico para el newsletter"
-                className="px-3 py-2 text-sm border border-[var(--color-border)] rounded-[var(--radius-md)] bg-[var(--color-background)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium bg-[var(--color-primary)] text-white rounded-[var(--radius-md)] hover:bg-[var(--color-primary-hover)] transition-colors"
-              >
-                Suscribirse
-              </button>
-            </form>
+            <Link
+              href="/contact"
+              className="inline-block px-4 py-2 text-sm font-medium bg-[var(--color-primary)] text-white rounded-[var(--radius-md)] hover:bg-[var(--color-primary-hover)] transition-colors"
+            >
+              Suscribirse
+            </Link>
           </div>
         </div>
 

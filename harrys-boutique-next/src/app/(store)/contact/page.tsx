@@ -3,7 +3,7 @@ import ContactForm from '@/components/store/contact-form'
 
 export const metadata: Metadata = {
   title: "Contacto — Harry's Boutique",
-  description: 'Contáctanos para cualquier consulta sobre nuestros productos.',
+  description: 'Contáctanos para cualquier consulta sobre nuestros productos. Estamos en Arica, Chile.',
 }
 
 export default function ContactPage() {
@@ -40,8 +40,8 @@ export default function ContactPage() {
               {[
                 {
                   label: 'Email',
-                  value: 'hola@harrys-boutique.com',
-                  href: 'mailto:hola@harrys-boutique.com',
+                  value: 'contacto@harrysboutique.cl',
+                  href: 'mailto:contacto@harrysboutique.cl',
                   icon: (
                     <path
                       strokeLinecap="round"
@@ -53,8 +53,8 @@ export default function ContactPage() {
                 },
                 {
                   label: 'Teléfono',
-                  value: '+54 11 1234-5678',
-                  href: 'tel:+541112345678',
+                  value: '+56 58 2265 4321',
+                  href: 'tel:+565822654321',
                   icon: (
                     <path
                       strokeLinecap="round"
@@ -66,8 +66,8 @@ export default function ContactPage() {
                 },
                 {
                   label: 'Instagram',
-                  value: '@harrys.boutique',
-                  href: 'https://instagram.com/harrys.boutique',
+                  value: '@harrysboutique.CL',
+                  href: 'https://www.instagram.com/harrysboutique.CL',
                   icon: (
                     <>
                       <rect
@@ -126,6 +126,32 @@ export default function ContactPage() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="rounded-xl p-6 bg-[var(--color-surface)] border border-[var(--color-border)]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-[var(--color-accent-light)] text-[var(--color-accent-dark)]">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-medium text-[var(--color-text-primary)]">Ubicación</h3>
+            </div>
+            <p className="text-sm text-[var(--color-text-primary)] font-medium">Arica, Chile</p>
+            <p className="text-sm mt-1 text-[var(--color-text-muted)]">
+              Envíos a todo Chile
+            </p>
           </div>
 
           <div className="rounded-xl p-6 bg-[var(--color-surface)] border border-[var(--color-border)]">
