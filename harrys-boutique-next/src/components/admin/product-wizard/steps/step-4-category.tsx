@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
+import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 
 interface Step4CategoryProps {
   productData: ProductData
@@ -12,33 +13,33 @@ interface Step4CategoryProps {
 }
 
 // Default category icons (fallback)
-const CATEGORY_ICONS: Record<string, string> = {
-  perros: '🐕',
-  gatos: '🐈',
-  aves: '🦜',
-  otros: '🐾',
-  dogs: '🐕',
-  cats: '🐈',
-  birds: '🦜',
-  other: '🐾',
+const CATEGORY_ICONS: Record<string, BrandIconName> = {
+  perros: 'paw',
+  gatos: 'paw',
+  aves: 'paw',
+  otros: 'paw',
+  dogs: 'paw',
+  cats: 'paw',
+  birds: 'paw',
+  other: 'paw',
 }
 
 // Default subcategory icons (fallback)
-const SUBCATEGORY_ICONS: Record<string, string> = {
-  collares: '🦴',
-  juguetes: '🎾',
-  alimento: '🍖',
-  ropa: '👕',
-  accesorios: '🎒',
-  piedras: '🪨',
-  jaulas: '🏠',
-  habitats: '🏠',
-  toys: '🎾',
-  food: '🍖',
-  clothing: '👕',
-  accessories: '🎒',
-  litter: '🪨',
-  cages: '🏠',
+const SUBCATEGORY_ICONS: Record<string, BrandIconName> = {
+  collares: 'tag',
+  juguetes: 'toy',
+  alimento: 'food',
+  ropa: 'shirt',
+  accesorios: 'sparkles',
+  piedras: 'package',
+  jaulas: 'package',
+  habitats: 'package',
+  toys: 'toy',
+  food: 'food',
+  clothing: 'shirt',
+  accessories: 'sparkles',
+  litter: 'package',
+  cages: 'package',
 }
 
 /**
@@ -99,13 +100,13 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
   // Get icon for category name
   const getCategoryIcon = (name: string) => {
     const lowerName = name.toLowerCase()
-    return CATEGORY_ICONS[lowerName] || '🐾'
+    return CATEGORY_ICONS[lowerName] || 'paw'
   }
 
   // Get icon for subcategory name
   const getSubcategoryIcon = (name: string) => {
     const lowerName = name.toLowerCase()
-    return SUBCATEGORY_ICONS[lowerName] || '🎒'
+    return SUBCATEGORY_ICONS[lowerName] || 'sparkles'
   }
 
   if (loading) {
@@ -113,7 +114,8 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
       <div className="space-y-6">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            🏷️ Categoría
+            <BrandIcon name="tag" className="mr-2 h-5 w-5" />
+            Categoría
           </h2>
           <p className="mt-1 text-sm text-gray-500">
             Cargando categorías...
@@ -131,7 +133,8 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          🏷️ Categoría
+          <BrandIcon name="tag" className="mr-2 h-5 w-5" />
+          Categoría
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Seleccioná el tipo de mascota y la categoría del producto
@@ -160,7 +163,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
               }`}
             >
               <div className="flex flex-col items-center gap-2">
-                <span className="text-4xl">{getCategoryIcon(category.name)}</span>
+                <BrandIcon name={getCategoryIcon(category.name)} className="h-9 w-9 text-gray-700" />
                 <span className="text-sm font-medium text-gray-900">{category.name}</span>
               </div>
 
@@ -215,7 +218,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
-                  <span className="text-3xl">{getSubcategoryIcon(subcategory)}</span>
+                  <BrandIcon name={getSubcategoryIcon(subcategory)} className="h-7 w-7 text-gray-700" />
                   <span className="text-sm font-medium text-gray-900 capitalize">{subcategory}</span>
                 </div>
 

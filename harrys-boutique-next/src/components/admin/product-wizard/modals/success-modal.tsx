@@ -18,6 +18,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { BrandIcon } from '@/components/ui/brand-icon';
 
 interface SuccessModalProps {
   /**
@@ -123,7 +124,9 @@ export function SuccessModal({
       >
         {/* Success Icon and Title */}
         <div className="text-center mb-4">
-          <div className="text-5xl mb-3 animate-bounce">✅</div>
+          <div className="mb-3 flex justify-center text-green-600 animate-bounce">
+            <BrandIcon name="check-circle" className="h-12 w-12" />
+          </div>
           <h2
             id="success-modal-title"
             className="text-xl font-semibold text-gray-900"

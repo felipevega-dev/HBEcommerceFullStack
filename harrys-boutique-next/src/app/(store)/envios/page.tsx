@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 export const metadata: Metadata = {
   title: "Información de Envíos — Harry's Boutique",
@@ -36,19 +37,7 @@ export default function EnviosPage() {
         {/* Envío gratis */}
         <div className="bg-[var(--color-accent-light)] rounded-xl p-6 flex gap-4 items-start">
           <div className="w-10 h-10 rounded-full bg-[var(--color-accent)] flex items-center justify-center flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+            <BrandIcon name="check" className="h-5 w-5 text-white" />
           </div>
           <div>
             <h2 className="font-semibold text-[var(--color-text-primary)] mb-1">
@@ -131,8 +120,12 @@ export default function EnviosPage() {
         <p className="text-sm text-[var(--color-text-muted)] mb-3">
           ¿Tenés alguna duda sobre tu envío?
         </p>
-        <Link href="/contact" className="text-sm text-[var(--color-accent-dark)] hover:underline">
-          Contactanos →
+        <Link
+          href="/contact"
+          className="inline-flex items-center gap-1 text-sm text-[var(--color-accent-dark)] hover:underline"
+        >
+          Contactanos
+          <BrandIcon name="chevron-right" className="h-4 w-4" />
         </Link>
       </div>
     </main>

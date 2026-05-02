@@ -5,6 +5,7 @@ import { ProductCard } from './product-card'
 export async function LatestCollection() {
   let products: {
     id: string
+    slug?: string
     name: string
     price: number
     images: string[]
@@ -16,6 +17,15 @@ export async function LatestCollection() {
       where: { active: true },
       orderBy: { createdAt: 'desc' },
       take: 10,
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        price: true,
+        images: true,
+        ratingAverage: true,
+        ratingCount: true,
+      },
     })
     products = raw.map((p) => ({
       id: p.id,

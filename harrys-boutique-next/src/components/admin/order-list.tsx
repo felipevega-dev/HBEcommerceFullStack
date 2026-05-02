@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
 import type { OrderStatus } from '@prisma/client'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface OrderItem {
   id: string
@@ -240,13 +241,19 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
             onClick={() => setShowFilters(!showFilters)}
             className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 transition-colors"
           >
-            {showFilters ? '✕ Ocultar filtros' : '🔍 Filtros'}
+            <span className="inline-flex items-center gap-2">
+              <BrandIcon name={showFilters ? 'x' : 'filter'} className="h-4 w-4" />
+              {showFilters ? 'Ocultar filtros' : 'Filtros'}
+            </span>
           </button>
           <button
             onClick={exportToCSV}
             className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 transition-colors"
           >
-            📥 Exportar CSV
+            <span className="inline-flex items-center gap-2">
+              <BrandIcon name="download" className="h-4 w-4" />
+              Exportar CSV
+            </span>
           </button>
         </div>
 
@@ -436,8 +443,8 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-medium text-sm">#{order.id.slice(-8).toUpperCase()}</p>
                     {order.couponCode && (
-                      <span className="px-2 py-0.5 bg-orange-100 text-orange-800 text-xs rounded-full">
-                        🎟️ {order.couponCode}
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs rounded-full">
+                        <BrandIcon name="coupon" className="h-3 w-3" /> {order.couponCode}
                       </span>
                     )}
                   </div>
@@ -483,13 +490,16 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${order.payment ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
                   >
-                    {order.payment ? '✓ Pagado' : '⏳ Pendiente'}
+                    <span className="inline-flex items-center gap-1">
+                      <BrandIcon name={order.payment ? 'check' : 'loader'} className="h-3 w-3" />
+                      {order.payment ? 'Pagado' : 'Pendiente'}
+                    </span>
                   </span>
                   <button
                     onClick={() => setExpanded(expanded === order.id ? null : order.id)}
                     className="text-sm text-gray-500 hover:text-black transition-colors"
                   >
-                    {expanded === order.id ? '▲' : '▼'}
+                    {expanded === order.id ? 'Ocultar' : 'Ver'}
                   </button>
                 </div>
               </div>
@@ -533,7 +543,12 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                           <p>
                             {address.street}, {address.city}
                           </p>
-                          {address.phone && <p>📞 {address.phone}</p>}
+                          {address.phone && (
+                            <p className="flex items-center gap-1">
+                              <BrandIcon name="phone" className="h-3 w-3" />
+                              {address.phone}
+                            </p>
+                          )}
                         </div>
                       </div>
                     )}
@@ -589,7 +604,7 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
 
         {orders.length === 0 && (
           <div className="text-center py-12 text-gray-500 bg-white rounded-xl border">
-            <p className="text-lg mb-2">📦</p>
+            <BrandIcon name="package" className="mx-auto mb-2 h-6 w-6" />
             <p>No hay órdenes que coincidan con los filtros</p>
           </div>
         )}

@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 
 interface Category {
   id: string
@@ -10,34 +11,34 @@ interface Category {
   subcategories: string[]
 }
 
-const categoryImages: Record<string, { emoji: string; gradient: string; description: string }> = {
+const categoryImages: Record<string, { icon: BrandIconName; gradient: string; description: string }> = {
   Ropa: {
-    emoji: '👕',
+    icon: 'shirt',
     gradient: 'from-blue-500 to-purple-600',
     description: 'Estilo y comodidad',
   },
   Accesorios: {
-    emoji: '🎀',
+    icon: 'sparkles',
     gradient: 'from-pink-500 to-rose-600',
     description: 'Detalles que enamoran',
   },
   Juguetes: {
-    emoji: '🎾',
+    icon: 'toy',
     gradient: 'from-green-500 to-emerald-600',
     description: 'Diversión garantizada',
   },
   Camas: {
-    emoji: '🛏️',
+    icon: 'bed',
     gradient: 'from-indigo-500 to-blue-600',
     description: 'Descanso premium',
   },
   Collares: {
-    emoji: '⭕',
+    icon: 'circle',
     gradient: 'from-orange-500 to-amber-600',
     description: 'Seguridad con estilo',
   },
   Comederos: {
-    emoji: '🍽️',
+    icon: 'food',
     gradient: 'from-red-500 to-pink-600',
     description: 'Hora de comer',
   },
@@ -85,7 +86,7 @@ export function CategoryGrid3D({ categories }: { categories: Category[] }) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
           {displayCategories.slice(0, 6).map((category, index) => {
             const categoryData = categoryImages[category.name] || {
-              emoji: '🐾',
+              icon: 'paw',
               gradient: 'from-gray-500 to-gray-600',
               description: 'Ver productos',
             }
@@ -138,7 +139,7 @@ function CategoryCard({
   isInView,
 }: {
   category: Category
-  categoryData: { emoji: string; gradient: string; description: string }
+  categoryData: { icon: BrandIconName; gradient: string; description: string }
   index: number
   isInView: boolean
 }) {
@@ -207,13 +208,12 @@ function CategoryCard({
               transform: 'translateZ(30px)',
             }}
           >
-            {/* Emoji */}
             <motion.div
               whileHover={{ scale: 1.2, rotate: 10 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="text-5xl sm:text-6xl mb-3 drop-shadow-lg"
+              className="mb-3 drop-shadow-lg"
             >
-              {categoryData.emoji}
+              <BrandIcon name={categoryData.icon} className="h-12 w-12 sm:h-14 sm:w-14" />
             </motion.div>
 
             {/* Category name */}

@@ -95,7 +95,7 @@ describe('ProductWizard', () => {
     render(<ProductWizard />)
     
     await waitFor(() => {
-      expect(screen.getByText('📷 Fotos del Producto')).toBeInTheDocument()
+      expect(screen.getByText('Fotos del Producto')).toBeInTheDocument()
     })
   })
 
@@ -111,7 +111,7 @@ describe('ProductWizard', () => {
     render(<ProductWizard />)
     
     await waitFor(() => {
-      expect(screen.getByText('Siguiente →')).toBeInTheDocument()
+      expect(screen.getByText('Siguiente')).toBeInTheDocument()
     })
   })
 
@@ -119,7 +119,7 @@ describe('ProductWizard', () => {
     render(<ProductWizard />)
     
     await waitFor(() => {
-      expect(screen.queryByText('← Anterior')).not.toBeInTheDocument()
+      expect(screen.queryByText('Anterior')).not.toBeInTheDocument()
     })
   })
 })

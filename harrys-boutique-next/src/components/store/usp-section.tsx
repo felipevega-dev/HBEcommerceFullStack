@@ -2,28 +2,34 @@
 
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
+import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 
-const features = [
+const features: Array<{
+  icon: BrandIconName
+  title: string
+  description: string
+  color: string
+}> = [
   {
-    icon: '🎨',
+    icon: 'design',
     title: 'Diseños Únicos',
     description: 'Cada pieza es una obra de arte con identidad regional y estilo propio',
     color: 'from-purple-500 to-pink-500',
   },
   {
-    icon: '✨',
+    icon: 'sparkles',
     title: 'Calidad Premium',
     description: 'Materiales de primera calidad, duraderos y cómodos para tu mascota',
     color: 'from-blue-500 to-cyan-500',
   },
   {
-    icon: '🚀',
+    icon: 'shipping',
     title: 'Envío Express',
     description: 'Recibe tus productos en 24-48 horas. Envío gratis en compras sobre $50.000',
     color: 'from-orange-500 to-red-500',
   },
   {
-    icon: '💚',
+    icon: 'leaf',
     title: 'Eco-Friendly',
     description: 'Telas reutilizadas y procesos sustentables. Moda consciente para mascotas',
     color: 'from-green-500 to-emerald-500',
@@ -95,9 +101,9 @@ export function USPSection() {
                 <motion.div
                   whileHover={{ rotate: 360, scale: 1.2 }}
                   transition={{ duration: 0.6 }}
-                  className="relative w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-accent-light)] flex items-center justify-center text-4xl shadow-md"
+                  className="relative w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-accent-light)] flex items-center justify-center text-[var(--color-accent)] shadow-md"
                 >
-                  {feature.icon}
+                  <BrandIcon name={feature.icon} className="h-8 w-8" />
                 </motion.div>
 
                 {/* Content */}

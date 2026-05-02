@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BrandIcon } from '@/components/ui/brand-icon'
 import { ProductCard } from './product-card'
 
 interface Product {
@@ -67,9 +68,10 @@ export function ProductGrid({
           {currentPage > 1 && (
             <Link
               href={`?page=${currentPage - 1}`}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+              className="inline-flex h-10 w-10 items-center justify-center border rounded-lg hover:bg-gray-50 text-sm"
+              aria-label="Pagina anterior"
             >
-              ←
+              <BrandIcon name="chevron-left" className="h-4 w-4" />
             </Link>
           )}
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -84,9 +86,10 @@ export function ProductGrid({
           {currentPage < totalPages && (
             <Link
               href={`?page=${currentPage + 1}`}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+              className="inline-flex h-10 w-10 items-center justify-center border rounded-lg hover:bg-gray-50 text-sm"
+              aria-label="Pagina siguiente"
             >
-              →
+              <BrandIcon name="chevron-right" className="h-4 w-4" />
             </Link>
           )}
         </div>

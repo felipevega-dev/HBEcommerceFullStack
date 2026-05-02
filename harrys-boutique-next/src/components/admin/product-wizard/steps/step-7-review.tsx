@@ -2,6 +2,7 @@
 
 import { ProductData } from '../types'
 import { formatPrice, formatPriceWithDiscount, formatList } from '../utils/format-helpers'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Step7ReviewProps {
   productData: ProductData
@@ -85,7 +86,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          ✅ Revisión Final
+          <BrandIcon name="check-circle" className="mr-2 h-5 w-5" />
+          Revisión Final
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Verificá que toda la información sea correcta antes de guardar
@@ -96,7 +98,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       <div className="p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            📷 Imágenes
+            <BrandIcon name="camera" className="h-5 w-5" />
+            Imágenes
           </h3>
           <button
             type="button"
@@ -131,7 +134,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       <div className="p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            📝 Información Básica
+            <BrandIcon name="review" className="h-5 w-5" />
+            Información Básica
           </h3>
           <button
             type="button"
@@ -158,7 +162,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       <div className="p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            💰 Precio
+            <BrandIcon name="price" className="h-5 w-5" />
+            Precio
           </h3>
           <button
             type="button"
@@ -193,7 +198,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       <div className="p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            🏷️ Categoría
+            <BrandIcon name="tag" className="h-5 w-5" />
+            Categoría
           </h3>
           <button
             type="button"
@@ -218,7 +224,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       <div className="p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            📏 Tallas y Colores
+            <BrandIcon name="ruler" className="h-5 w-5" />
+            Tallas y Colores
           </h3>
           <button
             type="button"
@@ -256,7 +263,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
       <div className="p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            ⚙️ Opciones
+            <BrandIcon name="settings" className="h-5 w-5" />
+            Opciones
           </h3>
           <button
             type="button"
@@ -279,12 +287,14 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
             <dd className="mt-2 flex flex-wrap gap-2">
               {bestSeller && (
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-lg">
-                  ⭐ Más Vendido
+                  <BrandIcon name="star" className="mr-1 inline h-3 w-3" />
+                  Más Vendido
                 </span>
               )}
               {active ? (
                 <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-lg">
-                  ✓ Activo
+                  <BrandIcon name="check" className="mr-1 inline h-3 w-3" />
+                  Activo
                 </span>
               ) : (
                 <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-lg">

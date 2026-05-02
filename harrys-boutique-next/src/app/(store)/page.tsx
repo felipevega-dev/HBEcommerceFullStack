@@ -8,7 +8,6 @@ import { ProductsShowcase } from '@/components/store/products-showcase'
 import { BestSeller } from '@/components/store/best-seller'
 import { Testimonials } from '@/components/store/testimonials'
 import { OurPolicy } from '@/components/store/our-policy'
-import { NewsletterBox } from '@/components/store/newsletter-box'
 import { SkeletonCard } from '@/components/ui/skeleton-card'
 
 export const revalidate = 60
@@ -142,8 +141,6 @@ export default async function HomePage() {
           {/* Políticas */}
           <OurPolicy />
 
-          {/* Newsletter */}
-          <NewsletterBox />
         </div>
       </div>
     </main>

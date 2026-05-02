@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Review {
   id: string
@@ -79,9 +80,14 @@ export function ProductReviews({
               <div key={review.id} className="border-b pb-4">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium text-sm">{review.user.name}</span>
-                  <span className="text-yellow-400 text-sm">
-                    {'★'.repeat(review.rating)}
-                    {'☆'.repeat(5 - review.rating)}
+                  <span className="flex gap-0.5 text-yellow-400">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <BrandIcon
+                        key={star}
+                        name="star"
+                        className={`h-4 w-4 ${star <= review.rating ? 'fill-current' : 'text-gray-200'}`}
+                      />
+                    ))}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">{review.comment}</p>
@@ -97,9 +103,9 @@ export function ProductReviews({
                       key={s}
                       type="button"
                       onClick={() => setRating(s)}
-                      className={`text-2xl ${s <= rating ? 'text-yellow-400' : 'text-gray-200'}`}
+                      className={`${s <= rating ? 'text-yellow-400' : 'text-gray-200'}`}
                     >
-                      ★
+                      <BrandIcon name="star" className="h-6 w-6 fill-current" />
                     </button>
                   ))}
                 </div>

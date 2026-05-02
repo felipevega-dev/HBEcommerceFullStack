@@ -8,6 +8,7 @@ import { useCartStore } from '@/store/cart-store'
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Role } from '@prisma/client'
+import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 
 const navItems = [
   { href: '/', label: 'INICIO' },
@@ -56,13 +57,26 @@ export function Navbar() {
   const openDrawer = useCartStore((s) => s.openDrawer)
   const [menuOpen, setMenuOpen] = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
 
   useEffect(() => {
     setMenuOpen(false)
     setCategoriesOpen(false)
+    setMobileSearchOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [menuOpen])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,20 +87,21 @@ export function Navbar() {
     }
   }
 
-  const categories = [
-    { name: 'Ropa', href: '/collection?category=ropa', icon: '👕' },
-    { name: 'Accesorios', href: '/collection?category=accesorios', icon: '🎀' },
-    { name: 'Juguetes', href: '/collection?category=juguetes', icon: '🎾' },
-    { name: 'Camas', href: '/collection?category=camas', icon: '🛏️' },
-    { name: 'Collares', href: '/collection?category=collares', icon: '⭕' },
-    { name: 'Comederos', href: '/collection?category=comederos', icon: '🍽️' },
+  const categories: Array<{ name: string; href: string; icon: BrandIconName }> = [
+    { name: 'Prendas', href: '/collection?category=Prendas', icon: 'shirt' },
+    { name: 'Polerones', href: '/collection?subCategory=Polerones', icon: 'shirt' },
+    { name: 'Camisetas', href: '/collection?subCategory=Camisetas', icon: 'sparkles' },
+    { name: 'Vestidos', href: '/collection?subCategory=Vestidos', icon: 'design' },
+    { name: 'Más vendidos', href: '/collection?bestSeller=true', icon: 'star' },
+    { name: 'Novedades', href: '/collection?sort=newest', icon: 'tag' },
   ]
 
   return (
-    <nav
-      aria-label="Navegación principal"
-      className="sticky top-0 z-40 bg-[var(--color-background)]/95 backdrop-blur-md border-b border-[var(--color-border)] shadow-sm"
-    >
+    <>
+      <nav
+        aria-label="Navegación principal"
+        className="sticky top-0 z-40 bg-[var(--color-background)]/95 backdrop-blur-md border-b border-[var(--color-border)] shadow-sm"
+      >
       {/* Top bar - Social links y login */}
       <div className="hidden lg:block border-b border-[var(--color-border)]/50 bg-[var(--color-surface)]/30">
         <div className="px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
@@ -114,15 +129,15 @@ export function Navbar() {
             {/* Login/Account */}
             <div className="flex items-center gap-4">
               {session?.user ? (
-                <div className="relative group">
+                <div className="relative z-50 group">
                   <button className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
                     <div className="w-6 h-6 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center text-xs font-semibold">
                       {session.user.name?.charAt(0).toUpperCase() ?? 'U'}
                     </div>
                     <span className="text-xs font-medium">{session.user.name}</span>
                   </button>
-                  <div className="absolute right-0 pt-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
-                    <div className="bg-white rounded-lg shadow-xl border border-[var(--color-border)] overflow-hidden min-w-[180px]">
+                  <div className="absolute right-0 top-full z-[70] pt-3 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto">
+                    <div className="min-w-[196px] overflow-hidden rounded-lg border border-[var(--color-border)] bg-white shadow-xl ring-1 ring-black/5">
                       {(session.user.role === 'OWNER' ||
                         session.user.role === 'ADMIN' ||
                         session.user.role === 'MODERATOR') && (
@@ -234,7 +249,7 @@ export function Navbar() {
                           onClick={() => setCategoriesOpen(false)}
                           className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--color-surface)] transition-colors border-b border-[var(--color-border)] last:border-b-0"
                         >
-                          <span className="text-2xl">{category.icon}</span>
+                          <BrandIcon name={category.icon} className="h-5 w-5 text-[var(--color-accent)]" />
                           <span className="text-sm font-medium text-[var(--color-text-secondary)]">
                             {category.name}
                           </span>
@@ -245,7 +260,7 @@ export function Navbar() {
                         onClick={() => setCategoriesOpen(false)}
                         className="block px-4 py-3 text-center text-sm font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent-light)] transition-colors"
                       >
-                        Ver todas las categorías →
+                        Ver todas las categorías
                       </Link>
                     </motion.div>
                   </>
@@ -324,21 +339,16 @@ export function Navbar() {
           <div className="flex gap-2 sm:gap-3 items-center">
             {/* Search icon - Mobile */}
             <button
-              onClick={() => {
-                const query = prompt('¿Qué estás buscando?')
-                if (query) router.push(`/collection?search=${encodeURIComponent(query)}`)
-              }}
+              onClick={() => setMobileSearchOpen((open) => !open)}
               className="md:hidden p-2 hover:bg-[var(--color-surface)] rounded-full transition-colors"
-              aria-label="Buscar"
+              aria-label={mobileSearchOpen ? 'Cerrar busqueda' : 'Buscar'}
+              aria-expanded={mobileSearchOpen}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
+              <BrandIcon
+                name={mobileSearchOpen ? 'x' : 'search'}
+                className="h-5 w-5"
+                strokeWidth={1.5}
+              />
             </button>
 
             {/* Wishlist */}
@@ -441,19 +451,52 @@ export function Navbar() {
         </div>
       </div>
 
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.form
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onSubmit={handleSearch}
+            className="overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-background)] px-4 py-3 md:hidden"
+          >
+            <div className="relative">
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar productos..."
+                autoFocus
+                className="w-full rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-[var(--color-accent)] p-2 text-white transition-colors hover:bg-[var(--color-accent-dark)]"
+                aria-label="Buscar"
+              >
+                <BrandIcon name="search" className="h-4 w-4" />
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
+
+      </nav>
+
       {/* Mobile menu — animated with framer-motion */}
       <AnimatePresence>
         {menuOpen && (
           <>
             <motion.div
-              className="fixed inset-0 bg-black/50 z-[100]"
+              className="fixed inset-0 z-[1000] bg-black/50 lg:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
             />
             <motion.div
-              className="fixed inset-y-0 right-0 w-[85%] max-w-sm bg-white shadow-2xl z-[101] flex flex-col"
+              className="fixed right-0 top-0 z-[1001] flex h-dvh w-[85%] max-w-sm flex-col bg-white shadow-2xl lg:hidden"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -475,14 +518,7 @@ export function Navbar() {
                   className="p-2 hover:bg-[var(--color-surface-2)] rounded-full transition-colors"
                   aria-label="Cerrar menú"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <BrandIcon name="x" className="h-6 w-6" />
                 </button>
               </div>
 
@@ -501,7 +537,7 @@ export function Navbar() {
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg hover:bg-[var(--color-surface)] transition-colors text-sm"
                       >
-                        <span className="text-lg">{category.icon}</span>
+                        <BrandIcon name={category.icon} className="h-4 w-4 text-[var(--color-accent)]" />
                         <span className="font-medium text-[var(--color-text-secondary)]">
                           {category.name}
                         </span>
@@ -613,6 +649,6 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   )
 }

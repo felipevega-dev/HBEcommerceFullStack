@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 export const metadata: Metadata = {
   title: "Devoluciones y Cambios — Harry's Boutique",
@@ -114,7 +115,7 @@ export default function DevolucionesPage() {
               'Accesorios de higiene por razones sanitarias',
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="text-[var(--color-error)] mt-0.5">✕</span>
+                <BrandIcon name="x" className="mt-0.5 h-4 w-4 text-[var(--color-error)]" />
                 {item}
               </li>
             ))}

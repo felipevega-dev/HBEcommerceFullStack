@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import {
@@ -327,7 +327,12 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
         <StatCard label="Rechazados" value={stats.rejected} color="bg-red-50 text-red-700" />
         <StatCard
           label="Rating promedio"
-          value={`${stats.avgRating} ★`}
+          value={
+            <span className="inline-flex items-center gap-1">
+              {stats.avgRating}
+              <Star className="h-5 w-5 fill-current" />
+            </span>
+          }
           color="bg-yellow-50 text-yellow-700"
         />
       </div>
@@ -492,7 +497,7 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
                   onClick={() => setForm((f) => ({ ...f, rating: s }))}
                   className={`text-3xl transition-all hover:scale-110 ${s <= form.rating ? 'text-yellow-400' : 'text-gray-200'}`}
                 >
-                  ★
+                  <Star className="h-8 w-8 fill-current" />
                 </button>
               ))}
             </div>
@@ -570,7 +575,7 @@ function StatCard({
   color,
 }: {
   label: string
-  value: number | string
+  value: ReactNode
   color: string
 }) {
   return (
@@ -717,7 +722,7 @@ function TestimonialItem({
                 onClick={() => setEditForm((f) => ({ ...f, rating: s }))}
                 className={`text-3xl transition-all hover:scale-110 ${s <= (editForm.rating || 5) ? 'text-yellow-400' : 'text-gray-200'}`}
               >
-                ★
+                <Star className="h-8 w-8 fill-current" />
               </button>
             ))}
           </div>

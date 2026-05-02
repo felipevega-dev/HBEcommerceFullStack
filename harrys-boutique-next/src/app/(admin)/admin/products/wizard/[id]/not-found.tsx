@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 /**
  * Not Found page for edit product wizard
@@ -11,7 +12,7 @@ export default function ProductNotFound() {
       <div className="max-w-md w-full bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
         <div className="mb-4">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">🔍</span>
+            <BrandIcon name="search" className="h-8 w-8 text-gray-500" />
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Producto no encontrado

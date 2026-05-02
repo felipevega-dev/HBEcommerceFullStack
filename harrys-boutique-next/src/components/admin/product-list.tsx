@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Product {
   id: string
@@ -203,7 +204,7 @@ export function AdminProductList({ products, total, page, limit, categories }: P
               onClick={() => setSearchQuery('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              ✕
+              <BrandIcon name="x" className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -333,7 +334,10 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                     <div>
                       <p className="font-medium line-clamp-1">{product.name}</p>
                       {product.bestSeller && (
-                        <span className="text-xs text-yellow-600 font-medium">★ Best Seller</span>
+                        <span className="inline-flex items-center gap-1 text-xs text-yellow-600 font-medium">
+                          <BrandIcon name="star" className="h-3 w-3" />
+                          Best Seller
+                        </span>
                       )}
                     </div>
                   </div>
@@ -364,7 +368,10 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                       className="px-3 py-1 text-xs border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50"
                       title="Ver en tienda"
                     >
-                      👁️ Ver
+                      <span className="inline-flex items-center gap-1">
+                        <BrandIcon name="eye" className="h-3 w-3" />
+                        Ver
+                      </span>
                     </Link>
                     <Link
                       href={`/admin/products/${product.id}/edit`}

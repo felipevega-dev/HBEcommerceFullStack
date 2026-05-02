@@ -2,17 +2,18 @@
 
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
+import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 
 interface Step {
   number: number
   label: string
-  icon: string
+  icon: BrandIconName
 }
 
 const steps: Step[] = [
-  { number: 1, label: 'Dirección', icon: '📍' },
-  { number: 2, label: 'Pago', icon: '💳' },
-  { number: 3, label: 'Confirmación', icon: '✅' },
+  { number: 1, label: 'Dirección', icon: 'location' },
+  { number: 2, label: 'Pago', icon: 'payment' },
+  { number: 3, label: 'Confirmación', icon: 'check-circle' },
 ]
 
 interface Props {
@@ -66,7 +67,7 @@ export function CheckoutProgress({ currentStep }: Props) {
                       <Check className="w-5 h-5" />
                     </motion.div>
                   ) : (
-                    <span className="text-lg">{step.icon}</span>
+                    <BrandIcon name={step.icon} className="h-5 w-5" />
                   )}
                 </motion.div>
                 <motion.p
@@ -116,7 +117,7 @@ export function CheckoutProgress({ currentStep }: Props) {
                     : 'text-[var(--color-text-muted)]'
                 }`}
               >
-                {step.icon}
+                <BrandIcon name={step.icon} className="h-4 w-4" />
               </div>
             ))}
           </div>

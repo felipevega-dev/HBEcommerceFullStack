@@ -27,6 +27,15 @@ export async function RelatedProducts({ categoryId, subCategory, excludeId }: Pr
       },
       take: 5,
       orderBy: { ratingAverage: 'desc' },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        price: true,
+        images: true,
+        ratingAverage: true,
+        ratingCount: true,
+      },
     })
     products = raw.map((p) => ({
       id: p.id,

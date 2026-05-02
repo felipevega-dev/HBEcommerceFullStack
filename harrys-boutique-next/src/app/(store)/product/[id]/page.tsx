@@ -15,6 +15,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Support both UUID and slug lookup
   const product = await prisma.product.findFirst({
     where: { OR: [{ id }, { slug: id }] },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      description: true,
+      images: true,
+    },
   })
   if (!product) return { title: 'Producto no encontrado' }
 
@@ -39,7 +46,23 @@ export default async function ProductPage({ params }: Props) {
   // Support both UUID and slug lookup
   const rawProduct = await prisma.product.findFirst({
     where: { active: true, OR: [{ id }, { slug: id }] },
-    include: { category: { select: { name: true } } },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      description: true,
+      price: true,
+      originalPrice: true,
+      images: true,
+      colors: true,
+      sizes: true,
+      stock: true,
+      ratingAverage: true,
+      ratingCount: true,
+      categoryId: true,
+      subCategory: true,
+      category: { select: { name: true } },
+    },
   })
 
   if (!rawProduct) notFound()

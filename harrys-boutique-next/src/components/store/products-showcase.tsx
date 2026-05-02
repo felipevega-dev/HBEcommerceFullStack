@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ProductCard } from './product-card'
 import { motion, AnimatePresence } from 'framer-motion'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Product {
   id: string
@@ -38,8 +39,8 @@ export function ProductsShowcase({
 
   // Tabs: Todos + categorías principales
   const tabs = [
-    { id: 'all', name: 'PRODUCTOS' },
-    ...categories.slice(0, 7).map((c) => ({ id: c.id, name: c.name.toUpperCase() })),
+    { id: 'all', name: 'Todos' },
+    ...categories.slice(0, 7).map((c) => ({ id: c.id, name: c.name })),
   ]
 
   return (
@@ -99,9 +100,10 @@ export function ProductsShowcase({
       <div className="text-center pt-4">
         <Link
           href="/collection"
-          className="inline-block px-8 py-3 border-2 border-[var(--color-text-primary)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-primary)] hover:text-white transition-all rounded-lg font-medium"
+          className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-text-primary)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-text-primary)] hover:text-white"
         >
-          VER TODOS LOS PRODUCTOS
+          Ver todos los productos
+          <BrandIcon name="chevron-right" className="h-4 w-4" />
         </Link>
       </div>
     </section>

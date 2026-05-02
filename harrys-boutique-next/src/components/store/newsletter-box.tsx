@@ -2,72 +2,71 @@
 
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 
 export function NewsletterBox() {
   const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
+    if (loading) return
+
     if (!email) {
       toast.error('Por favor ingresa tu correo electrónico')
-      throw new Error('Email required')
+      return
     }
 
     if (!/\S+@\S+\.\S+/.test(email)) {
       toast.error('Por favor ingresa un correo electrónico válido')
-      throw new Error('Invalid email')
+      return
     }
 
+    setLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    toast.success('¡Gracias por suscribirte!')
+    toast.success('Gracias por suscribirte')
     setEmail('')
+    setLoading(false)
   }
 
   return (
-    <section className="py-8 bg-gradient-to-br from-[var(--color-accent-light)] to-[var(--color-gold-light)]">
-      <div className="max-w-3xl mx-auto px-6 text-center space-y-8">
-        <div className="space-y-4">
-          <h2
-            className="text-3xl md:text-4xl font-medium text-[var(--color-text-primary)]"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Obtén un 10% de descuento
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Suscríbete a nuestro newsletter y recibe un 10% de descuento en tu primera compra,
-            además de noticias exclusivas y ofertas especiales.
-          </p>
-        </div>
+    <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)] py-12">
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <h2
+          className="text-3xl font-medium text-[var(--color-text-primary)] md:text-4xl"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Recibe novedades de Harry's Boutique
+        </h2>
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
+          Recibe novedades, lanzamientos y ofertas especiales sin saturar tu bandeja.
+        </p>
 
         <form
           onSubmit={(e) => {
             e.preventDefault()
             handleSubmit()
           }}
-          className="max-w-md mx-auto"
+          className="mx-auto mt-8 max-w-md"
         >
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Ingresa tu correo electrónico"
-              className="flex-1 px-4 py-3 rounded-lg border border-[var(--color-border)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-colors outline-none bg-white"
+              placeholder="tu@email.com"
+              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
             />
-            <ButtonWithFeedback
+            <button
               type="submit"
-              onClick={handleSubmit}
-              variant="primary"
-              className="px-6 !bg-[var(--color-primary)] hover:!bg-[var(--color-primary-hover)]"
+              disabled={loading}
+              className="rounded-lg bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Suscribirse
-            </ButtonWithFeedback>
+              {loading ? 'Enviando...' : 'Suscribirse'}
+            </button>
           </div>
         </form>
 
-        <p className="text-sm text-gray-500">
-          Al suscribirte, aceptas recibir correos de marketing. Puedes darte de baja en cualquier
-          momento.
+        <p className="mt-4 text-xs text-[var(--color-text-muted)]">
+          Puedes darte de baja cuando quieras.
         </p>
       </div>
     </section>

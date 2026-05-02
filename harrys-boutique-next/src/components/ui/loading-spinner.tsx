@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { BrandIcon } from './brand-icon'
 
 interface Props {
   size?: 'sm' | 'md' | 'lg'
@@ -48,7 +49,7 @@ export function LoadingDots({ className = '' }: { className?: string }) {
 export function LoadingPaw({ className = '' }: { className?: string }) {
   return (
     <motion.div
-      className={`text-4xl ${className}`}
+      className={`text-[var(--color-accent)] ${className}`}
       animate={{
         scale: [1, 1.2, 1],
         rotate: [0, 10, -10, 0],
@@ -59,7 +60,7 @@ export function LoadingPaw({ className = '' }: { className?: string }) {
         ease: 'easeInOut',
       }}
     >
-      🐾
+      <BrandIcon name="paw" className="h-10 w-10" />
     </motion.div>
   )
 }

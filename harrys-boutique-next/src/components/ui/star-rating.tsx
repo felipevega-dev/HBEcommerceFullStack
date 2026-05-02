@@ -1,10 +1,12 @@
+import { useId } from 'react'
+
 interface StarRatingProps {
   average: number
   count: number
 }
 
 function StarIcon({ fill }: { fill: 'full' | 'half' | 'empty' }) {
-  const id = `half-${Math.random().toString(36).slice(2, 7)}`
+  const id = useId()
 
   return (
     <svg

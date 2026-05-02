@@ -3,6 +3,7 @@
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
 import { CharacterCounter } from '../components/character-counter'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Step2BasicInfoProps {
   productData: ProductData
@@ -53,7 +54,8 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          📝 Información Básica
+          <BrandIcon name="review" className="mr-2 h-5 w-5" />
+          Información Básica
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Contanos sobre tu producto
@@ -156,7 +158,7 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
               />
             </svg>
             <div className="text-sm text-blue-800">
-              <p className="font-medium mb-1">💡 Tip para una buena descripción:</p>
+              <p className="font-medium mb-1">Tip para una buena descripción:</p>
               <ul className="list-disc list-inside space-y-1 text-blue-700">
                 <li>Mencioná el material y la calidad</li>
                 <li>Indicá para qué tipo de mascota es</li>

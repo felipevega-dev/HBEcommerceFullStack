@@ -40,7 +40,25 @@ export default async function CollectionPage({
   const orderBy = buildProductOrderBy(sort)
 
   const [products, total, categories, allProducts, wishlistIds] = await Promise.all([
-    prisma.product.findMany({ where, orderBy, skip, take: limit }),
+    prisma.product.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        price: true,
+        originalPrice: true,
+        images: true,
+        ratingAverage: true,
+        ratingCount: true,
+        bestSeller: true,
+        colors: true,
+        sizes: true,
+      },
+    }),
     prisma.product.count({ where }),
     prisma.category.findMany({ orderBy: { name: 'asc' } }),
     prisma.product.findMany({

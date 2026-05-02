@@ -1,5 +1,7 @@
 'use client'
 
+import { BrandIcon } from '@/components/ui/brand-icon'
+
 /**
  * Character counter component props
  */
@@ -63,8 +65,8 @@ export function CharacterCounter({
         {current}/{max} caracteres
       </span>
       {isOverLimit && (
-        <span className="ml-1" aria-label="Límite excedido">
-          ⚠️
+        <span className="ml-1 inline-flex align-middle" aria-label="Límite excedido">
+          <BrandIcon name="alert" className="h-3 w-3" />
         </span>
       )}
     </div>

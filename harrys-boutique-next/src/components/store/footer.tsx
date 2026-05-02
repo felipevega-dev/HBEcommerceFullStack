@@ -21,8 +21,10 @@ export function Footer() {
             </p>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://instagram.com/harrysboutique"
                 aria-label="Instagram"
+                target="_blank"
+                rel="noreferrer"
                 className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -30,8 +32,10 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://facebook.com/harrysboutique"
                 aria-label="Facebook"
+                target="_blank"
+                rel="noreferrer"
                 className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

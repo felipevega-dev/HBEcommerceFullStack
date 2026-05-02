@@ -84,7 +84,7 @@ export function orderConfirmationEmail(data: OrderEmailData): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>✅ Pedido Confirmado</h1>
+          <h1>Pedido Confirmado</h1>
         </div>
         
         <div class="content">
@@ -181,7 +181,7 @@ export function paymentConfirmedEmail(data: OrderEmailData): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>💰 Pago Confirmado</h1>
+          <h1>Pago Confirmado</h1>
         </div>
         
         <div class="content">
@@ -189,7 +189,7 @@ export function paymentConfirmedEmail(data: OrderEmailData): string {
           <p>Tu pago ha sido confirmado exitosamente.</p>
           
           <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 20px; margin: 20px 0; text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 10px;">✓</div>
+            <div style="font-size: 48px; margin-bottom: 10px;">OK</div>
             <h3 style="margin: 0; color: #155724;">Pago Recibido</h3>
             <p style="margin: 10px 0 0 0; color: #155724;">
               <strong>$${data.total.toLocaleString('es-CL')}</strong>
@@ -235,7 +235,7 @@ export function orderShippedEmail(
     <body>
       <div class="container">
         <div class="header">
-          <h1>📦 Tu pedido está en camino</h1>
+          <h1>Tu pedido está en camino</h1>
         </div>
         
         <div class="content">
@@ -300,7 +300,7 @@ export function orderDeliveredEmail(data: OrderEmailData): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>✨ Pedido Entregado</h1>
+          <h1>Pedido Entregado</h1>
         </div>
         
         <div class="content">
@@ -308,7 +308,7 @@ export function orderDeliveredEmail(data: OrderEmailData): string {
           <p>Esperamos que disfrutes tus productos.</p>
           
           <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 20px; margin: 20px 0; text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+            <div style="font-size: 48px; margin-bottom: 10px;">OK</div>
             <h3 style="margin: 0; color: #155724;">Entrega Completada</h3>
             <p style="margin: 10px 0 0 0; color: #155724;">
               Pedido #${data.orderId}

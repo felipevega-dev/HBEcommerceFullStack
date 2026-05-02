@@ -9,6 +9,7 @@ import { useCartStore } from '@/store/cart-store'
 import { toast } from 'react-toastify'
 import { colorToHex } from '@/lib/utils'
 import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Product {
   id: string
@@ -23,6 +24,12 @@ interface Product {
   ratingAverage: number
   ratingCount: number
 }
+
+const stripEmoji = (text: string) =>
+  text.replace(
+    /[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu,
+    ''
+  )
 
 export function ProductInfo({
   product,
@@ -40,6 +47,7 @@ export function ProductInfo({
 
   const sizes = Array.isArray(product.sizes) ? (product.sizes as string[]) : []
   const price = product.price
+  const description = stripEmoji(product.description).replace(/\s{2,}/g, ' ').trim()
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
@@ -142,21 +150,14 @@ export function ProductInfo({
             </span>
           ) : (
             <span className="text-[var(--color-success)] font-medium flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+              <BrandIcon name="check" className="h-4 w-4" />
               En stock
             </span>
           )}
         </div>
       )}
 
-      <p className="text-gray-600 leading-relaxed">{product.description}</p>
+      <p className="text-gray-600 leading-relaxed">{description}</p>
 
       {/* Colors */}
       {product.colors.length > 0 && (
@@ -203,13 +204,15 @@ export function ProductInfo({
           <button
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
+            aria-label="Disminuir cantidad"
           >
-            −
+            -
           </button>
           <span className="w-8 text-center font-medium">{quantity}</span>
           <button
             onClick={() => setQuantity((q) => q + 1)}
             className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
+            aria-label="Aumentar cantidad"
           >
             +
           </button>
@@ -237,9 +240,18 @@ export function ProductInfo({
 
       {/* Features */}
       <div className="pt-4 border-t space-y-2 text-sm text-gray-500">
-        <p>✓ Producto 100% original</p>
-        <p>✓ Devoluciones gratis por 7 días</p>
-        <p>✓ Servicio de asistencia al cliente</p>
+        <p className="flex items-center gap-2">
+          <BrandIcon name="check" className="h-4 w-4" />
+          Producto 100% original
+        </p>
+        <p className="flex items-center gap-2">
+          <BrandIcon name="check" className="h-4 w-4" />
+          Devoluciones gratis por 7 días
+        </p>
+        <p className="flex items-center gap-2">
+          <BrandIcon name="check" className="h-4 w-4" />
+          Servicio de asistencia al cliente
+        </p>
       </div>
 
       {/* Cart modal */}
@@ -257,15 +269,9 @@ export function ProductInfo({
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600"
+                aria-label="Cerrar"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <BrandIcon name="x" className="h-5 w-5" />
               </button>
             </div>
 

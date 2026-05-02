@@ -2,6 +2,7 @@
 
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Step6OptionsProps {
   productData: ProductData
@@ -28,7 +29,8 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          ⚙️ Opciones Finales
+          <BrandIcon name="settings" className="mr-2 h-5 w-5" />
+          Opciones Finales
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Configurá las opciones adicionales del producto
@@ -141,7 +143,7 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
             </svg>
             <div>
               <p className="text-sm font-medium text-amber-800">
-                ⚠️ Este producto no estará visible en la tienda
+                Este producto no estará visible en la tienda
               </p>
               <p className="mt-1 text-sm text-amber-700">
                 Los clientes no podrán verlo ni comprarlo hasta que lo actives

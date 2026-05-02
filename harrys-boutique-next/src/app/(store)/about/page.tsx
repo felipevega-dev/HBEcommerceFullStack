@@ -1,47 +1,43 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { AboutPageClient } from '@/components/store/about-page-client'
+import type { BrandIconName } from '@/components/ui/brand-icon'
 
 export const metadata: Metadata = {
-  title: "Nosotros — Harry's Boutique",
+  title: "Nosotros - Harry's Boutique",
   description:
     "Conoce la historia de Harry's Boutique, tu tienda de ropa y accesorios para mascotas.",
 }
 
 const stats = [
-  { value: '5000+', label: 'Mascotas Felices', icon: '🐾' },
-  { value: '200+', label: 'Productos Únicos', icon: '✨' },
-  { value: '4', label: 'Años de Amor', icon: '❤️' },
-  { value: '4.9★', label: 'Calificación', icon: '⭐' },
-]
+  { value: '5000+', label: 'Clientes atendidos', icon: 'handshake' },
+  { value: '200+', label: 'Productos seleccionados', icon: 'shirt' },
+  { value: '4', label: 'Años de experiencia', icon: 'check-circle' },
+  { value: '4.9', label: 'Valoración promedio', icon: 'star' },
+] satisfies Array<{ value: string; label: string; icon: BrandIconName }>
 
 const values = [
   {
-    title: 'Calidad Premium',
-    description: 'Cada producto seleccionado con los más altos estándares para el confort de tu mascota',
-    icon: '🎯',
+    title: 'Calidad verificable',
+    description: 'Seleccionamos telas, terminaciones y proveedores con criterios claros de durabilidad.',
+    icon: 'target',
   },
   {
-    title: 'Amor Animal',
-    description: 'Cada decisión tomada pensando en el bienestar y felicidad de tus compañeros',
-    icon: '💛',
+    title: 'Comodidad primero',
+    description: 'Priorizamos calces que respeten el movimiento y el uso cotidiano de cada mascota.',
+    icon: 'ruler',
   },
   {
-    title: 'Comunidad',
-    description: 'Construimos una familia de amantes de las mascotas que comparten nuestra pasión',
-    icon: '🤝',
+    title: 'Atención cercana',
+    description: 'Acompañamos la elección con información práctica, cambios claros y respuesta directa.',
+    icon: 'handshake',
   },
   {
-    title: 'Sostenibilidad',
-    description: 'Comprometidos con productos eco-amigables y prácticas comerciales responsables',
-    icon: '🌱',
+    title: 'Identidad de marca',
+    description: 'Cuidamos que cada colección tenga una estética reconocible sin sacrificar funcionalidad.',
+    icon: 'design',
   },
-]
+] satisfies Array<{ title: string; description: string; icon: BrandIconName }>
 
 export default function AboutPage() {
-  return (
-    <AboutPageClient stats={stats} values={values} />
-
-
-  )
+  return <AboutPageClient stats={stats} values={values} />
 }

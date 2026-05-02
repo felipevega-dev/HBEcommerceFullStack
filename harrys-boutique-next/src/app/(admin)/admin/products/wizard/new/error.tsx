@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 /**
  * Error boundary for the new product wizard page
@@ -26,7 +27,7 @@ export default function NewProductWizardError({
       <div className="max-w-md w-full bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
         <div className="mb-4">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">❌</span>
+            <BrandIcon name="x-circle" className="h-8 w-8 text-red-600" />
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Error al cargar el wizard

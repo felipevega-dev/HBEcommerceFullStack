@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import { useWizardState } from './use-wizard-state'
 import { ProductData } from '../types'
 

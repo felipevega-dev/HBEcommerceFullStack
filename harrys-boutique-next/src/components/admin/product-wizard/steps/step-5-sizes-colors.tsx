@@ -3,6 +3,7 @@
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
 import { formatSelectionCount } from '../utils/format-helpers'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Step5SizesColorsProps {
   productData: ProductData
@@ -60,7 +61,8 @@ export function Step5SizesColors({ productData, updateField, errors = {} }: Step
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          📏 Tallas y Colores
+          <BrandIcon name="ruler" className="mr-2 h-5 w-5" />
+          Tallas y Colores
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Seleccioná las opciones disponibles para tu producto

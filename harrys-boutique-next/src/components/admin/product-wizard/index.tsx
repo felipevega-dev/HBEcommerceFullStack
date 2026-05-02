@@ -33,6 +33,7 @@ import {
   Step7Review,
 } from './steps'
 import { SuccessModal, ErrorModal } from './modals'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface ProductWizardProps {
   /**
@@ -384,7 +385,7 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
                     ${step > wizard.currentStep ? 'bg-gray-200 text-gray-500' : ''}
                   `}
                 >
-                  {step < wizard.currentStep ? '✓' : step}
+                  {step < wizard.currentStep ? <BrandIcon name="check" className="h-4 w-4" /> : step}
                 </div>
                 {step < 7 && (
                   <div
@@ -417,7 +418,7 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
                 onClick={handlePrevious}
                 className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                ← Anterior
+                Anterior
               </button>
             )}
           </div>
@@ -433,7 +434,7 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
                 disabled={validation.hasErrors()}
                 className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                Siguiente →
+                Siguiente
               </button>
             ) : (
               <button
@@ -447,7 +448,10 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
                     Guardando...
                   </>
                 ) : (
-                  <>💾 Guardar Producto</>
+                  <>
+                    <BrandIcon name="save" className="h-4 w-4" />
+                    Guardar Producto
+                  </>
                 )}
               </button>
             )}
@@ -465,20 +469,24 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
       </div>
       
       {/* Success Modal */}
-      <SuccessModal
-        isOpen={showSuccessModal}
-        productId={savedProductId}
-        onCreateAnother={handleCreateAnother}
-        onClose={() => setShowSuccessModal(false)}
-      />
+      {showSuccessModal && (
+        <SuccessModal
+          isOpen={showSuccessModal}
+          productId={savedProductId}
+          onCreateAnother={handleCreateAnother}
+          onClose={() => setShowSuccessModal(false)}
+        />
+      )}
       
       {/* Error Modal */}
-      <ErrorModal
-        isOpen={showErrorModal}
-        errorMessage={errorMessage}
-        onRetry={handleRetry}
-        onClose={handleCloseError}
-      />
+      {showErrorModal && (
+        <ErrorModal
+          isOpen={showErrorModal}
+          errorMessage={errorMessage}
+          onRetry={handleRetry}
+          onClose={handleCloseError}
+        />
+      )}
     </div>
   )
 }

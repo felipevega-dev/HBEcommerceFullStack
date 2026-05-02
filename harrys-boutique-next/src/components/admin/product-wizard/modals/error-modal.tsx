@@ -18,6 +18,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { BrandIcon } from '@/components/ui/brand-icon';
 
 interface ErrorModalProps {
   /**
@@ -98,7 +99,9 @@ export function ErrorModal({
       >
         {/* Error Icon and Title */}
         <div className="text-center mb-4">
-          <div className="text-5xl mb-3">❌</div>
+          <div className="mb-3 flex justify-center text-red-600">
+            <BrandIcon name="x-circle" className="h-12 w-12" />
+          </div>
           <h2
             id="error-modal-title"
             className="text-xl font-semibold text-red-600"

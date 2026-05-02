@@ -18,7 +18,7 @@ function validateEnv(): Env {
 
   if (!result.success) {
     const missing = result.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`)
-    console.error('\n❌ Missing or invalid environment variables:\n' + missing.join('\n') + '\n')
+    console.error('\nMissing or invalid environment variables:\n' + missing.join('\n') + '\n')
     process.exit(1)
   }
 

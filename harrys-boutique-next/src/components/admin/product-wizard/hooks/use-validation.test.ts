@@ -3,7 +3,7 @@
  */
 
 import { renderHook, act } from '@testing-library/react'
-import { vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { useValidation } from './use-validation'
 import type { ProductData } from '../types'
 
@@ -107,7 +107,9 @@ describe('useValidation', () => {
       })
 
       expect(isValid).toBe(false)
-      expect(result.current.errors.description).toBe('La descripción debe tener al menos 10 caracteres')
+      expect(result.current.errors.description).toBe(
+        'La descripción debe tener al menos 10 caracteres (sin contar espacios al inicio o final)'
+      )
     })
 
     it('should fail validation with name over 100 characters', () => {

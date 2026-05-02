@@ -61,7 +61,7 @@ describe('ErrorModal', () => {
       />
     );
     
-    expect(screen.getByText('❌')).toBeInTheDocument();
+    expect(screen.getByText('No se pudo guardar el producto')).toBeInTheDocument();
   });
   
   it('should display custom error message when provided', () => {

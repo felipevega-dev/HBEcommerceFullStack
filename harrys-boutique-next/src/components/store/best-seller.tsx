@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { ProductCard } from './product-card'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 export async function BestSeller() {
   let products: {
     id: string
+    slug?: string
     name: string
     price: number
     images: string[]
@@ -16,6 +18,15 @@ export async function BestSeller() {
       where: { bestSeller: true, active: true },
       orderBy: { ratingAverage: 'desc' },
       take: 5,
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        price: true,
+        images: true,
+        ratingAverage: true,
+        ratingCount: true,
+      },
     })
     products = raw.map((p) => ({
       id: p.id,
@@ -33,7 +44,12 @@ export async function BestSeller() {
   return (
     <section className="space-y-12">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-medium">Los Más Vendidos</h1>
+        <h2
+          className="text-3xl font-medium text-[var(--color-text-primary)]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Los Más Vendidos
+        </h2>
         <p className="text-gray-600 text-sm max-w-2xl mx-auto">
           Descubre nuestros productos más populares, elegidos por nuestros clientes
         </p>
@@ -58,10 +74,12 @@ export async function BestSeller() {
       )}
 
       <div className="text-center">
-        <Link href="/collection">
-          <button className="px-8 py-3 border border-gray-800 hover:bg-gray-800 hover:text-white transition-colors rounded-md">
-            Ver Todos los Productos
-          </button>
+        <Link
+          href="/collection?bestSeller=true"
+          className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-text-primary)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-text-primary)] hover:text-white"
+        >
+          Ver más vendidos
+          <BrandIcon name="chevron-right" className="h-4 w-4" />
         </Link>
       </div>
     </section>

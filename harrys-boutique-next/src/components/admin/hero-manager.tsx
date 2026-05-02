@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { motion, Reorder } from 'framer-motion'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Product {
   id: string
@@ -418,20 +419,32 @@ export function HeroManager({ slides: initial, products }: Props) {
                           onClick={() => handleEdit(slide)}
                           className="px-3 py-1.5 text-xs font-medium border rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                          ✏️ Editar
+                          <span className="inline-flex items-center gap-1">
+                            <BrandIcon name="edit" className="h-3 w-3" />
+                            Editar
+                          </span>
                         </button>
                         <button
                           onClick={() => setPreviewSlide(index)}
                           className="px-3 py-1.5 text-xs font-medium border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                         >
-                          👁️ Vista previa
+                          <span className="inline-flex items-center gap-1">
+                            <BrandIcon name="eye" className="h-3 w-3" />
+                            Vista previa
+                          </span>
                         </button>
                         <button
                           onClick={() => handleDelete(slide.id)}
                           disabled={deleting === slide.id}
                           className="px-3 py-1.5 text-xs font-medium border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          {deleting === slide.id ? '⏳ Eliminando...' : '🗑️ Eliminar'}
+                          <span className="inline-flex items-center gap-1">
+                            <BrandIcon
+                              name={deleting === slide.id ? 'loader' : 'trash'}
+                              className={`h-3 w-3 ${deleting === slide.id ? 'animate-spin' : ''}`}
+                            />
+                            {deleting === slide.id ? 'Eliminando...' : 'Eliminar'}
+                          </span>
                         </button>
                       </div>
                     </>

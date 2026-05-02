@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ProductCard } from './product-card'
 import { toast } from 'react-toastify'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface WishlistProduct {
   id: string
@@ -53,7 +54,7 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
               className="absolute top-2 right-2 bg-white rounded-full p-1 shadow text-red-500 hover:bg-red-50"
               title="Eliminar de favoritos"
             >
-              ♥
+              <BrandIcon name="heart" className="h-5 w-5" />
             </button>
           </div>
         ))}

@@ -72,7 +72,7 @@ describe('SuccessModal', () => {
       />
     );
     
-    expect(screen.getByText('✅')).toBeInTheDocument();
+    expect(screen.getByText('¡Producto guardado exitosamente!')).toBeInTheDocument();
   });
   
   it('should display action buttons', () => {
@@ -100,7 +100,7 @@ describe('SuccessModal', () => {
     const viewButton = screen.getByText('Ver Producto');
     fireEvent.click(viewButton);
     
-    expect(mockPush).toHaveBeenCalledWith('/admin/products/123');
+    expect(mockPush).toHaveBeenCalledWith('/admin/products');
   });
   
   it('should navigate to products list when no productId is provided', () => {

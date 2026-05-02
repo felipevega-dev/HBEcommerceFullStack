@@ -3,6 +3,7 @@
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
 import { calculateDiscountPercentage } from '../utils/format-helpers'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Step3PricingProps {
   productData: ProductData
@@ -33,7 +34,8 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          💰 Precio
+          <BrandIcon name="price" className="mr-2 h-5 w-5" />
+          Precio
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Configurá el precio de tu producto
@@ -152,7 +154,7 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
           {discountPercentage > 0 && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">🎉</span>
+                <BrandIcon name="gift" className="h-6 w-6 text-green-700" />
                 <div>
                   <p className="text-lg font-semibold text-green-800">
                     {discountPercentage}% de descuento

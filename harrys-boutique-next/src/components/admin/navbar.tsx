@@ -4,6 +4,7 @@ import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Role } from '@prisma/client'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Props {
   user: { name?: string | null; email?: string | null; role: Role }
@@ -11,7 +12,7 @@ interface Props {
 
 export function AdminNavbar({ user }: Props) {
   return (
-    <header className="bg-white border-b border-[var(--color-border)] px-6 h-14 flex items-center justify-between">
+    <header className="flex h-14 items-center justify-between border-b border-[var(--color-border)] bg-white px-6">
       <Link href="/admin/dashboard" className="flex-shrink-0">
         <Image
           src="/harrys_logo.png"
@@ -26,18 +27,9 @@ export function AdminNavbar({ user }: Props) {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 hover:text-black transition-colors text-blue-600"
+          className="flex items-center gap-1.5 text-blue-600 transition-colors hover:text-black"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
+          <BrandIcon name="external-link" className="h-4 w-4" />
           Ver tienda
         </Link>
         <span>
@@ -45,22 +37,9 @@ export function AdminNavbar({ user }: Props) {
         </span>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center gap-1.5 hover:text-black transition-colors"
+          className="flex items-center gap-1.5 transition-colors hover:text-black"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
+          <BrandIcon name="logout" className="h-4 w-4" />
           Cerrar sesión
         </button>
       </div>

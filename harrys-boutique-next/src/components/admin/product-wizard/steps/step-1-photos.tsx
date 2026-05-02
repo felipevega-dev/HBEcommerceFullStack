@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
 import { validateImageFile } from '../utils/validation-rules'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface Step1PhotosProps {
   productData: ProductData
@@ -103,7 +104,8 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-          📷 Fotos del Producto
+          <BrandIcon name="camera" className="mr-2 h-5 w-5" />
+          Fotos del Producto
         </h2>
         <p className="mt-1 text-sm text-gray-500">
           Subí hasta 4 imágenes de tu producto
