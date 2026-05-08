@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { Prisma } from '@prisma/client'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { AdminProductList } from '@/components/admin/product-list'
@@ -8,16 +9,27 @@ export const metadata: Metadata = { title: "Productos - Admin Harry's Boutique" 
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; search?: string; category?: string }>
+  searchParams: Promise<{
+    page?: string
+    search?: string
+    category?: string
+    status?: string
+    stock?: string
+  }>
 }) {
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page ?? '1'))
   const limit = 20
   const skip = (page - 1) * limit
 
-  const where = {
+  const where: Prisma.ProductWhereInput = {
     ...(params.search ? { name: { contains: params.search, mode: 'insensitive' as const } } : {}),
     ...(params.category ? { category: { name: params.category } } : {}),
+    ...(params.status === 'active' ? { active: true } : {}),
+    ...(params.status === 'inactive' ? { active: false } : {}),
+    ...(params.stock === 'out' ? { stock: 0 } : {}),
+    ...(params.stock === 'low' ? { stock: { gt: 0, lte: 5 } } : {}),
+    ...(params.stock === 'available' ? { stock: { gt: 5 } } : {}),
   }
 
   const [rawProducts, total, rawCategories] = await Promise.all([

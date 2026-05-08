@@ -45,6 +45,8 @@ export function AdminProductList({ products, total, page, limit, categories }: P
   const totalPages = Math.ceil(total / limit)
   const searchParamsString = searchParams.toString()
   const categoryFilter = searchParams.get('category') || ''
+  const statusFilter = searchParams.get('status') || ''
+  const stockFilter = searchParams.get('stock') || ''
 
   const buildListHref = (nextPage?: number) => {
     const params = new URLSearchParams(searchParamsString)
@@ -229,7 +231,7 @@ export function AdminProductList({ products, total, page, limit, categories }: P
   return (
     <div className="space-y-4">
       {/* Search bar */}
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 lg:flex-row">
         <div className="relative flex-1">
           <input
             type="text"
@@ -267,6 +269,27 @@ export function AdminProductList({ products, total, page, limit, categories }: P
             ))}
           </select>
         )}
+        <select
+          name="status"
+          value={statusFilter}
+          onChange={(event) => pushFilter('status', event.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          <option value="">Todos los estados</option>
+          <option value="active">Activos</option>
+          <option value="inactive">Inactivos</option>
+        </select>
+        <select
+          name="stock"
+          value={stockFilter}
+          onChange={(event) => pushFilter('stock', event.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          <option value="">Todo el stock</option>
+          <option value="out">Sin stock</option>
+          <option value="low">Stock bajo (1-5)</option>
+          <option value="available">Disponible (+5)</option>
+        </select>
       </div>
 
       {/* Bulk actions */}
