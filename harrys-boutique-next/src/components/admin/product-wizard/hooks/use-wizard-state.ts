@@ -9,6 +9,8 @@ const defaultProductData: ProductData = {
   imageOrder: [],
   name: '',
   description: '',
+  seoTitle: '',
+  seoDescription: '',
   price: 0,
   hasDiscount: false,
   originalPrice: undefined,
@@ -51,41 +53,39 @@ export interface UseWizardStateReturn {
 
 /**
  * Core wizard state management hook
- * 
+ *
  * Manages the wizard's current step, product data, and navigation.
  * This is the central state management for the entire 7-step wizard.
- * 
+ *
  * @param initialProduct - Optional initial product data (for edit mode)
  * @returns Wizard state and control functions
- * 
+ *
  * @example
  * ```tsx
  * const wizard = useWizardState(existingProduct)
- * 
+ *
  * // Update a field
  * wizard.updateField('name', 'Collar para Perro')
- * 
+ *
  * // Navigate
  * wizard.nextStep()
  * wizard.prevStep()
  * wizard.goToStep(5)
- * 
+ *
  * // Reset
  * wizard.resetWizard()
  * ```
  */
 export function useWizardState(initialProduct?: ProductData): UseWizardStateReturn {
   // Initialize product data with provided data or defaults
-  const [productData, setProductData] = useState<ProductData>(
-    initialProduct || defaultProductData
-  )
-  
+  const [productData, setProductData] = useState<ProductData>(initialProduct || defaultProductData)
+
   // Track current step (1-7)
   const [currentStep, setCurrentStep] = useState(1)
-  
+
   // Track whether there are unsaved changes
   const [isDirty, setIsDirty] = useState(false)
-  
+
   // Track whether the wizard is currently saving
   const [isSaving, setIsSaving] = useState(false)
 
@@ -93,23 +93,23 @@ export function useWizardState(initialProduct?: ProductData): UseWizardStateRetu
    * Update a single field in the product data
    * Marks the wizard as dirty when any field is updated
    */
-  const updateField = useCallback(<K extends keyof ProductData>(
-    field: K,
-    value: ProductData[K]
-  ) => {
-    setProductData(prev => ({
-      ...prev,
-      [field]: value,
-    }))
-    setIsDirty(true)
-  }, [])
+  const updateField = useCallback(
+    <K extends keyof ProductData>(field: K, value: ProductData[K]) => {
+      setProductData((prev) => ({
+        ...prev,
+        [field]: value,
+      }))
+      setIsDirty(true)
+    },
+    [],
+  )
 
   /**
    * Navigate to the next step
    * Maximum step is 7 (Review)
    */
   const nextStep = useCallback(() => {
-    setCurrentStep(prev => Math.min(prev + 1, 7))
+    setCurrentStep((prev) => Math.min(prev + 1, 7))
   }, [])
 
   /**
@@ -117,13 +117,13 @@ export function useWizardState(initialProduct?: ProductData): UseWizardStateRetu
    * Minimum step is 1 (Photos)
    */
   const prevStep = useCallback(() => {
-    setCurrentStep(prev => Math.max(prev - 1, 1))
+    setCurrentStep((prev) => Math.max(prev - 1, 1))
   }, [])
 
   /**
    * Jump directly to a specific step
    * Clamps the step number between 1 and 7
-   * 
+   *
    * @param step - Target step number (1-7)
    */
   const goToStep = useCallback((step: number) => {
@@ -148,7 +148,7 @@ export function useWizardState(initialProduct?: ProductData): UseWizardStateRetu
   const markClean = useCallback(() => {
     setIsDirty(false)
   }, [])
-  
+
   /**
    * Set the saving state
    * Used to show loading indicators during save operation

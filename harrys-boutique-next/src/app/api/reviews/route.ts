@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAuth, getPagination, validateBody } from '@/lib/api-utils'
+import {
+  getPagination,
+  handleApiError,
+  protectMutation,
+  requireAuth,
+  validateBody,
+} from '@/lib/api-utils'
 
 const createReviewSchema = z.object({
   productId: z.string().uuid(),
@@ -20,13 +26,13 @@ export async function GET(req: NextRequest) {
 
     const [reviews, total] = await Promise.all([
       prisma.review.findMany({
-        where: { productId },
+        where: { productId, approved: true },
         include: { user: { select: { name: true, profileImage: true } } },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
       }),
-      prisma.review.count({ where: { productId } }),
+      prisma.review.count({ where: { productId, approved: true } }),
     ])
 
     return NextResponse.json({
@@ -49,6 +55,14 @@ export async function POST(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'reviews:create',
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, createReviewSchema)
   if (validationError) return validationError
 
@@ -66,27 +80,38 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const purchased = await prisma.order.findFirst({
+      where: {
+        userId,
+        status: 'DELIVERED',
+        items: { some: { productId } },
+      },
+      select: { id: true },
+    })
+
+    if (!purchased) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Solo puedes reseñar productos de pedidos entregados',
+        },
+        { status: 403 },
+      )
+    }
+
     const review = await prisma.review.create({
-      data: { userId, productId, rating, comment },
+      data: { userId, productId, rating, comment, approved: false },
       include: { user: { select: { name: true, profileImage: true } } },
     })
 
-    // Update product rating
-    const stats = await prisma.review.aggregate({
-      where: { productId },
-      _avg: { rating: true },
-      _count: { rating: true },
-    })
-
-    await prisma.product.update({
-      where: { id: productId },
-      data: {
-        ratingAverage: stats._avg.rating ?? 0,
-        ratingCount: stats._count.rating,
+    return NextResponse.json(
+      {
+        success: true,
+        review,
+        message: 'Reseña recibida. Se publicará después de moderación.',
       },
-    })
-
-    return NextResponse.json({ success: true, review }, { status: 201 })
+      { status: 201 },
+    )
   } catch (e) {
     return handleApiError(e)
   }

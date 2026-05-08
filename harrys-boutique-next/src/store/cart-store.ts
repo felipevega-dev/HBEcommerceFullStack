@@ -40,12 +40,21 @@ export function mapDbCartToStoreItems(dbItems: DbCartItem[]): CartItem[] {
   }))
 }
 
+export function getCartLineKey(item: Pick<CartItem, 'productId' | 'size' | 'color'>) {
+  return `${item.productId}::${item.size}::${item.color ?? ''}`
+}
+
 interface CartStore {
   items: CartItem[]
   isOpen: boolean
   addItem: (item: Omit<CartItem, 'id'>) => void
-  removeItem: (productId: string, size: string) => void
-  updateQuantity: (productId: string, size: string, quantity: number) => void
+  removeItem: (productId: string, size: string, color?: string) => void
+  updateQuantity: (
+    productId: string,
+    size: string,
+    color: string | undefined,
+    quantity: number,
+  ) => void
   clearCart: () => void
   setItems: (items: CartItem[]) => void
   openDrawer: () => void
@@ -63,44 +72,39 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (item) => {
         set((state) => {
-          const existing = state.items.find(
-            (i) => i.productId === item.productId && i.size === item.size,
-          )
+          const itemKey = getCartLineKey(item)
+          const existing = state.items.find((i) => getCartLineKey(i) === itemKey)
+
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.productId === item.productId && i.size === item.size
-                  ? { ...i, quantity: i.quantity + item.quantity }
-                  : i,
+                getCartLineKey(i) === itemKey ? { ...i, quantity: i.quantity + item.quantity } : i,
               ),
               isOpen: true,
             }
           }
           return {
-            items: [
-              ...state.items,
-              { ...item, id: `${item.productId}-${item.size}-${Date.now()}` },
-            ],
+            items: [...state.items, { ...item, id: `${itemKey}-${Date.now()}` }],
             isOpen: true,
           }
         })
       },
 
-      removeItem: (productId, size) => {
+      removeItem: (productId, size, color = '') => {
+        const itemKey = getCartLineKey({ productId, size, color })
         set((state) => ({
-          items: state.items.filter((i) => !(i.productId === productId && i.size === size)),
+          items: state.items.filter((i) => getCartLineKey(i) !== itemKey),
         }))
       },
 
-      updateQuantity: (productId, size, quantity) => {
+      updateQuantity: (productId, size, color = '', quantity) => {
         if (quantity <= 0) {
-          get().removeItem(productId, size)
+          get().removeItem(productId, size, color)
           return
         }
+        const itemKey = getCartLineKey({ productId, size, color })
         set((state) => ({
-          items: state.items.map((i) =>
-            i.productId === productId && i.size === size ? { ...i, quantity } : i,
-          ),
+          items: state.items.map((i) => (getCartLineKey(i) === itemKey ? { ...i, quantity } : i)),
         }))
       },
 

@@ -3,7 +3,8 @@ import ContactForm from '@/components/store/contact-form'
 
 export const metadata: Metadata = {
   title: "Contacto — Harry's Boutique",
-  description: 'Contáctanos para cualquier consulta sobre nuestros productos. Estamos en Arica, Chile.',
+  description:
+    'Contáctanos para cualquier consulta sobre nuestros productos. Estamos en Arica, Chile.',
 }
 
 export default function ContactPage() {
@@ -149,9 +150,7 @@ export default function ContactPage() {
               <h3 className="font-medium text-[var(--color-text-primary)]">Ubicación</h3>
             </div>
             <p className="text-sm text-[var(--color-text-primary)] font-medium">Arica, Chile</p>
-            <p className="text-sm mt-1 text-[var(--color-text-muted)]">
-              Envíos a todo Chile
-            </p>
+            <p className="text-sm mt-1 text-[var(--color-text-muted)]">Envíos a todo Chile</p>
           </div>
 
           <div className="rounded-xl p-6 bg-[var(--color-surface)] border border-[var(--color-border)]">

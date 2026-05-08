@@ -9,8 +9,36 @@ import { BestSeller } from '@/components/store/best-seller'
 import { Testimonials } from '@/components/store/testimonials'
 import { OurPolicy } from '@/components/store/our-policy'
 import { SkeletonCard } from '@/components/ui/skeleton-card'
+import { canUseDatabaseFallback, logDatabaseFallback } from '@/lib/db-fallback'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+
+type HomeHeroSlide = {
+  id: string
+  title: string
+  subtitle: string
+  image: string
+  product: { id: string; name: string } | null
+}
+
+type HomeCategory = {
+  id: string
+  name: string
+  subcategories: string[]
+  products: { images: string[] }[]
+  _count: { products: number }
+}
+
+type HomeProduct = {
+  id: string
+  slug: string
+  name: string
+  price: { toNumber: () => number }
+  images: string[]
+  ratingAverage: number
+  ratingCount: number
+  categoryId: string
+}
 
 export const metadata: Metadata = {
   title: "Harry's Boutique — Ropa y accesorios para mascotas",
@@ -23,83 +51,83 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [heroSlidesResult, categoriesResult, productsResult] = await Promise.allSettled([
-    prisma.heroSlide.findMany({
-      orderBy: { order: 'asc' },
-      include: { product: { select: { id: true, name: true } } },
-    }),
-    prisma.category.findMany({
-      orderBy: { name: 'asc' },
-      select: {
-        id: true,
-        name: true,
-        subcategories: true,
-        products: {
-          where: { active: true },
-          select: { images: true },
-          take: 1,
-          orderBy: { createdAt: 'desc' },
+  let heroSlidesData: HomeHeroSlide[] = []
+  let categoriesData: HomeCategory[] = []
+  let productsData: HomeProduct[] = []
+
+  try {
+    ;[heroSlidesData, categoriesData, productsData] = await Promise.all([
+      prisma.heroSlide.findMany({
+        orderBy: { order: 'asc' },
+        include: { product: { select: { id: true, name: true } } },
+      }),
+      prisma.category.findMany({
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          subcategories: true,
+          products: {
+            where: { active: true },
+            select: { images: true },
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+          },
+          _count: { select: { products: { where: { active: true } } } },
         },
-        _count: { select: { products: { where: { active: true } } } },
+      }),
+      prisma.product.findMany({
+        where: { active: true },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          price: true,
+          images: true,
+          ratingAverage: true,
+          ratingCount: true,
+          categoryId: true,
+        },
+      }),
+    ])
+  } catch (error) {
+    if (!canUseDatabaseFallback(error)) throw error
+    logDatabaseFallback('HomePage', error)
+  }
+
+  const heroSlides = serialize(heroSlidesData).flatMap((s) => {
+    if (!s.product) return []
+    return [
+      {
+        id: s.id,
+        title: s.title,
+        subtitle: s.subtitle,
+        image: s.image,
+        product: { id: s.product.id, name: s.product.name },
       },
-    }),
-    prisma.product.findMany({
-      where: { active: true },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        price: true,
-        images: true,
-        ratingAverage: true,
-        ratingCount: true,
-        categoryId: true,
-      },
-    }),
-  ])
+    ]
+  })
 
-  const heroSlides =
-    heroSlidesResult.status === 'fulfilled'
-      ? serialize(heroSlidesResult.value).flatMap((s) => {
-          if (!s.product) return []
-          return [
-            {
-              id: s.id,
-              title: s.title,
-              subtitle: s.subtitle,
-              image: s.image,
-              product: { id: s.product.id, name: s.product.name },
-            },
-          ]
-        })
-      : []
+  const categories = serialize(categoriesData).map((c) => ({
+    id: c.id,
+    name: c.name,
+    subcategories: c.subcategories ?? [],
+    productImage: c.products?.[0]?.images?.[0] ?? null,
+    productCount: c._count?.products ?? 0,
+  }))
 
-  const categories =
-    categoriesResult.status === 'fulfilled'
-      ? serialize(categoriesResult.value).map((c) => ({
-          id: c.id,
-          name: c.name,
-          subcategories: c.subcategories ?? [],
-          productImage: c.products?.[0]?.images?.[0] ?? null,
-          productCount: c._count?.products ?? 0,
-        }))
-      : []
-
-  const products =
-    productsResult.status === 'fulfilled'
-      ? productsResult.value.map((p) => ({
-          id: p.id,
-          slug: p.slug || '',
-          name: p.name,
-          price: p.price.toNumber(),
-          images: p.images || [],
-          ratingAverage: p.ratingAverage || 0,
-          ratingCount: p.ratingCount || 0,
-          categoryId: p.categoryId || '',
-        }))
-      : []
+  const products = productsData.map((p) => ({
+    id: p.id,
+    slug: p.slug || '',
+    name: p.name,
+    price: p.price.toNumber(),
+    images: p.images || [],
+    ratingAverage: p.ratingAverage || 0,
+    ratingCount: p.ratingCount || 0,
+    categoryId: p.categoryId || '',
+  }))
 
   const skeletonFallback = (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -140,7 +168,6 @@ export default async function HomePage() {
 
           {/* Políticas */}
           <OurPolicy />
-
         </div>
       </div>
     </main>

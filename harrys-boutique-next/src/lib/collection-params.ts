@@ -41,9 +41,11 @@ export function splitParam(value: string | undefined): string[] {
 }
 
 /** Build a Prisma `where` clause from CollectionParams */
-export function buildProductWhere(params: CollectionParams) {
+export function buildProductWhere(params: CollectionParams): Prisma.ProductWhereInput {
   const selectedCategories = splitParam(params.category)
   const selectedSubcategories = splitParam(params.subCategory)
+  const selectedColors = splitParam(params.colors)
+  const selectedSizes = splitParam(params.sizes)
 
   return {
     active: true,
@@ -60,6 +62,12 @@ export function buildProductWhere(params: CollectionParams) {
       subCategory: { in: selectedSubcategories },
     }),
     ...(params.bestSeller === 'true' && { bestSeller: true }),
+    ...(selectedColors.length > 0 && {
+      colors: { hasSome: selectedColors },
+    }),
+    ...(selectedSizes.length > 0 && {
+      sizes: { array_contains: selectedSizes },
+    }),
     ...((params.minPrice || params.maxPrice) && {
       price: {
         ...(params.minPrice && { gte: parseFloat(params.minPrice) }),
@@ -84,3 +92,4 @@ export function buildProductOrderBy(sort: string) {
       return { createdAt: 'desc' as const }
   }
 }
+import type { Prisma } from '@prisma/client'

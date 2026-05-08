@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, getPagination, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { revalidateCatalogCache } from '@/lib/cache'
+import {
+  handleApiError,
+  getPagination,
+  protectMutation,
+  requireAdminAuth,
+  validateBody,
+} from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
 import { buildProductWhere, buildProductOrderBy } from '@/lib/collection-params'
 
 const createProductSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
+  seoTitle: z.string().trim().max(70).nullable().optional(),
+  seoDescription: z.string().trim().max(160).nullable().optional(),
   price: z.number().positive(),
   originalPrice: z.number().positive().optional(),
   images: z.array(z.string().url()).min(1).max(4),
@@ -67,6 +76,13 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:products:create',
+    maxRequests: 30,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, createProductSchema)
   if (validationError) {
     console.error('Validation error:', validationError)
@@ -75,13 +91,14 @@ export async function POST(req: NextRequest) {
 
   try {
     console.log('Creating product with data:', JSON.stringify(data, null, 2))
-    
+
     // Generate unique slug from name
     const baseSlug = generateSlug(data!.name)
     const existing = await prisma.product.findFirst({ where: { slug: { startsWith: baseSlug } } })
     const slug = existing ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug
 
     const product = await prisma.product.create({ data: { ...data!, slug } })
+    revalidateCatalogCache()
     return NextResponse.json({ success: true, product }, { status: 201 })
   } catch (e) {
     console.error('Product creation error:', e)

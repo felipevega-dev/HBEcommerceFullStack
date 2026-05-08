@@ -1,51 +1,32 @@
 import { StarRating } from '@/components/ui/star-rating'
 import { prisma } from '@/lib/prisma'
-
-const STATIC_TESTIMONIALS = [
-  {
-    id: 'static-1',
-    name: 'María García',
-    role: 'Dueña de Harry',
-    comment: 'Increíble calidad, mi perro Harry ama su nuevo abrigo. ¡Lo recomiendo totalmente!',
-    rating: 5,
-  },
-  {
-    id: 'static-2',
-    name: 'Carlos López',
-    role: 'Dueño de Luna',
-    comment: 'Envío rápido y el producto llegó perfecto. El collar es hermoso y muy resistente.',
-    rating: 5,
-  },
-  {
-    id: 'static-3',
-    name: 'Ana Martínez',
-    role: 'Dueña de Mochi',
-    comment: 'Excelente atención al cliente. Me ayudaron a elegir el talle correcto para mi gato.',
-    rating: 5,
-  },
-]
+import { canUseDatabaseFallback, logDatabaseFallback } from '@/lib/db-fallback'
 
 export async function Testimonials() {
-  let testimonials = STATIC_TESTIMONIALS
+  let dbTestimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = []
 
   try {
-    const dbTestimonials = await prisma.testimonial.findMany({
+    dbTestimonials = await prisma.testimonial.findMany({
       where: { active: true },
       orderBy: { order: 'asc' },
       take: 6,
     })
-    if (dbTestimonials.length > 0) {
-      testimonials = dbTestimonials.map((t) => ({
-        id: t.id,
-        name: t.name,
-        role: t.role,
-        comment: t.comment,
-        rating: t.rating,
-      }))
-    }
-  } catch {
-    // DB not available, use static fallback
+  } catch (error) {
+    if (!canUseDatabaseFallback(error)) throw error
+    logDatabaseFallback('Testimonials', error)
   }
+
+  if (dbTestimonials.length === 0) {
+    return null
+  }
+
+  const testimonials = dbTestimonials.map((t) => ({
+    id: t.id,
+    name: t.name,
+    role: t.role,
+    comment: t.comment,
+    rating: t.rating,
+  }))
 
   return (
     <section>
@@ -71,7 +52,7 @@ export async function Testimonials() {
               {t.comment}
             </p>
             <div className="flex flex-col gap-1">
-              <StarRating average={t.rating} count={0} />
+              <StarRating average={t.rating} count={1} />
               <span className="font-semibold text-[var(--color-text-primary)] text-sm">
                 {t.name}
               </span>

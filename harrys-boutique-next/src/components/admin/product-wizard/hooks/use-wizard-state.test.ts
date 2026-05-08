@@ -15,6 +15,8 @@ describe('useWizardState', () => {
         imageOrder: [],
         name: '',
         description: '',
+        seoTitle: '',
+        seoDescription: '',
         price: 0,
         hasDiscount: false,
         originalPrice: undefined,
@@ -268,6 +270,8 @@ describe('useWizardState', () => {
         imageOrder: [],
         name: '',
         description: '',
+        seoTitle: '',
+        seoDescription: '',
         price: 0,
         hasDiscount: false,
         originalPrice: undefined,
@@ -320,7 +324,10 @@ describe('useWizardState', () => {
       // Step 2: Basic Info
       act(() => {
         result.current.updateField('name', 'Collar para Perro Ajustable')
-        result.current.updateField('description', 'Collar ajustable de nylon resistente para perros')
+        result.current.updateField(
+          'description',
+          'Collar ajustable de nylon resistente para perros',
+        )
         result.current.nextStep()
       })
 
@@ -370,6 +377,8 @@ describe('useWizardState', () => {
         imageOrder: [0, 1],
         name: 'Collar para Perro Ajustable',
         description: 'Collar ajustable de nylon resistente para perros',
+        seoTitle: '',
+        seoDescription: '',
         price: 2500,
         hasDiscount: true,
         originalPrice: 3500,

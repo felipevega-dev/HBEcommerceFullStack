@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { Country, State, City, ICountry, IState, ICity } from 'country-state-city'
+import { useEffect, useMemo, useState } from 'react'
 
 interface AddressFormData {
   firstname: string
@@ -22,109 +21,61 @@ interface AddressFormProps {
   emailReadOnly?: boolean
 }
 
-export function AddressForm({ formData, onChange, showEmail = true, emailReadOnly = false }: AddressFormProps) {
-  const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null)
-  const [selectedState, setSelectedState] = useState<IState | null>(null)
-  const [states, setStates] = useState<IState[]>([])
-  const [cities, setCities] = useState<ICity[]>([])
-  const [loadingStates, setLoadingStates] = useState(false)
-  const [loadingCities, setLoadingCities] = useState(false)
+const COUNTRY = 'Chile'
 
-  // Get all countries sorted by name
-  const countries = useMemo(() => {
-    return Country.getAllCountries().sort((a, b) => a.name.localeCompare(b.name))
-  }, [])
+const CHILE_REGIONS = [
+  { name: 'Arica y Parinacota', cities: ['Arica', 'Putre', 'Camarones'] },
+  { name: 'Tarapaca', cities: ['Iquique', 'Alto Hospicio', 'Pozo Almonte'] },
+  { name: 'Antofagasta', cities: ['Antofagasta', 'Calama', 'Tocopilla'] },
+  { name: 'Atacama', cities: ['Copiapo', 'Caldera', 'Vallenar'] },
+  { name: 'Coquimbo', cities: ['La Serena', 'Coquimbo', 'Ovalle'] },
+  { name: 'Valparaiso', cities: ['Valparaiso', 'Vina del Mar', 'Quilpue', 'Villa Alemana'] },
+  {
+    name: 'Metropolitana de Santiago',
+    cities: ['Santiago', 'Providencia', 'Las Condes', 'Nunoa', 'Maipu', 'La Florida'],
+  },
+  { name: 'O Higgins', cities: ['Rancagua', 'San Fernando', 'Rengo'] },
+  { name: 'Maule', cities: ['Talca', 'Curico', 'Linares'] },
+  { name: 'Nuble', cities: ['Chillan', 'San Carlos', 'Bulnes'] },
+  { name: 'Biobio', cities: ['Concepcion', 'Talcahuano', 'Los Angeles'] },
+  { name: 'La Araucania', cities: ['Temuco', 'Villarrica', 'Angol'] },
+  { name: 'Los Rios', cities: ['Valdivia', 'La Union', 'Rio Bueno'] },
+  { name: 'Los Lagos', cities: ['Puerto Montt', 'Osorno', 'Castro'] },
+  { name: 'Aysen', cities: ['Coyhaique', 'Puerto Aysen', 'Chile Chico'] },
+  { name: 'Magallanes', cities: ['Punta Arenas', 'Puerto Natales', 'Porvenir'] },
+]
 
-  // Initialize country from formData
+export function AddressForm({
+  formData,
+  onChange,
+  showEmail = true,
+  emailReadOnly = false,
+}: AddressFormProps) {
+  const [useCustomCity, setUseCustomCity] = useState(false)
+
   useEffect(() => {
-    if (formData.country && !selectedCountry) {
-      const country = countries.find(
-        (c) => c.name === formData.country || c.isoCode === formData.country
-      )
-      if (country) {
-        setSelectedCountry(country)
-      }
+    if (!formData.country || formData.country !== COUNTRY) {
+      onChange({ country: COUNTRY })
     }
-  }, [formData.country, countries, selectedCountry])
+  }, [formData.country, onChange])
 
-  // Load states when country changes
+  const selectedRegion = useMemo(
+    () => CHILE_REGIONS.find((region) => region.name === formData.region),
+    [formData.region],
+  )
+
   useEffect(() => {
-    if (selectedCountry) {
-      setLoadingStates(true)
-      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode)
-      setStates(countryStates)
-      setLoadingStates(false)
-
-      // Try to find matching state from formData
-      if (formData.region && countryStates.length > 0) {
-        const state = countryStates.find(
-          (s) => s.name === formData.region || s.isoCode === formData.region
-        )
-        if (state) {
-          setSelectedState(state)
-        }
-      }
-    } else {
-      setStates([])
-      setSelectedState(null)
+    if (selectedRegion && formData.city && !selectedRegion.cities.includes(formData.city)) {
+      setUseCustomCity(true)
     }
-  }, [selectedCountry, formData.region])
+  }, [formData.city, selectedRegion])
 
-  // Load cities when state changes
-  useEffect(() => {
-    if (selectedCountry && selectedState) {
-      setLoadingCities(true)
-      const stateCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
-      setCities(stateCities)
-      setLoadingCities(false)
-    } else if (selectedCountry && states.length === 0) {
-      // If country has no states, load cities directly
-      setLoadingCities(true)
-      const countryCities = City.getCitiesOfCountry(selectedCountry.isoCode)
-      setCities(countryCities || [])
-      setLoadingCities(false)
-    } else {
-      setCities([])
-    }
-  }, [selectedCountry, selectedState, states.length])
-
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const countryCode = e.target.value
-    const country = countries.find((c) => c.isoCode === countryCode)
-    
-    setSelectedCountry(country || null)
-    setSelectedState(null)
-    setCities([])
-    
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUseCustomCity(false)
     onChange({
-      country: country?.name || '',
-      region: '',
+      region: e.target.value,
       city: '',
-      postalCode: '',
-    })
-  }
-
-  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const stateCode = e.target.value
-    const state = states.find((s) => s.isoCode === stateCode)
-    
-    setSelectedState(state || null)
-    
-    onChange({
-      region: state?.name || '',
-      city: '',
-      postalCode: '',
-    })
-  }
-
-  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const cityName = e.target.value
-    const city = cities.find((c) => c.name === cityName)
-    
-    onChange({
-      city: cityName,
-      // Some cities have postal codes in the data
-      ...(city && { postalCode: formData.postalCode || '' }),
+      country: COUNTRY,
     })
   }
 
@@ -135,7 +86,6 @@ export function AddressForm({ formData, onChange, showEmail = true, emailReadOnl
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Nombre */}
       <div>
         <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
           Nombre <span className="text-red-500">*</span>
@@ -150,7 +100,6 @@ export function AddressForm({ formData, onChange, showEmail = true, emailReadOnl
         />
       </div>
 
-      {/* Apellido */}
       <div>
         <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
           Apellido
@@ -164,7 +113,6 @@ export function AddressForm({ formData, onChange, showEmail = true, emailReadOnl
         />
       </div>
 
-      {/* Email */}
       {showEmail && (
         <div>
           <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
@@ -182,10 +130,9 @@ export function AddressForm({ formData, onChange, showEmail = true, emailReadOnl
         </div>
       )}
 
-      {/* Teléfono */}
       <div>
         <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Teléfono <span className="text-red-500">*</span>
+          Telefono <span className="text-red-500">*</span>
         </label>
         <input
           required
@@ -193,98 +140,88 @@ export function AddressForm({ formData, onChange, showEmail = true, emailReadOnl
           value={formData.phone}
           onChange={(e) => onChange({ phone: e.target.value })}
           className={inputClass}
-          placeholder="+54 11 1234-5678"
+          placeholder="+56 9 1234 5678"
         />
       </div>
 
-      {/* País */}
-      <div className="md:col-span-2">
+      <div>
         <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          País <span className="text-red-500">*</span>
+          Region <span className="text-red-500">*</span>
         </label>
         <select
           required
-          value={selectedCountry?.isoCode || ''}
-          onChange={handleCountryChange}
+          value={formData.region}
+          onChange={handleRegionChange}
           className={selectClass}
         >
-          <option value="">Selecciona un país</option>
-          {countries.map((country) => (
-            <option key={country.isoCode} value={country.isoCode}>
-              {country.flag} {country.name}
+          <option value="">Selecciona una region</option>
+          {CHILE_REGIONS.map((region) => (
+            <option key={region.name} value={region.name}>
+              {region.name}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Región/Estado */}
-      {states.length > 0 && (
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Región / Estado <span className="text-red-500">*</span>
-          </label>
+      <div>
+        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+          Ciudad / Comuna <span className="text-red-500">*</span>
+        </label>
+        {selectedRegion ? (
           <select
             required
-            value={selectedState?.isoCode || ''}
-            onChange={handleStateChange}
-            className={selectClass}
-            disabled={loadingStates}
-          >
-            <option value="">
-              {loadingStates ? 'Cargando...' : 'Selecciona una región'}
-            </option>
-            {states.map((state) => (
-              <option key={state.isoCode} value={state.isoCode}>
-                {state.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+            value={useCustomCity ? 'Otra' : formData.city}
+            onChange={(e) => {
+              if (e.target.value === 'Otra') {
+                setUseCustomCity(true)
+                onChange({ city: '' })
+                return
+              }
 
-      {/* Ciudad */}
-      {cities.length > 0 ? (
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Ciudad <span className="text-red-500">*</span>
-          </label>
-          <select
-            required
-            value={formData.city}
-            onChange={handleCityChange}
+              setUseCustomCity(false)
+              onChange({ city: e.target.value })
+            }}
             className={selectClass}
-            disabled={loadingCities}
           >
-            <option value="">
-              {loadingCities ? 'Cargando...' : 'Selecciona una ciudad'}
-            </option>
-            {cities.map((city) => (
-              <option key={`${city.name}-${city.stateCode}`} value={city.name}>
-                {city.name}
+            <option value="">Selecciona una ciudad</option>
+            {selectedRegion.cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
               </option>
             ))}
+            <option value="Otra">Otra</option>
           </select>
-        </div>
-      ) : (
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Ciudad <span className="text-red-500">*</span>
-          </label>
+        ) : (
           <input
             required
             type="text"
             value={formData.city}
             onChange={(e) => onChange({ city: e.target.value })}
             className={inputClass}
-            placeholder="Ciudad"
+            placeholder="Ciudad o comuna"
+          />
+        )}
+      </div>
+
+      {useCustomCity && (
+        <div>
+          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+            Especifica tu comuna
+          </label>
+          <input
+            required
+            type="text"
+            value={selectedRegion?.cities.includes(formData.city) ? '' : formData.city}
+            onChange={(e) => onChange({ city: e.target.value })}
+            className={inputClass}
+            placeholder="Comuna"
           />
         </div>
       )}
 
-      {/* Dirección */}
       <div className="md:col-span-2">
         <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Dirección <span className="text-red-500">*</span>
+          Direccion <span className="text-red-500">*</span>
         </label>
         <input
           required
@@ -292,44 +229,29 @@ export function AddressForm({ formData, onChange, showEmail = true, emailReadOnl
           value={formData.street}
           onChange={(e) => onChange({ street: e.target.value })}
           className={inputClass}
-          placeholder="Calle y número"
+          placeholder="Calle, numero, depto o referencia"
         />
       </div>
 
-      {/* Código Postal */}
       <div>
         <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Código Postal
+          Codigo postal
         </label>
         <input
           type="text"
           value={formData.postalCode}
           onChange={(e) => onChange({ postalCode: e.target.value })}
           className={inputClass}
-          placeholder="1234"
+          placeholder="Opcional"
         />
-        {selectedCountry && (
-          <p className="text-xs text-[var(--color-text-muted)] mt-1">
-            Formato: {selectedCountry.isoCode === 'AR' ? 'XXXX' : selectedCountry.isoCode === 'CL' ? 'XXXXXXX' : 'Según tu país'}
-          </p>
-        )}
       </div>
 
-      {/* Región manual (si no hay estados) */}
-      {selectedCountry && states.length === 0 && (
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Región / Provincia
-          </label>
-          <input
-            type="text"
-            value={formData.region}
-            onChange={(e) => onChange({ region: e.target.value })}
-            className={inputClass}
-            placeholder="Provincia"
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+          Pais
+        </label>
+        <input readOnly value={COUNTRY} className={`${inputClass} bg-[var(--color-surface)]`} />
+      </div>
     </div>
   )
 }

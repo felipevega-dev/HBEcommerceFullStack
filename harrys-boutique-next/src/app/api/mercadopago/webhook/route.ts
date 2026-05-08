@@ -4,25 +4,42 @@ import { prisma } from '@/lib/prisma'
 import { handleApiError } from '@/lib/api-utils'
 import { sendEmail } from '@/lib/email'
 import OrderConfirmation from '@/lib/email/templates/order-confirmation'
+import { CURRENCY_CODE } from '@/lib/commerce'
+import { toPaymentMinorUnits } from '@/lib/checkout'
 
-const SHIPPING_FEE = 10
+function getPaymentClient() {
+  const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN
+  if (!accessToken) {
+    throw new Error('MERCADOPAGO_ACCESS_TOKEN no configurado')
+  }
 
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
-})
+  return new Payment(new MercadoPagoConfig({ accessToken }))
+}
+
+function timingSafeEqual(a: string, b: string) {
+  if (a.length !== b.length) return false
+
+  let mismatch = 0
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  }
+
+  return mismatch === 0
+}
 
 /**
  * Verify MercadoPago webhook signature.
  * Docs: https://www.mercadopago.com.ar/developers/es/docs/your-integrations/notifications/webhooks
  */
 async function verifySignature(req: NextRequest): Promise<boolean> {
-  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET!
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET
+  if (!secret) return false
 
   const xSignature = req.headers.get('x-signature')
   const xRequestId = req.headers.get('x-request-id')
   const dataId = new URL(req.url).searchParams.get('data.id')
 
-  if (!xSignature || !xRequestId) return false
+  if (!xSignature || !xRequestId || !dataId) return false
 
   // Parse ts and v1 from x-signature header
   const parts = Object.fromEntries(xSignature.split(',').map((p) => p.split('=')))
@@ -47,7 +64,7 @@ async function verifySignature(req: NextRequest): Promise<boolean> {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
 
-  return computed === v1
+  return timingSafeEqual(computed, v1)
 }
 
 export async function POST(req: NextRequest) {
@@ -72,7 +89,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch payment details from MercadoPago
-    const payment = new Payment(client)
+    const payment = getPaymentClient()
     const paymentData = await payment.get({ id: paymentId })
 
     if (paymentData.status !== 'approved') {
@@ -98,14 +115,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true, skipped: 'already_processed' })
     }
 
-    // Update order status
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: 'PROCESSING', payment: true },
+    const paymentAmount = toPaymentMinorUnits(Number(paymentData.transaction_amount ?? 0))
+    const orderAmount = toPaymentMinorUnits(Number(existingOrder.amount))
+    const currencyId = paymentData.currency_id
+
+    if (currencyId !== CURRENCY_CODE || paymentAmount !== orderAmount) {
+      console.error('[Webhook] Amount or currency mismatch', {
+        orderId,
+        paymentId,
+        paymentAmount,
+        orderAmount,
+        currencyId,
+      })
+      return NextResponse.json({ received: true, skipped: 'amount_mismatch' })
+    }
+
+    const processed = await prisma.$transaction(async (tx) => {
+      const orderUpdate = await tx.order.updateMany({
+        where: { id: orderId, payment: false },
+        data: { status: 'PROCESSING', payment: true },
+      })
+
+      if (orderUpdate.count !== 1) return false
+
+      if (existingOrder.couponCode) {
+        await tx.coupon.updateMany({
+          where: { code: existingOrder.couponCode },
+          data: { usedCount: { increment: 1 } },
+        })
+      }
+
+      await tx.cart.deleteMany({ where: { userId: existingOrder.userId } })
+      return true
     })
 
-    // Clear user cart
-    await prisma.cart.deleteMany({ where: { userId: existingOrder.userId } })
+    if (!processed) {
+      return NextResponse.json({ received: true, skipped: 'already_processed' })
+    }
 
     // Send confirmation email (non-blocking)
     const orderWithDetails = await prisma.order.findUnique({
@@ -118,7 +164,12 @@ export async function POST(req: NextRequest) {
 
     if (orderWithDetails?.user?.email) {
       const total = Number(orderWithDetails.amount)
-      const subtotal = total - SHIPPING_FEE
+      const subtotal = orderWithDetails.items.reduce(
+        (sum, item) => sum + Number(item.price) * item.quantity,
+        0,
+      )
+      const discountAmount = Number(orderWithDetails.discountAmount ?? 0)
+      const shippingFee = Math.max(0, total + discountAmount - subtotal)
 
       sendEmail({
         to: orderWithDetails.user.email,
@@ -134,7 +185,7 @@ export async function POST(req: NextRequest) {
             image: item.image || undefined,
           })),
           subtotal,
-          shippingFee: SHIPPING_FEE,
+          shippingFee,
           total,
           address: JSON.stringify(orderWithDetails.addressSnapshot),
         }),

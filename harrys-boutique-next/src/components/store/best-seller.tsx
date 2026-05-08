@@ -2,19 +2,23 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { ProductCard } from './product-card'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { canUseDatabaseFallback, logDatabaseFallback } from '@/lib/db-fallback'
+
+type BestSellerProduct = {
+  id: string
+  slug: string
+  name: string
+  price: { toNumber: () => number }
+  images: string[]
+  ratingAverage: number
+  ratingCount: number
+}
 
 export async function BestSeller() {
-  let products: {
-    id: string
-    slug?: string
-    name: string
-    price: number
-    images: string[]
-    ratingAverage: number
-    ratingCount: number
-  }[] = []
+  let raw: BestSellerProduct[] = []
+
   try {
-    const raw = await prisma.product.findMany({
+    raw = await prisma.product.findMany({
       where: { bestSeller: true, active: true },
       orderBy: { ratingAverage: 'desc' },
       take: 5,
@@ -28,18 +32,19 @@ export async function BestSeller() {
         ratingCount: true,
       },
     })
-    products = raw.map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      name: p.name,
-      price: p.price.toNumber(),
-      images: p.images,
-      ratingAverage: p.ratingAverage,
-      ratingCount: p.ratingCount,
-    }))
-  } catch {
-    // DB not connected
+  } catch (error) {
+    if (!canUseDatabaseFallback(error)) throw error
+    logDatabaseFallback('BestSeller', error)
   }
+  const products = raw.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    price: p.price.toNumber(),
+    images: p.images,
+    ratingAverage: p.ratingAverage,
+    ratingCount: p.ratingCount,
+  }))
 
   return (
     <section className="space-y-12">
