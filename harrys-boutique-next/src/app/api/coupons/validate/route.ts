@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, validateBody } from '@/lib/api-utils'
+import { calculateDiscountAmount, calculateShippingForSubtotal } from '@/lib/checkout'
+import { getPricingSettings } from '@/lib/commerce-settings'
 
 const validateSchema = z.object({
   code: z.string().min(1),
@@ -9,6 +11,13 @@ const validateSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'coupons:validate',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   const { data, error } = await validateBody(req, validateSchema)
   if (error) return error
 
@@ -34,10 +43,12 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const discountAmount =
-      coupon.discountType === 'PERCENTAGE'
-        ? Math.floor((orderAmount * Number(coupon.discountValue)) / 100)
-        : Number(coupon.discountValue)
+    const pricingSettings = await getPricingSettings()
+    const discountAmount = calculateDiscountAmount(
+      coupon,
+      orderAmount,
+      calculateShippingForSubtotal(orderAmount, pricingSettings),
+    )
 
     return NextResponse.json({
       valid: true,

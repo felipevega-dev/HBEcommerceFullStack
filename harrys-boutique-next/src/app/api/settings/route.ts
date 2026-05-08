@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAdminAuth } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth } from '@/lib/api-utils'
 
 const DEFAULT_SETTINGS = [
   { key: 'store_name', value: "Harry's Boutique", description: 'Nombre de la tienda' },
   { key: 'shipping_fee', value: '10', description: 'Costo de envío base' },
-  { key: 'free_shipping_threshold', value: '0', description: 'Monto mínimo para envío gratis' },
+  { key: 'free_shipping_threshold', value: '50000', description: 'Monto mínimo para envío gratis' },
   { key: 'currency', value: '$', description: 'Símbolo de moneda' },
 ]
 
@@ -26,6 +26,13 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:settings:update',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
 
   try {
     const updates: Record<string, string> = await req.json()

@@ -50,7 +50,9 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<Testimonial>>({})
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'PENDING' | 'APPROVED' | 'REJECTED'>('all')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'PENDING' | 'APPROVED' | 'REJECTED'>(
+    'all',
+  )
   const [testimonials, setTestimonials] = useState(initialTestimonials)
   const [reordering, setReordering] = useState(false)
 
@@ -58,7 +60,7 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -84,9 +86,7 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
         t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.role.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesStatus =
-        filterStatus === 'all' ||
-        t.status === filterStatus
+      const matchesStatus = filterStatus === 'all' || t.status === filterStatus
       return matchesSearch && matchesStatus
     })
   }, [testimonials, searchQuery, filterStatus])
@@ -228,7 +228,7 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
             ? 'Testimonio aprobado'
             : status === 'REJECTED'
               ? 'Testimonio rechazado'
-              : 'Testimonio marcado como pendiente'
+              : 'Testimonio marcado como pendiente',
         )
         router.refresh()
       } else {
@@ -263,13 +263,13 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus }),
-        })
+        }),
       )
       await Promise.all(updates)
       toast.success(
         bulkAction === 'approve'
           ? `${selectedIds.size} testimonios aprobados`
-          : `${selectedIds.size} testimonios rechazados`
+          : `${selectedIds.size} testimonios rechazados`,
       )
       setSelectedIds(new Set())
       router.refresh()
@@ -301,7 +301,7 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ order: t.order }),
-        })
+        }),
       )
       await Promise.all(updates)
       toast.success('Orden actualizado')
@@ -569,15 +569,7 @@ export function TestimonialsManager({ testimonials: initialTestimonials }: Props
 }
 
 // Stat Card Component
-function StatCard({
-  label,
-  value,
-  color,
-}: {
-  label: string
-  value: ReactNode
-  color: string
-}) {
+function StatCard({ label, value, color }: { label: string; value: ReactNode; color: string }) {
   return (
     <div className={`rounded-xl p-4 ${color}`}>
       <div className="text-2xl font-bold">{value}</div>
@@ -783,7 +775,11 @@ function TestimonialItem({
                   : 'bg-yellow-100 text-yellow-800'
             }`}
           >
-            {t.status === 'APPROVED' ? 'Aprobado' : t.status === 'REJECTED' ? 'Rechazado' : 'Pendiente'}
+            {t.status === 'APPROVED'
+              ? 'Aprobado'
+              : t.status === 'REJECTED'
+                ? 'Rechazado'
+                : 'Pendiente'}
           </span>
           <span className="text-xs text-gray-400">Orden: {t.order}</span>
         </div>

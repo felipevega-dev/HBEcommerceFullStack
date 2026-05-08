@@ -6,7 +6,7 @@ import { CharacterCounter } from '../character-counter'
 
 /**
  * Demo page for Tooltip and CharacterCounter components
- * 
+ *
  * This is a visual test page to verify the components work correctly.
  * Not meant for production use.
  */
@@ -19,13 +19,15 @@ export function ComponentsDemo() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">Product Wizard Components Demo</h1>
-          <p className="text-gray-600">Visual test page for Tooltip and CharacterCounter components</p>
+          <p className="text-gray-600">
+            Visual test page for Tooltip and CharacterCounter components
+          </p>
         </div>
 
         {/* Tooltip Demo */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="text-xl font-semibold">Tooltip Component</h2>
-          
+
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <span className="text-sm">Basic tooltip</span>
@@ -39,7 +41,7 @@ export function ComponentsDemo() {
 
             <div className="flex items-center gap-2">
               <span className="text-sm">Custom aria-label</span>
-              <Tooltip 
+              <Tooltip
                 content="El precio que verán tus clientes en la tienda"
                 ariaLabel="Ayuda sobre precio de venta"
               />
@@ -47,14 +49,15 @@ export function ComponentsDemo() {
           </div>
 
           <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
-            <strong>Tip:</strong> Hover over the info icons to see the tooltips. They auto-hide after 5 seconds.
+            <strong>Tip:</strong> Hover over the info icons to see the tooltips. They auto-hide
+            after 5 seconds.
           </div>
         </div>
 
         {/* CharacterCounter Demo */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="text-xl font-semibold">CharacterCounter Component</h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="flex items-center text-sm font-medium mb-2">
@@ -88,11 +91,19 @@ export function ComponentsDemo() {
           </div>
 
           <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800 space-y-2">
-            <p><strong>Color States:</strong></p>
+            <p>
+              <strong>Color States:</strong>
+            </p>
             <ul className="list-disc list-inside space-y-1">
-              <li><span className="text-gray-400">Gray</span>: Normal (below 90%)</li>
-              <li><span className="text-amber-600">Amber</span>: Approaching limit (90-100%)</li>
-              <li><span className="text-red-600">Red</span>: Over limit (&gt;100%)</li>
+              <li>
+                <span className="text-gray-400">Gray</span>: Normal (below 90%)
+              </li>
+              <li>
+                <span className="text-amber-600">Amber</span>: Approaching limit (90-100%)
+              </li>
+              <li>
+                <span className="text-red-600">Red</span>: Over limit (&gt;100%)
+              </li>
             </ul>
           </div>
         </div>
@@ -100,7 +111,7 @@ export function ComponentsDemo() {
         {/* Static Examples */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="text-xl font-semibold">CharacterCounter States</h2>
-          
+
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
               <span className="text-sm">Normal state (50/100)</span>

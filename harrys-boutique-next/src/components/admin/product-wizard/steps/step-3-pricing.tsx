@@ -13,7 +13,7 @@ interface Step3PricingProps {
 
 /**
  * Step 3: Pricing
- * 
+ *
  * Collects product pricing information with optional discount calculation.
  * Features:
  * - Selling price input
@@ -25,9 +25,8 @@ interface Step3PricingProps {
 export function Step3Pricing({ productData, updateField, errors = {} }: Step3PricingProps) {
   const { price = 0, hasDiscount = false, originalPrice } = productData
 
-  const discountPercentage = hasDiscount && originalPrice && price
-    ? calculateDiscountPercentage(originalPrice, price)
-    : 0
+  const discountPercentage =
+    hasDiscount && originalPrice && price ? calculateDiscountPercentage(originalPrice, price) : 0
 
   return (
     <div className="space-y-6">
@@ -37,9 +36,7 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
           <BrandIcon name="price" className="mr-2 h-5 w-5" />
           Precio
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Configurá el precio de tu producto
-        </p>
+        <p className="mt-1 text-sm text-gray-500">Configurá el precio de tu producto</p>
       </div>
 
       {/* Selling Price */}
@@ -99,9 +96,7 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
             }}
             className="w-5 h-5 text-black border-gray-300 rounded focus:ring-2 focus:ring-black cursor-pointer"
           />
-          <span className="text-sm font-medium text-gray-700">
-            Este producto tiene descuento
-          </span>
+          <span className="text-sm font-medium text-gray-700">Este producto tiene descuento</span>
         </label>
       </div>
 
@@ -109,7 +104,10 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
       {hasDiscount && (
         <div className="space-y-4 pl-8 border-l-2 border-gray-200">
           <div>
-            <label htmlFor="original-price" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="original-price"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               <span className="inline-flex items-center">
                 Precio Original (antes del descuento) *
                 <Tooltip content="El precio anterior tachado que se mostrará junto al descuento" />
@@ -123,7 +121,9 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
                 type="number"
                 id="original-price"
                 value={originalPrice || ''}
-                onChange={(e) => updateField('originalPrice', parseFloat(e.target.value) || undefined)}
+                onChange={(e) =>
+                  updateField('originalPrice', parseFloat(e.target.value) || undefined)
+                }
                 placeholder="3500"
                 min="0"
                 step="1"
@@ -137,7 +137,10 @@ export function Step3Pricing({ productData, updateField, errors = {} }: Step3Pri
 
             {/* Error Message */}
             {errors.originalPrice && (
-              <div id="original-price-error" className="flex items-center gap-2 text-red-600 text-sm mt-2">
+              <div
+                id="original-price-error"
+                className="flex items-center gap-2 text-red-600 text-sm mt-2"
+              >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"

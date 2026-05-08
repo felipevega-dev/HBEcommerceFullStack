@@ -87,14 +87,9 @@ export function HeroEpic({
 
                 <p className="max-w-xl text-base leading-relaxed text-white/72 sm:text-lg">
                   Diseños únicos con{' '}
-                  <span className="font-semibold text-white">
-                    identidad regional
-                  </span>
-                  , telas de{' '}
-                  <span className="font-semibold text-white">
-                    calidad premium
-                  </span>{' '}
-                  y amor por los peludos de la familia.
+                  <span className="font-semibold text-white">identidad regional</span>, telas de{' '}
+                  <span className="font-semibold text-white">calidad premium</span> y amor por los
+                  peludos de la familia.
                 </p>
 
                 <div className="flex flex-wrap gap-3 pt-1 sm:gap-4">

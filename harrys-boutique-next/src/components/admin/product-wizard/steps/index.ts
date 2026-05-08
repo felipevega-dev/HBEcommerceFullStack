@@ -1,6 +1,6 @@
 /**
  * Step Components Index
- * 
+ *
  * Exports all 7 wizard step components for easy importing.
  */
 

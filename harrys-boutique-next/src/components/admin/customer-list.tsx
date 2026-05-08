@@ -80,7 +80,9 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
         <button
           onClick={() => handleFilter('vip')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-            currentSegment === 'vip' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            currentSegment === 'vip'
+              ? 'bg-black text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           VIP
@@ -88,7 +90,9 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
         <button
           onClick={() => handleFilter('frequent')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-            currentSegment === 'frequent' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            currentSegment === 'frequent'
+              ? 'bg-black text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           Frecuentes
@@ -96,7 +100,9 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
         <button
           onClick={() => handleFilter('new')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-            currentSegment === 'new' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            currentSegment === 'new'
+              ? 'bg-black text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           Nuevos
@@ -104,7 +110,9 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
         <button
           onClick={() => handleFilter('at_risk')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-            currentSegment === 'at_risk' ? 'bg-black text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'
+            currentSegment === 'at_risk'
+              ? 'bg-black text-white'
+              : 'bg-red-100 text-red-700 hover:bg-red-200'
           }`}
         >
           En riesgo

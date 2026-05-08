@@ -13,3 +13,6 @@ coverage/
 
 # Legacy — ignored by agents
 legacy/
+
+# Tool-local planning artifacts
+.kiro/

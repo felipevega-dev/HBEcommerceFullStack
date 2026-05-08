@@ -3,8 +3,23 @@ import path from 'path'
 
 const productionUrl = process.env.NEXTAUTH_URL ?? ''
 const allowedOrigins = ['localhost:3000', 'localhost:3001']
+const scriptSrc =
+  process.env.NODE_ENV === 'production'
+    ? "script-src 'self' 'unsafe-inline'"
+    : "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://ui-avatars.com https://res.cloudinary.com",
+  "font-src 'self' https://fonts.gstatic.com data:",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  scriptSrc,
+  "connect-src 'self' https://api.mercadopago.com https://graph.facebook.com https://*.upstash.io https://*.upstash.com",
+  "worker-src 'self' blob:",
+].join('; ')
 
-// Add production domain to allowed origins if set
 if (productionUrl) {
   try {
     const { host } = new URL(productionUrl)
@@ -17,14 +32,32 @@ if (productionUrl) {
 }
 
 const nextConfig: NextConfig = {
-  // Enable standalone output for Docker deployments
   output: 'standalone',
-  
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Content-Security-Policy', value: contentSecurityPolicy },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-site' },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          },
+        ],
+      },
+    ]
+  },
+
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
       { protocol: 'https', hostname: 'ui-avatars.com' },
-      // Legacy Cloudinary images (for backward compatibility with old products)
       { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },

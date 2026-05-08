@@ -14,7 +14,7 @@ interface Step2BasicInfoProps {
 
 /**
  * Step 2: Basic Information
- * 
+ *
  * Collects product name and description with character counters and helpful tooltips.
  * Features:
  * - Name input (3-100 characters)
@@ -23,12 +23,19 @@ interface Step2BasicInfoProps {
  * - Contextual help tooltips
  * - Example placeholders
  */
-export function Step2BasicInfo({ productData, updateField, errors = {}, clearFieldError }: Step2BasicInfoProps) {
-  const { name = '', description = '' } = productData
+export function Step2BasicInfo({
+  productData,
+  updateField,
+  errors = {},
+  clearFieldError,
+}: Step2BasicInfoProps) {
+  const { name = '', description = '', seoTitle = '', seoDescription = '' } = productData
 
   const MAX_NAME_LENGTH = 100
   const MAX_DESCRIPTION_LENGTH = 500
-  
+  const MAX_SEO_TITLE_LENGTH = 70
+  const MAX_SEO_DESCRIPTION_LENGTH = 160
+
   /**
    * Handle name change and clear error if exists
    */
@@ -38,7 +45,7 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
       clearFieldError('name')
     }
   }
-  
+
   /**
    * Handle description change and clear error if exists
    */
@@ -46,6 +53,20 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
     updateField('description', value)
     if (errors.description && clearFieldError) {
       clearFieldError('description')
+    }
+  }
+
+  const handleSeoTitleChange = (value: string) => {
+    updateField('seoTitle', value)
+    if (errors.seoTitle && clearFieldError) {
+      clearFieldError('seoTitle')
+    }
+  }
+
+  const handleSeoDescriptionChange = (value: string) => {
+    updateField('seoDescription', value)
+    if (errors.seoDescription && clearFieldError) {
+      clearFieldError('seoDescription')
     }
   }
 
@@ -57,9 +78,7 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
           <BrandIcon name="review" className="mr-2 h-5 w-5" />
           Información Básica
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Contanos sobre tu producto
-        </p>
+        <p className="mt-1 text-sm text-gray-500">Contanos sobre tu producto</p>
       </div>
 
       {/* Name Field */}
@@ -80,7 +99,7 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? 'name-error' : undefined}
         />
-        
+
         {/* Character Counter */}
         <div className="mt-1">
           <CharacterCounter current={name.length} max={MAX_NAME_LENGTH} />
@@ -101,9 +120,96 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
         )}
       </div>
 
+      {/* SEO Fields */}
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mb-4">
+          <h3 className="text-sm font-semibold text-gray-900">SEO para Google</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Opcional. Si lo dejas vacio, se usara el nombre y la descripcion del producto.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="seo-title" className="block text-sm font-medium text-gray-700 mb-1">
+              Titulo SEO
+            </label>
+            <input
+              type="text"
+              id="seo-title"
+              value={seoTitle}
+              onChange={(event) => handleSeoTitleChange(event.target.value)}
+              placeholder={name || 'Ej: Collar premium ajustable para perros'}
+              maxLength={MAX_SEO_TITLE_LENGTH}
+              className={`w-full rounded-lg border px-4 py-2 transition-colors focus:border-transparent focus:ring-2 focus:ring-black ${
+                errors.seoTitle ? 'border-red-500' : 'border-gray-300'
+              }`}
+              aria-invalid={!!errors.seoTitle}
+              aria-describedby={errors.seoTitle ? 'seo-title-error' : undefined}
+            />
+            <div className="mt-1">
+              <CharacterCounter current={seoTitle.trim().length} max={MAX_SEO_TITLE_LENGTH} />
+            </div>
+            {errors.seoTitle && (
+              <p id="seo-title-error" className="mt-2 text-sm text-red-600">
+                {errors.seoTitle}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="seo-description"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Meta descripcion SEO
+            </label>
+            <textarea
+              id="seo-description"
+              value={seoDescription}
+              onChange={(event) => handleSeoDescriptionChange(event.target.value)}
+              placeholder="Ej: Compra collar ajustable para perros en Harry's Boutique. Material resistente, estilo premium y despacho en Chile."
+              maxLength={MAX_SEO_DESCRIPTION_LENGTH}
+              rows={3}
+              className={`w-full resize-none rounded-lg border px-4 py-2 transition-colors focus:border-transparent focus:ring-2 focus:ring-black ${
+                errors.seoDescription ? 'border-red-500' : 'border-gray-300'
+              }`}
+              aria-invalid={!!errors.seoDescription}
+              aria-describedby={errors.seoDescription ? 'seo-description-error' : undefined}
+            />
+            <div className="mt-1">
+              <CharacterCounter
+                current={seoDescription.trim().length}
+                max={MAX_SEO_DESCRIPTION_LENGTH}
+              />
+            </div>
+            {errors.seoDescription && (
+              <p id="seo-description-error" className="mt-2 text-sm text-red-600">
+                {errors.seoDescription}
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-gray-200 bg-white p-3">
+            <p className="text-sm font-medium text-blue-700">
+              {seoTitle.trim() || name || 'Titulo del producto'}
+            </p>
+            <p className="mt-1 text-xs text-green-700">harrys-boutique.com/product/...</p>
+            <p className="mt-1 text-sm text-gray-600">
+              {seoDescription.trim() ||
+                description.slice(0, MAX_SEO_DESCRIPTION_LENGTH) ||
+                'Vista previa de la descripcion que puede aparecer en buscadores.'}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Description Field */}
       <div>
-        <label htmlFor="product-description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="product-description"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           <span className="inline-flex items-center">
             Descripción *
             <Tooltip content="Describí las características principales: material, tamaño, para qué mascota es" />
@@ -122,14 +228,12 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
           aria-invalid={!!errors.description}
           aria-describedby={errors.description ? 'description-error' : undefined}
         />
-        
+
         {/* Character Counter - showing trimmed length */}
         <div className="mt-1 flex items-center justify-between">
           <CharacterCounter current={description.trim().length} max={MAX_DESCRIPTION_LENGTH} />
           {description.trim().length !== description.length && (
-            <span className="text-xs text-gray-400">
-              ({description.length} con espacios)
-            </span>
+            <span className="text-xs text-gray-400">({description.length} con espacios)</span>
           )}
         </div>
 
@@ -150,7 +254,11 @@ export function Step2BasicInfo({ productData, updateField, errors = {}, clearFie
         {/* Helpful Tip */}
         <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex gap-2">
-            <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg
+              className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
               <path
                 fillRule="evenodd"
                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"

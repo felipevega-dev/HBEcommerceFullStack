@@ -1,118 +1,113 @@
 /**
  * Success Modal Component
- * 
+ *
  * Displays after successfully saving a product.
  * Shows celebration message and provides options to view the product or create another.
- * 
+ *
  * Features:
  * - Celebration animation (scale + fade in)
  * - Auto-close after 10 seconds
  * - Clear draft from localStorage on display
  * - Navigate to product detail or reset wizard
- * 
+ *
  * @see requirements.md - Requirement 14: Guardado Final y Confirmación
  * @see design.md - Modals section
  */
 
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { BrandIcon } from '@/components/ui/brand-icon';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface SuccessModalProps {
   /**
    * Whether the modal is visible
    */
-  isOpen: boolean;
-  
+  isOpen: boolean
+
   /**
    * Product ID of the saved product (for navigation)
    */
-  productId?: string;
-  
+  productId?: string
+
   /**
    * Callback when user wants to create another product
    */
-  onCreateAnother: () => void;
-  
+  onCreateAnother: () => void
+
   /**
    * Callback when modal closes
    */
-  onClose?: () => void;
+  onClose?: () => void
 }
 
 /**
  * Success Modal
- * 
+ *
  * Shows success feedback after saving a product with options to:
  * - View the saved product in admin
  * - Create another product (reset wizard)
- * 
+ *
  * Auto-closes after 10 seconds if no action is taken.
  */
-export function SuccessModal({
-  isOpen,
-  productId,
-  onCreateAnother,
-  onClose,
-}: SuccessModalProps) {
-  const router = useRouter();
-  const [countdown, setCountdown] = useState(10);
-  
+export function SuccessModal({ isOpen, productId, onCreateAnother, onClose }: SuccessModalProps) {
+  const router = useRouter()
+  const [countdown, setCountdown] = useState(10)
+
   /**
    * Auto-close countdown timer
    */
   useEffect(() => {
     if (!isOpen) {
-      setCountdown(10);
-      return;
+      setCountdown(10)
+      return
     }
-    
+
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           // Auto-close and navigate to products list
-          handleClose();
-          return 0;
+          handleClose()
+          return 0
         }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [isOpen]);
-  
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [isOpen])
+
   /**
    * Handle viewing the product
    */
   const handleViewProduct = () => {
     // Redirect to products list since there's no detail page
-    router.push('/admin/products');
-  };
-  
+    router.push('/admin/products')
+  }
+
   /**
    * Handle creating another product
    */
   const handleCreateAnother = () => {
-    onCreateAnother();
+    onCreateAnother()
     if (onClose) {
-      onClose();
+      onClose()
     }
-  };
-  
+  }
+
   /**
    * Handle modal close (auto-close)
    */
   const handleClose = () => {
-    router.push('/admin/products');
+    router.push('/admin/products')
     if (onClose) {
-      onClose();
+      onClose()
     }
-  };
-  
-  if (!isOpen) return null;
-  
+  }
+
+  if (!isOpen) return null
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       {/* Modal Container with Animation */}
@@ -127,22 +122,16 @@ export function SuccessModal({
           <div className="mb-3 flex justify-center text-green-600 animate-bounce">
             <BrandIcon name="check-circle" className="h-12 w-12" />
           </div>
-          <h2
-            id="success-modal-title"
-            className="text-xl font-semibold text-gray-900"
-          >
+          <h2 id="success-modal-title" className="text-xl font-semibold text-gray-900">
             ¡Producto guardado exitosamente!
           </h2>
         </div>
-        
+
         {/* Success Message */}
-        <p
-          id="success-modal-description"
-          className="text-center text-gray-600 mb-6"
-        >
+        <p id="success-modal-description" className="text-center text-gray-600 mb-6">
           Tu producto ya está disponible en la tienda
         </p>
-        
+
         {/* Action Buttons */}
         <div className="space-y-3">
           {/* Primary Action: View Product */}
@@ -153,7 +142,7 @@ export function SuccessModal({
           >
             Ver Producto
           </button>
-          
+
           {/* Secondary Action: Create Another */}
           <button
             onClick={handleCreateAnother}
@@ -162,13 +151,13 @@ export function SuccessModal({
             Crear Otro Producto
           </button>
         </div>
-        
+
         {/* Auto-close Countdown */}
         <p className="text-center text-xs text-gray-400 mt-4">
           Cerrando automáticamente en {countdown} segundos...
         </p>
       </div>
-      
+
       {/* CSS Animation Styles */}
       <style jsx>{`
         @keyframes scale-fade-in {
@@ -181,11 +170,11 @@ export function SuccessModal({
             transform: scale(1);
           }
         }
-        
+
         .animate-scale-fade-in {
           animation: scale-fade-in 0.3s ease-out;
         }
       `}</style>
     </div>
-  );
+  )
 }

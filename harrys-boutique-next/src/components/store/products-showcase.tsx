@@ -33,9 +33,7 @@ export function ProductsShowcase({
 
   // Filtrar productos por categoría
   const filteredProducts =
-    activeTab === 'all'
-      ? products
-      : products.filter((p) => p.categoryId === activeTab)
+    activeTab === 'all' ? products : products.filter((p) => p.categoryId === activeTab)
 
   // Tabs: Todos + categorías principales
   const tabs = [
@@ -82,9 +80,7 @@ export function ProductsShowcase({
         >
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-[var(--color-text-muted)]">
-                No hay productos en esta categoría
-              </p>
+              <p className="text-[var(--color-text-muted)]">No hay productos en esta categoría</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-8">

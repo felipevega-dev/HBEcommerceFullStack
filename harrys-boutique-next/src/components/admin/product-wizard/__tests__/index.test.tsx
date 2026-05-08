@@ -69,7 +69,7 @@ describe('ProductWizard', () => {
 
   it('renders in create mode', async () => {
     render(<ProductWizard />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Crear Producto')).toBeInTheDocument()
     })
@@ -77,7 +77,7 @@ describe('ProductWizard', () => {
 
   it('renders in edit mode', async () => {
     render(<ProductWizard productId="123" />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Editar Producto')).toBeInTheDocument()
     })
@@ -85,7 +85,7 @@ describe('ProductWizard', () => {
 
   it('displays progress indicator', async () => {
     render(<ProductWizard />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Paso 1 de 7')).toBeInTheDocument()
     })
@@ -93,7 +93,7 @@ describe('ProductWizard', () => {
 
   it('displays step 1 content', async () => {
     render(<ProductWizard />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Fotos del Producto')).toBeInTheDocument()
     })
@@ -101,7 +101,7 @@ describe('ProductWizard', () => {
 
   it('shows cancel button', async () => {
     render(<ProductWizard />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Cancelar')).toBeInTheDocument()
     })
@@ -109,7 +109,7 @@ describe('ProductWizard', () => {
 
   it('shows next button on step 1', async () => {
     render(<ProductWizard />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Siguiente')).toBeInTheDocument()
     })
@@ -117,7 +117,7 @@ describe('ProductWizard', () => {
 
   it('does not show previous button on step 1', async () => {
     render(<ProductWizard />)
-    
+
     await waitFor(() => {
       expect(screen.queryByText('Anterior')).not.toBeInTheDocument()
     })

@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import type { Coupon } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import {
   handleApiError,
+  protectMutation,
   requireAuth,
   requireAdminAuth,
   getPagination,
   validateBody,
 } from '@/lib/api-utils'
+import {
+  calculateCheckoutTotals,
+  calculateSubtotal,
+  resolveCheckoutItems,
+  validateCouponForSubtotal,
+} from '@/lib/checkout'
+import { getPricingSettings } from '@/lib/commerce-settings'
 
 const addressSchema = z.object({
   firstname: z.string().min(1),
@@ -22,9 +31,9 @@ const addressSchema = z.object({
 })
 
 const orderItemSchema = z.object({
-  productId: z.string().uuid().optional(),
-  name: z.string(),
-  price: z.number().positive(),
+  productId: z.string().uuid(),
+  name: z.string().optional(),
+  price: z.number().positive().optional(),
   quantity: z.number().int().positive(),
   size: z.string(),
   color: z.string().optional(),
@@ -108,72 +117,150 @@ export async function POST(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'orders:create',
+    maxRequests: 10,
+    windowMs: 10 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, createOrderSchema)
   if (validationError) return validationError
 
   try {
     const { items, address, paymentMethod, couponCode } = data!
 
-    // Calculate total
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const shippingFee = 10
-    let discountAmount = 0
+    const productIds = [...new Set(items.map((item) => item.productId))]
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        images: true,
+        stock: true,
+        active: true,
+        colors: true,
+        sizes: true,
+      },
+    })
 
-    // Validate coupon if provided
+    if (products.length !== productIds.length) {
+      return NextResponse.json(
+        { success: false, message: 'Uno de los productos ya no existe o no está disponible' },
+        { status: 400 },
+      )
+    }
+
+    const resolvedItems = resolveCheckoutItems(items, products)
+    const subtotal = calculateSubtotal(resolvedItems)
+    const pricingSettings = await getPricingSettings()
+
+    let appliedCouponId: string | undefined
+    let appliedCouponCode: string | undefined
+    let couponToApply: Coupon | null = null
+
     if (couponCode) {
       const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } })
-      if (coupon && coupon.active) {
-        const now = new Date()
-        const notExpired = !coupon.expiresAt || coupon.expiresAt > now
-        const notExceeded = !coupon.maxUses || coupon.usedCount < coupon.maxUses
-        const meetsMinimum = !coupon.minOrderAmount || subtotal >= Number(coupon.minOrderAmount)
 
-        if (notExpired && notExceeded && meetsMinimum) {
-          discountAmount =
-            coupon.discountType === 'PERCENTAGE'
-              ? Math.floor((subtotal * Number(coupon.discountValue)) / 100)
-              : Number(coupon.discountValue)
-
-          await prisma.coupon.update({
-            where: { id: coupon.id },
-            data: { usedCount: { increment: 1 } },
-          })
-        }
+      if (coupon && validateCouponForSubtotal(coupon, subtotal)) {
+        appliedCouponId = coupon.id
+        appliedCouponCode = coupon.code
+        couponToApply = coupon
+      } else {
+        return NextResponse.json(
+          { success: false, message: 'El cupón no es válido para este pedido' },
+          { status: 400 },
+        )
       }
     }
 
-    const amount = subtotal + shippingFee - discountAmount
+    const totals = calculateCheckoutTotals(resolvedItems, couponToApply, pricingSettings)
 
-    const order = await prisma.order.create({
-      data: {
-        userId: session!.user.id,
-        amount,
-        addressSnapshot: address,
-        paymentMethod,
-        couponCode: couponCode?.toUpperCase(),
-        discountAmount: discountAmount > 0 ? discountAmount : undefined,
-        items: {
-          create: items.map((item) => ({
-            productId: item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            size: item.size,
-            color: item.color ?? '',
-            image: item.image ?? '',
-          })),
+    const order = await prisma.$transaction(async (tx) => {
+      for (const item of resolvedItems) {
+        const stockUpdate = await tx.product.updateMany({
+          where: {
+            id: item.productId,
+            active: true,
+            stock: { gte: item.quantity },
+          },
+          data: { stock: { decrement: item.quantity } },
+        })
+
+        if (stockUpdate.count !== 1) {
+          throw new Error(`STOCK_INSUFFICIENT:${item.name}`)
+        }
+      }
+
+      if (appliedCouponId && paymentMethod === 'COD') {
+        const couponUpdate = await tx.coupon.updateMany({
+          where: {
+            id: appliedCouponId,
+            active: true,
+            ...(couponToApply?.expiresAt && { expiresAt: { gt: new Date() } }),
+            ...(couponToApply?.maxUses && { usedCount: { lt: couponToApply.maxUses } }),
+          },
+          data: { usedCount: { increment: 1 } },
+        })
+
+        if (couponUpdate.count !== 1) {
+          throw new Error('COUPON_EXHAUSTED')
+        }
+      }
+
+      const createdOrder = await tx.order.create({
+        data: {
+          userId: session!.user.id,
+          amount: totals.total,
+          addressSnapshot: address,
+          paymentMethod,
+          couponCode: appliedCouponCode,
+          discountAmount: totals.discountAmount > 0 ? totals.discountAmount : undefined,
+          items: {
+            create: resolvedItems.map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              size: item.size,
+              color: item.color,
+              image: item.image,
+            })),
+          },
         },
-      },
-      include: { items: true },
-    })
+        include: { items: true },
+      })
 
-    // Clear cart after COD order
-    if (paymentMethod === 'COD') {
-      await prisma.cart.deleteMany({ where: { userId: session!.user.id } })
-    }
+      if (paymentMethod === 'COD') {
+        await tx.cart.deleteMany({ where: { userId: session!.user.id } })
+      }
+
+      return createdOrder
+    })
 
     return NextResponse.json({ success: true, order }, { status: 201 })
   } catch (e) {
+    if (e instanceof Error) {
+      if (e.message.startsWith('STOCK_INSUFFICIENT:')) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Stock insuficiente para ${e.message.replace('STOCK_INSUFFICIENT:', '')}`,
+          },
+          { status: 409 },
+        )
+      }
+
+      if (e.message === 'COUPON_EXHAUSTED') {
+        return NextResponse.json(
+          { success: false, message: 'El cupón ya alcanzó su límite de usos' },
+          { status: 409 },
+        )
+      }
+    }
+
     return handleApiError(e)
   }
 }

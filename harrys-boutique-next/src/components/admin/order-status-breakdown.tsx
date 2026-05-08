@@ -29,7 +29,11 @@ export function OrderStatusBreakdown({ ordersByStatus }: { ordersByStatus: Statu
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {ordersByStatus.map((item) => {
-          const config = statusConfig[item.status] || { label: item.status, color: 'text-gray-700', bg: 'bg-gray-100' }
+          const config = statusConfig[item.status] || {
+            label: item.status,
+            color: 'text-gray-700',
+            bg: 'bg-gray-100',
+          }
           const percentage = total > 0 ? (item._count.status / total) * 100 : 0
           return (
             <Link
@@ -43,10 +47,7 @@ export function OrderStatusBreakdown({ ordersByStatus }: { ordersByStatus: Statu
               </div>
               <p className="text-xl font-semibold">{item._count.status}</p>
               <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${config.bg}`}
-                  style={{ width: `${percentage}%` }}
-                />
+                <div className={`h-full ${config.bg}`} style={{ width: `${percentage}%` }} />
               </div>
             </Link>
           )

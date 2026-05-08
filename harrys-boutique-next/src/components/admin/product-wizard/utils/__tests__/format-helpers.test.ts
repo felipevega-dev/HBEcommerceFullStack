@@ -12,7 +12,7 @@ import {
   formatList,
   truncateText,
   formatCharacterCount,
-  formatSelectionCount
+  formatSelectionCount,
 } from '../format-helpers'
 
 describe('formatPrice', () => {
@@ -107,7 +107,7 @@ describe('formatRelativeTime', () => {
   it('should format minutes ago', () => {
     const date1 = new Date(Date.now() - 1 * 60 * 1000)
     expect(formatRelativeTime(date1)).toBe('hace 1 minuto')
-    
+
     const date5 = new Date(Date.now() - 5 * 60 * 1000)
     expect(formatRelativeTime(date5)).toBe('hace 5 minutos')
   })
@@ -115,7 +115,7 @@ describe('formatRelativeTime', () => {
   it('should format hours ago', () => {
     const date1 = new Date(Date.now() - 1 * 60 * 60 * 1000)
     expect(formatRelativeTime(date1)).toBe('hace 1 hora')
-    
+
     const date3 = new Date(Date.now() - 3 * 60 * 60 * 1000)
     expect(formatRelativeTime(date3)).toBe('hace 3 horas')
   })
@@ -123,7 +123,7 @@ describe('formatRelativeTime', () => {
   it('should format days ago', () => {
     const date1 = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
     expect(formatRelativeTime(date1)).toBe('hace 1 día')
-    
+
     const date3 = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
     expect(formatRelativeTime(date3)).toBe('hace 3 días')
   })

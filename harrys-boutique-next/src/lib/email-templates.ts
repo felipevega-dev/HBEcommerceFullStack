@@ -68,7 +68,7 @@ export function orderConfirmationEmail(data: OrderEmailData): string {
         $${(item.price * item.quantity).toLocaleString('es-CL')}
       </div>
     </div>
-  `
+  `,
     )
     .join('')
 
@@ -93,10 +93,10 @@ export function orderConfirmationEmail(data: OrderEmailData): string {
           
           <div style="margin: 20px 0;">
             <strong>Número de pedido:</strong> #${data.orderId}<br>
-            <strong>Fecha:</strong> ${new Date(data.orderDate).toLocaleDateString('es-CL', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            <strong>Fecha:</strong> ${new Date(data.orderDate).toLocaleDateString('es-CL', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}<br>
             <strong>Estado:</strong> <span class="badge badge-pending">Pendiente</span>
           </div>
@@ -114,12 +114,16 @@ export function orderConfirmationEmail(data: OrderEmailData): string {
                 <span>Envío:</span>
                 <span>${data.shipping === 0 ? '<strong style="color: #28a745;">Gratis</strong>' : `$${data.shipping.toLocaleString('es-CL')}`}</span>
               </div>
-              ${data.discount ? `
+              ${
+                data.discount
+                  ? `
               <div style="display: flex; justify-content: space-between; padding: 5px 0; color: #28a745;">
                 <span>Descuento:</span>
                 <span>-$${data.discount.toLocaleString('es-CL')}</span>
               </div>
-              ` : ''}
+              `
+                  : ''
+              }
               <div class="total-row">
                 <span>Total:</span>
                 <span>$${data.total.toLocaleString('es-CL')}</span>
@@ -221,7 +225,7 @@ export function paymentConfirmedEmail(data: OrderEmailData): string {
 }
 
 export function orderShippedEmail(
-  data: OrderEmailData & { trackingNumber: string; courier: string }
+  data: OrderEmailData & { trackingNumber: string; courier: string },
 ): string {
   return `
     <!DOCTYPE html>

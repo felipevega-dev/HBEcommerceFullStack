@@ -1,4 +1,4 @@
-# ─── Multi-stage Dockerfile for Next.js with PostgreSQL ──────────────────────
+# ─── Multi-stage Dockerfile for Next.js ──────────────────────────────────────
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
@@ -9,8 +9,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci --only=production && \
+# Install full dependencies for build
+RUN npm ci && \
     npm cache clean --force
 
 # Stage 2: Builder
@@ -57,5 +57,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start script with migrations
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+CMD ["node", "server.js"]

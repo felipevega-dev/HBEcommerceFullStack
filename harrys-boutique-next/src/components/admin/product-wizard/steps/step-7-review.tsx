@@ -45,7 +45,7 @@ const COLOR_NAMES: Record<string, string> = {
 
 /**
  * Step 7: Review
- * 
+ *
  * Final review screen showing all product information before saving.
  * Features:
  * - Organized sections for all product data
@@ -58,6 +58,8 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
     images = [],
     name,
     description,
+    seoTitle,
+    seoDescription,
     price,
     hasDiscount,
     originalPrice,
@@ -155,6 +157,13 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
             <dt className="text-sm font-medium text-gray-500">Descripción</dt>
             <dd className="mt-1 text-base text-gray-900">{description}</dd>
           </div>
+          <div>
+            <dt className="text-sm font-medium text-gray-500">SEO</dt>
+            <dd className="mt-1 space-y-1 text-base text-gray-900">
+              <p>{seoTitle?.trim() || name}</p>
+              <p className="text-sm text-gray-600">{seoDescription?.trim() || description}</p>
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -181,7 +190,9 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
               {hasDiscount && originalPrice ? (
                 <div className="flex items-center gap-3">
                   <span className="text-2xl font-bold">${formatPrice(price)}</span>
-                  <span className="text-lg text-gray-500 line-through">${formatPrice(originalPrice)}</span>
+                  <span className="text-lg text-gray-500 line-through">
+                    ${formatPrice(originalPrice)}
+                  </span>
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-sm font-medium rounded">
                     {Math.round(((originalPrice - price) / originalPrice) * 100)}% OFF
                   </span>
@@ -252,9 +263,7 @@ export function Step7Review({ productData, goToStep }: Step7ReviewProps) {
           </div>
           <div>
             <dt className="text-sm font-medium text-gray-500">Colores</dt>
-            <dd className="mt-2 text-base text-gray-900">
-              {formatList(colorNames)}
-            </dd>
+            <dd className="mt-2 text-base text-gray-900">{formatList(colorNames)}</dd>
           </div>
         </dl>
       </div>

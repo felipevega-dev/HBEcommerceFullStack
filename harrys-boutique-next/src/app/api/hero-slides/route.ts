@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 
 const createSchema = z.object({
   title: z.string().min(1),
@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:hero:create',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, createSchema)
   if (validationError) return validationError
 
@@ -36,11 +43,11 @@ export async function POST(req: NextRequest) {
       data: { ...data!, order: count },
       include: { product: { select: { id: true, name: true } } },
     })
-    
+
     // Revalidate pages to show new slide
     revalidatePath('/', 'page')
     revalidatePath('/admin/hero', 'page')
-    
+
     return NextResponse.json({ success: true, slide }, { status: 201 })
   } catch (e) {
     return handleApiError(e)

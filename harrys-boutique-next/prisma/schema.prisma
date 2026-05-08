@@ -32,25 +32,34 @@ enum DiscountType {
   FIXED
 }
 
+enum InstagramPostStatus {
+  DRAFT
+  PENDING
+  PROCESSING
+  PUBLISHED
+  FAILED
+  SKIPPED
+}
+
 // ─── User & Auth ──────────────────────────────────────────────────────────────
 
 model User {
-  id           String    @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
-  email        String    @unique
+  email        String   @unique
   password     String
-  role         Role      @default(USER)
+  role         Role     @default(USER)
   profileImage String?
-  tags         String[]  @default([])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  tags         String[] @default([])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  addresses Address[]
-  cart      Cart?
-  orders    Order[]
-  reviews   Review[]
-  wishlist  Wishlist[]
-  auditLogs AuditLog[]
+  addresses           Address[]
+  cart                Cart?
+  orders              Order[]
+  reviews             Review[]
+  wishlist            Wishlist[]
+  auditLogs           AuditLog[]
   passwordResetTokens PasswordResetToken[]
 
   @@map("users")
@@ -86,6 +95,8 @@ model Address {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([userId, isDefault])
   @@map("addresses")
 }
 
@@ -103,32 +114,35 @@ model Category {
 }
 
 model Product {
-  id            String   @id @default(uuid())
-  slug          String   @unique @default("")
-  sku           String?  @unique
-  name          String
-  description   String
-  price         Decimal  @db.Decimal(10, 2)
-  originalPrice Decimal? @db.Decimal(10, 2)
-  images        String[]
-  categoryId    String
-  subCategory   String
-  colors        String[]
-  sizes         Json
-  bestSeller    Boolean  @default(false)
-  active        Boolean  @default(true)
-  stock         Int      @default(0)
-  ratingAverage Float    @default(0)
-  ratingCount   Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default(uuid())
+  slug           String   @unique @default("")
+  sku            String?  @unique
+  name           String
+  description    String
+  seoTitle       String?
+  seoDescription String?
+  price          Decimal  @db.Decimal(10, 2)
+  originalPrice  Decimal? @db.Decimal(10, 2)
+  images         String[]
+  categoryId     String
+  subCategory    String
+  colors         String[]
+  sizes          Json
+  bestSeller     Boolean  @default(false)
+  active         Boolean  @default(true)
+  stock          Int      @default(0)
+  ratingAverage  Float    @default(0)
+  ratingCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  category   Category    @relation(fields: [categoryId], references: [id])
-  reviews    Review[]
-  orderItems OrderItem[]
-  wishlist   Wishlist[]
-  heroSlides HeroSlide[]
-  cartItems  CartItem[]
+  category       Category        @relation(fields: [categoryId], references: [id])
+  reviews        Review[]
+  orderItems     OrderItem[]
+  wishlist       Wishlist[]
+  heroSlides     HeroSlide[]
+  cartItems      CartItem[]
+  instagramPosts InstagramPost[]
 
   @@index([slug])
   @@index([categoryId, subCategory])
@@ -162,6 +176,8 @@ model CartItem {
   cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@unique([cartId, productId, size, color])
+  @@index([cartId])
   @@map("cart_items")
 }
 
@@ -213,7 +229,7 @@ model Review {
   productId String
   rating    Int
   comment   String   @db.VarChar(500)
-  approved  Boolean  @default(true)
+  approved  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -221,6 +237,7 @@ model Review {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+  @@index([productId, approved, createdAt(sort: Desc)])
   @@map("reviews")
 }
 
@@ -236,22 +253,23 @@ model Wishlist {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+  @@index([userId, createdAt(sort: Desc)])
   @@map("wishlists")
 }
 
 // ─── Coupons ──────────────────────────────────────────────────────────────────
 
 model Coupon {
-  id              String       @id @default(uuid())
-  code            String       @unique
-  discountType    DiscountType
-  discountValue   Decimal      @db.Decimal(10, 2)
-  minOrderAmount  Decimal?     @db.Decimal(10, 2)
-  maxUses         Int?
-  usedCount       Int          @default(0)
-  expiresAt       DateTime?
-  active          Boolean      @default(true)
-  createdAt       DateTime     @default(now())
+  id             String       @id @default(uuid())
+  code           String       @unique
+  discountType   DiscountType
+  discountValue  Decimal      @db.Decimal(10, 2)
+  minOrderAmount Decimal?     @db.Decimal(10, 2)
+  maxUses        Int?
+  usedCount      Int          @default(0)
+  expiresAt      DateTime?
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
 
   @@map("coupons")
 }
@@ -291,6 +309,7 @@ model Testimonial {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([active, order])
   @@map("testimonials")
 }
 
@@ -320,5 +339,68 @@ model HeroSlide {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([order])
   @@map("hero_slides")
+}
+
+model InstagramAutomationSettings {
+  id                    String   @id @default(uuid())
+  enabled               Boolean  @default(false)
+  timezone              String   @default("America/Santiago")
+  dailyHour             Int      @default(10)
+  dailyMinute           Int      @default(0)
+  sourceType            String   @default("PRODUCTS")
+  captionTemplate       String   @db.Text
+  fallbackHashtags      String   @default("")
+  maxDailyPosts         Int      @default(1)
+  requireManualApproval Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("instagram_automation_settings")
+}
+
+model InstagramPost {
+  id                  String              @id @default(uuid())
+  productId           String?
+  status              InstagramPostStatus @default(DRAFT)
+  sourceType          String              @default("PRODUCTS")
+  imageUrl            String
+  title               String
+  sourceDescription   String?             @db.Text
+  captionDraft        String?             @db.Text
+  finalCaption        String?             @db.Text
+  scheduledFor        DateTime?
+  publishedAt         DateTime?
+  selectedAt          DateTime?
+  processedAt         DateTime?
+  instagramCreationId String?
+  instagramMediaId    String?
+  retryCount          Int                 @default(0)
+  lastError           String?             @db.Text
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  product  Product?               @relation(fields: [productId], references: [id], onDelete: SetNull)
+  attempts InstagramPostAttempt[]
+
+  @@index([status, scheduledFor])
+  @@index([productId])
+  @@index([createdAt(sort: Desc)])
+  @@map("instagram_posts")
+}
+
+model InstagramPostAttempt {
+  id              String   @id @default(uuid())
+  instagramPostId String
+  status          String
+  message         String?  @db.Text
+  requestPayload  Json?
+  responsePayload Json?
+  createdAt       DateTime @default(now())
+
+  instagramPost InstagramPost @relation(fields: [instagramPostId], references: [id], onDelete: Cascade)
+
+  @@index([instagramPostId, createdAt(sort: Desc)])
+  @@map("instagram_post_attempts")
 }

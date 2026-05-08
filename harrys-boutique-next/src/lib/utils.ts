@@ -1,11 +1,18 @@
+import {
+  CURRENCY_CODE,
+  CURRENCY_LOCALE,
+  FREE_SHIPPING_THRESHOLD,
+  SHIPPING_FEE,
+} from '@/lib/commerce'
+
 /**
  * Formats a price number as Chilean Peso (CLP) currency string.
  * Uses Intl.NumberFormat with locale 'es-CL'.
  */
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-CL', {
+  return new Intl.NumberFormat(CURRENCY_LOCALE, {
     style: 'currency',
-    currency: 'CLP',
+    currency: CURRENCY_CODE,
     minimumFractionDigits: 0,
   }).format(price)
 }
@@ -52,9 +59,6 @@ export function generateSlug(name: string): string {
     .replace(/-+/g, '-') // collapse multiple hyphens
 }
 
-/** Shared shipping fee constant — used in checkout, orders API, and webhook */
-export const SHIPPING_FEE = 10
-
 /**
  * Maps Spanish color names (as stored in DB) to CSS hex values.
  * Falls back to the name itself so CSS named colors (e.g. "red") still work.
@@ -79,5 +83,4 @@ export function colorToHex(name: string): string {
   return COLOR_MAP[name.toLowerCase()] ?? name.toLowerCase()
 }
 
-/** Free shipping threshold in ARS */
-export const FREE_SHIPPING_THRESHOLD = 50000
+export { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD }

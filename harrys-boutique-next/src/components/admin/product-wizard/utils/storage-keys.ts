@@ -1,6 +1,6 @@
 /**
  * LocalStorage key constants for the Product Wizard
- * 
+ *
  * This file centralizes all localStorage keys used for auto-save
  * and draft management functionality.
  */
@@ -12,15 +12,15 @@ const WIZARD_PREFIX = 'product-wizard'
 
 /**
  * Generates a localStorage key for a product draft
- * 
+ *
  * @param productId - Product ID for edit mode, or 'new' for create mode
  * @returns LocalStorage key string
- * 
+ *
  * @example
  * ```ts
  * // Create mode
  * getProductDraftKey() // "product-wizard-draft-new"
- * 
+ *
  * // Edit mode
  * getProductDraftKey("abc123") // "product-wizard-draft-abc123"
  * ```
@@ -47,10 +47,10 @@ export const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 /**
  * Checks if a draft timestamp is expired
- * 
+ *
  * @param timestamp - ISO timestamp string
  * @returns True if draft is expired, false otherwise
- * 
+ *
  * @example
  * ```ts
  * const draft = JSON.parse(localStorage.getItem(key))
@@ -69,14 +69,14 @@ export function isDraftExpired(timestamp: string): boolean {
 
 /**
  * Clears all product wizard related data from localStorage
- * 
+ *
  * @param productId - Optional product ID to clear specific draft
- * 
+ *
  * @example
  * ```ts
  * // Clear specific product draft
  * clearWizardStorage("abc123")
- * 
+ *
  * // Clear all wizard data
  * clearWizardStorage()
  * ```
@@ -88,7 +88,7 @@ export function clearWizardStorage(productId?: string): void {
   } else {
     // Clear all wizard-related keys
     const keys = Object.keys(localStorage)
-    keys.forEach(key => {
+    keys.forEach((key) => {
       if (key.startsWith(WIZARD_PREFIX)) {
         localStorage.removeItem(key)
       }
@@ -98,9 +98,9 @@ export function clearWizardStorage(productId?: string): void {
 
 /**
  * Gets all product draft keys from localStorage
- * 
+ *
  * @returns Array of draft keys
- * 
+ *
  * @example
  * ```ts
  * const draftKeys = getAllDraftKeys()
@@ -109,5 +109,5 @@ export function clearWizardStorage(productId?: string): void {
  */
 export function getAllDraftKeys(): string[] {
   const keys = Object.keys(localStorage)
-  return keys.filter(key => key.startsWith(`${WIZARD_PREFIX}-draft-`))
+  return keys.filter((key) => key.startsWith(`${WIZARD_PREFIX}-draft-`))
 }

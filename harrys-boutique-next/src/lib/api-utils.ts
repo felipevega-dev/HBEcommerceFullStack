@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { z } from 'zod'
 import type { Role } from '@prisma/client'
+import { getSiteUrl } from '@/lib/site'
+import { getClientIp, getRateLimitState } from '@/lib/rate-limiter'
 
 const ADMIN_ROLES: Role[] = ['OWNER', 'ADMIN', 'MODERATOR']
 
@@ -34,6 +36,68 @@ export async function requireAdminAuth() {
     }
   }
   return { session }
+}
+
+export async function protectMutation(
+  req: NextRequest,
+  options: { keyPrefix: string; maxRequests: number; windowMs: number; keySuffix?: string },
+) {
+  const originError = requireTrustedOrigin(req)
+  if (originError) return originError
+
+  return enforceRateLimit(req, options)
+}
+
+export function requireTrustedOrigin(req: NextRequest) {
+  const candidate = req.headers.get('origin') ?? req.headers.get('referer')
+
+  if (!candidate) {
+    return NextResponse.json({ success: false, message: 'Origen no permitido' }, { status: 403 })
+  }
+
+  let requestOrigin: string
+  try {
+    requestOrigin = new URL(candidate).origin
+  } catch {
+    return NextResponse.json({ success: false, message: 'Origen no permitido' }, { status: 403 })
+  }
+
+  const allowedOrigins = new Set<string>([req.nextUrl.origin])
+
+  try {
+    allowedOrigins.add(new URL(getSiteUrl()).origin)
+  } catch {
+    // Ignore invalid env value and fall back to request origin.
+  }
+
+  if (!allowedOrigins.has(requestOrigin)) {
+    return NextResponse.json({ success: false, message: 'Origen no permitido' }, { status: 403 })
+  }
+
+  return null
+}
+
+export async function enforceRateLimit(
+  req: NextRequest,
+  options: { keyPrefix: string; maxRequests: number; windowMs: number; keySuffix?: string },
+) {
+  const key = `${options.keyPrefix}:${options.keySuffix ?? getClientIp(req)}`
+  const result = await getRateLimitState(key, options.maxRequests, options.windowMs)
+
+  if (result.allowed) return null
+
+  const retryAfterSeconds = Math.max(1, Math.ceil((result.resetAt - Date.now()) / 1000))
+
+  return NextResponse.json(
+    { success: false, message: 'Demasiadas solicitudes. Intenta nuevamente en unos minutos.' },
+    {
+      status: 429,
+      headers: {
+        'Retry-After': String(retryAfterSeconds),
+        'X-RateLimit-Remaining': '0',
+      },
+    },
+  )
 }
 
 // ─── Validation ───────────────────────────────────────────────────────────────

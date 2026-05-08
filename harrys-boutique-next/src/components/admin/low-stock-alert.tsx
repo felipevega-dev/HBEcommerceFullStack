@@ -15,8 +15,18 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
       <div className="bg-white rounded-xl border border-[var(--color-border)] p-6">
         <h3 className="text-lg font-semibold mb-4">Alertas de inventario</h3>
         <div className="text-center py-8 text-gray-500">
-          <svg className="w-12 h-12 mx-auto mb-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-12 h-12 mx-auto mb-3 text-green-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <p>Sin alertas de stock</p>
         </div>
@@ -24,8 +34,8 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
     )
   }
 
-  const outOfStock = products.filter(p => p.stock === 0).length
-  const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5).length
+  const outOfStock = products.filter((p) => p.stock === 0).length
+  const lowStock = products.filter((p) => p.stock > 0 && p.stock <= 5).length
 
   return (
     <div className="bg-white rounded-xl border border-[var(--color-border)] p-6">
@@ -51,7 +61,11 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
           <div key={product.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
             <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
               {product.images?.[0] && (
-                <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -61,7 +75,7 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
               </p>
             </div>
             <Link
-              href={`/admin/products/${product.id}/edit`}
+              href={`/admin/products/wizard/${product.id}`}
               className="text-xs text-blue-600 hover:underline"
             >
               Editar
@@ -70,7 +84,10 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
         ))}
       </div>
       {products.length > 5 && (
-        <Link href="/admin/products?stock=low" className="block text-center text-sm text-blue-600 mt-4 hover:underline">
+        <Link
+          href="/admin/products?stock=low"
+          className="block text-center text-sm text-blue-600 mt-4 hover:underline"
+        >
           Ver todos los productos con bajo stock ({products.length})
         </Link>
       )}

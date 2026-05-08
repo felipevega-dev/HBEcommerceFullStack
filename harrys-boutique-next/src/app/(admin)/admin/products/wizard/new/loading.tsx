@@ -1,6 +1,6 @@
 /**
  * Loading state for the new product wizard page
- * 
+ *
  * Displays a loading spinner while fetching categories
  * and initializing the wizard.
  */

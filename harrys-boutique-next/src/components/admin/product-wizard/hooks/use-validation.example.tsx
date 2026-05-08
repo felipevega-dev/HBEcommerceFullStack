@@ -1,6 +1,6 @@
 /**
  * Example usage of useValidation hook
- * 
+ *
  * This file demonstrates how to use the validation hook in wizard step components.
  */
 
@@ -11,10 +11,10 @@ import type { ProductData } from '../types'
 /**
  * Example: Basic usage in a wizard step component
  */
-export function ExampleStep2BasicInfo({ 
-  productData, 
+export function ExampleStep2BasicInfo({
+  productData,
   currentStep,
-  onNext 
+  onNext,
 }: {
   productData: ProductData
   currentStep: number
@@ -27,13 +27,13 @@ export function ExampleStep2BasicInfo({
     registerField,
     focusFirstError,
     getFieldError,
-    hasFieldError
+    hasFieldError,
   } = useValidation(currentStep, productData)
 
   const handleNext = () => {
     // Validate before advancing
     const isValid = validateStep()
-    
+
     if (isValid) {
       onNext()
     } else {
@@ -54,8 +54,8 @@ export function ExampleStep2BasicInfo({
           type="text"
           ref={(el) => registerField('name', el)}
           className={`mt-1 block w-full rounded-lg border ${
-            hasFieldError('name') 
-              ? 'border-red-500 focus:ring-red-500' 
+            hasFieldError('name')
+              ? 'border-red-500 focus:ring-red-500'
               : 'border-gray-300 focus:ring-black'
           }`}
           onChange={() => {
@@ -67,9 +67,7 @@ export function ExampleStep2BasicInfo({
         />
         {/* Display error message */}
         {getFieldError('name') && (
-          <p className="mt-1 text-sm text-red-500">
-            {getFieldError('name')}
-          </p>
+          <p className="mt-1 text-sm text-red-500">{getFieldError('name')}</p>
         )}
       </div>
 
@@ -94,9 +92,7 @@ export function ExampleStep2BasicInfo({
           }}
         />
         {getFieldError('description') && (
-          <p className="mt-1 text-sm text-red-500">
-            {getFieldError('description')}
-          </p>
+          <p className="mt-1 text-sm text-red-500">{getFieldError('description')}</p>
         )}
       </div>
 
@@ -129,22 +125,18 @@ export function ExampleWizardContainer() {
     colors: [],
     stock: 0,
     bestSeller: false,
-    active: true
+    active: true,
   })
 
-  const {
-    validateStep,
-    focusFirstError,
-    hasErrors
-  } = useValidation(currentStep, productData)
+  const { validateStep, focusFirstError, hasErrors } = useValidation(currentStep, productData)
 
   const handleNext = () => {
     // Validate current step
     const isValid = validateStep()
-    
+
     if (isValid) {
       // Advance to next step
-      setCurrentStep(prev => prev + 1)
+      setCurrentStep((prev) => prev + 1)
     } else {
       // Focus first error field
       focusFirstError()
@@ -153,26 +145,19 @@ export function ExampleWizardContainer() {
 
   const handleBack = () => {
     // No validation needed when going back
-    setCurrentStep(prev => prev - 1)
+    setCurrentStep((prev) => prev - 1)
   }
 
   return (
     <div>
       {/* Render current step component */}
       {/* ... */}
-      
+
       {/* Navigation */}
       <div className="flex justify-between mt-6">
-        {currentStep > 1 && (
-          <button onClick={handleBack}>
-            Anterior
-          </button>
-        )}
-        
-        <button 
-          onClick={handleNext}
-          disabled={hasErrors()}
-        >
+        {currentStep > 1 && <button onClick={handleBack}>Anterior</button>}
+
+        <button onClick={handleNext} disabled={hasErrors()}>
           {currentStep === 7 ? 'Guardar Producto' : 'Siguiente'}
         </button>
       </div>
@@ -197,14 +182,14 @@ export function ExampleProgrammaticValidation() {
     colors: ['black'],
     stock: 10,
     bestSeller: false,
-    active: true
+    active: true,
   }
 
   const { validateStep, errors } = useValidation(2, productData)
 
   // Validate programmatically
   const isValid = validateStep()
-  
+
   if (!isValid) {
     console.log('Validation errors:', errors)
     // errors = { name: 'El nombre debe tener al menos 3 caracteres' }

@@ -5,6 +5,9 @@ import { ProductGallery } from '@/components/store/product-gallery'
 import { ProductInfo } from '@/components/store/product-info'
 import { ProductReviews } from '@/components/store/product-reviews'
 import { RelatedProducts } from '@/components/store/related-products'
+import { getProductByIdOrSlug } from '@/lib/catalog'
+import { CURRENCY_CODE } from '@/lib/commerce'
+import { getSiteUrl } from '@/lib/site'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -12,30 +15,31 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  // Support both UUID and slug lookup
-  const product = await prisma.product.findFirst({
-    where: { OR: [{ id }, { slug: id }] },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      description: true,
-      images: true,
-    },
-  })
+  const product = await getProductByIdOrSlug(id)
   if (!product) return { title: 'Producto no encontrado' }
 
-  const BASE_URL = process.env.NEXTAUTH_URL ?? 'https://harrys-boutique.com'
+  const baseUrl = getSiteUrl()
+  const canonical = `${baseUrl}/product/${product.slug || product.id}`
+  const title = product.seoTitle?.trim() || `${product.name} | Harry's Boutique`
+  const description = product.seoDescription?.trim() || product.description.slice(0, 160)
 
   return {
-    title: `${product.name} — Harry's Boutique`,
-    description: product.description.slice(0, 160),
-    alternates: { canonical: `${BASE_URL}/producto/${product.slug || product.id}` },
+    title,
+    description,
+    alternates: { canonical },
     openGraph: {
-      title: product.name,
-      description: product.description.slice(0, 160),
+      title,
+      description,
+      url: canonical,
       images: product.images[0] ? [{ url: product.images[0] }] : [],
       type: 'website',
+      siteName: "Harry's Boutique",
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: product.images[0] ? [product.images[0]] : [],
     },
   }
 }
@@ -43,27 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const { id } = await params
 
-  // Support both UUID and slug lookup
-  const rawProduct = await prisma.product.findFirst({
-    where: { active: true, OR: [{ id }, { slug: id }] },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      description: true,
-      price: true,
-      originalPrice: true,
-      images: true,
-      colors: true,
-      sizes: true,
-      stock: true,
-      ratingAverage: true,
-      ratingCount: true,
-      categoryId: true,
-      subCategory: true,
-      category: { select: { name: true } },
-    },
-  })
+  const rawProduct = await getProductByIdOrSlug(id)
 
   if (!rawProduct) notFound()
 
@@ -72,6 +56,8 @@ export default async function ProductPage({ params }: Props) {
     slug: rawProduct.slug,
     name: rawProduct.name,
     description: rawProduct.description,
+    seoTitle: rawProduct.seoTitle,
+    seoDescription: rawProduct.seoDescription,
     price: Number(rawProduct.price),
     originalPrice: rawProduct.originalPrice ? Number(rawProduct.originalPrice) : null,
     images: rawProduct.images,
@@ -92,41 +78,50 @@ export default async function ProductPage({ params }: Props) {
     take: 10,
   })
 
-  const reviews = rawReviews.map((r) => ({
-    id: r.id,
-    rating: r.rating,
-    comment: r.comment,
-    createdAt: r.createdAt.toISOString(),
-    user: { name: r.user.name, profileImage: r.user.profileImage },
+  const reviews = rawReviews.map((review) => ({
+    id: review.id,
+    rating: review.rating,
+    comment: review.comment,
+    createdAt: review.createdAt.toISOString(),
+    user: { name: review.user.name, profileImage: review.user.profileImage },
   }))
+
+  const productUrl = `${getSiteUrl()}/product/${product.slug || product.id}`
+  const productStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': productUrl,
+    name: product.name,
+    description: product.description,
+    image: product.images,
+    category: [product.category.name, product.subCategory].filter(Boolean).join(' > '),
+    brand: {
+      '@type': 'Brand',
+      name: "Harry's Boutique",
+    },
+    offers: {
+      '@type': 'Offer',
+      url: productUrl,
+      price: product.price,
+      priceCurrency: CURRENCY_CODE,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability:
+        product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    },
+    ...(product.ratingCount > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.ratingAverage,
+        reviewCount: product.ratingCount,
+      },
+    }),
+  }
 
   return (
     <div className="border-t pt-10">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            description: product.description,
-            image: product.images,
-            offers: {
-              '@type': 'Offer',
-              price: product.price,
-              priceCurrency: 'ARS',
-              availability:
-                product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            },
-            ...(product.ratingCount > 0 && {
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: product.ratingAverage,
-                reviewCount: product.ratingCount,
-              },
-            }),
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productStructuredData) }}
       />
       <div className="flex flex-col lg:flex-row gap-12">
         <ProductGallery images={product.images} name={product.name} />

@@ -168,7 +168,11 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
     }
     setIsAddingNew(true)
     setEditingAddress(null)
-    setCurrentAddress({ ...emptyAddress, email: user.email, isDefault: user.addresses.length === 0 })
+    setCurrentAddress({
+      ...emptyAddress,
+      email: user.email,
+      isDefault: user.addresses.length === 0,
+    })
   }
 
   const handleAddressChange = (updates: Partial<typeof currentAddress>) => {
@@ -320,7 +324,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               <h4 className="font-medium">
                 {isAddingNew ? 'Nueva dirección de facturación' : 'Editar dirección de facturación'}
               </h4>
-              
+
               <AddressForm
                 formData={currentAddress}
                 onChange={handleAddressChange}

@@ -69,28 +69,36 @@ export default async function AdminDashboardPage() {
     prisma.review.count({ where: { approved: false } }),
   ])
 
-  const topProductsWithDetails = (await Promise.all(
-      topProducts.filter((t): t is typeof t & { productId: string } => !!t.productId).map(async (t) => {
-        const product = await prisma.product.findUnique({
-          where: { id: t.productId },
-          select: { id: true, name: true, images: true, price: true },
-        })
-        if (!product) return null
-        return {
-          id: product.id,
-          name: product.name,
-          images: product.images,
-          price: Number(product.price),
-          totalSold: t._sum.quantity ?? 0,
-        }
-      })
-    )).filter((p): p is { id: string; name: string; images: string[]; price: number; totalSold: number } => p !== null)
+  const topProductsWithDetails = (
+    await Promise.all(
+      topProducts
+        .filter((t): t is typeof t & { productId: string } => !!t.productId)
+        .map(async (t) => {
+          const product = await prisma.product.findUnique({
+            where: { id: t.productId },
+            select: { id: true, name: true, images: true, price: true },
+          })
+          if (!product) return null
+          return {
+            id: product.id,
+            name: product.name,
+            images: product.images,
+            price: Number(product.price),
+            totalSold: t._sum.quantity ?? 0,
+          }
+        }),
+    )
+  ).filter(
+    (p): p is { id: string; name: string; images: string[]; price: number; totalSold: number } =>
+      p !== null,
+  )
 
   const monthlyRevenueValue = Number(monthlyRevenue._sum.amount ?? 0)
   const lastMonthRevenueValue = Number(lastMonthRevenue._sum.amount ?? 0)
-  const revenueChange = lastMonthRevenueValue > 0 
-    ? ((monthlyRevenueValue - lastMonthRevenueValue) / lastMonthRevenueValue) * 100 
-    : 0
+  const revenueChange =
+    lastMonthRevenueValue > 0
+      ? ((monthlyRevenueValue - lastMonthRevenueValue) / lastMonthRevenueValue) * 100
+      : 0
 
   const avgOrderValue = monthlyOrdersCount > 0 ? monthlyRevenueValue / monthlyOrdersCount : 0
   const lastMonthAOV = lastMonthOrdersCount > 0 ? lastMonthRevenueValue / lastMonthOrdersCount : 0
@@ -108,9 +116,10 @@ export default async function AdminDashboardPage() {
     revenueChange,
     monthlyOrdersCount,
     lastMonthOrdersCount,
-    ordersChange: lastMonthOrdersCount > 0 
-      ? ((monthlyOrdersCount - lastMonthOrdersCount) / lastMonthOrdersCount) * 100 
-      : 0,
+    ordersChange:
+      lastMonthOrdersCount > 0
+        ? ((monthlyOrdersCount - lastMonthOrdersCount) / lastMonthOrdersCount) * 100
+        : 0,
     avgOrderValue,
     aovChange,
     conversionRate,
@@ -126,7 +135,17 @@ export default async function AdminDashboardPage() {
         <LowStockAlert products={lowStockProducts} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TopProducts products={topProductsWithDetails.filter(Boolean) as { id: string; name: string; images: string[]; price: number; totalSold: number }[]} />
+        <TopProducts
+          products={
+            topProductsWithDetails.filter(Boolean) as {
+              id: string
+              name: string
+              images: string[]
+              price: number
+              totalSold: number
+            }[]
+          }
+        />
         <RecentOrders
           orders={recentOrders.map((o) => ({
             id: o.id,

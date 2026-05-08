@@ -16,13 +16,13 @@ interface TooltipProps {
 
 /**
  * Tooltip component with info icon and hover display
- * 
+ *
  * Features:
  * - Shows on hover with arrow pointing to icon
  * - Auto-hides after 5 seconds
  * - Fully accessible with ARIA attributes
  * - Responsive positioning
- * 
+ *
  * @example
  * ```tsx
  * <Tooltip content="Describí las características principales: material, tamaño, para qué mascota es" />
@@ -44,7 +44,7 @@ export function Tooltip({ content, className = '', ariaLabel }: TooltipProps) {
 
   const handleMouseEnter = () => {
     setIsVisible(true)
-    
+
     // Auto-hide after 5 seconds
     timeoutRef.current = setTimeout(() => {
       setIsVisible(false)
@@ -53,7 +53,7 @@ export function Tooltip({ content, className = '', ariaLabel }: TooltipProps) {
 
   const handleMouseLeave = () => {
     setIsVisible(false)
-    
+
     // Clear the auto-hide timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -99,7 +99,7 @@ export function Tooltip({ content, className = '', ariaLabel }: TooltipProps) {
           {/* Arrow pointing down to icon */}
           <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white" />
           <div className="absolute left-1/2 -translate-x-1/2 top-full mt-[1px] w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-t-[7px] border-t-gray-200" />
-          
+
           {/* Tooltip text */}
           <p className="text-xs leading-relaxed">{content}</p>
         </div>

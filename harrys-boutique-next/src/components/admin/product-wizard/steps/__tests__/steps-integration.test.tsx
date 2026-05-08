@@ -1,6 +1,6 @@
 /**
  * Integration tests for wizard step components
- * 
+ *
  * These tests verify that all step components can be rendered
  * and integrate correctly with the wizard state.
  */
@@ -37,38 +37,26 @@ const mockProductData: ProductData = {
 
 const mockUpdateField = () => {}
 const mockGoToStep = () => {}
+const mockCategories = [
+  { id: 'dogs', name: 'Perros', subcategories: ['collars', 'clothing'] },
+  { id: 'cats', name: 'Gatos', subcategories: ['toys'] },
+]
 
 describe('Step Components Integration', () => {
   it('renders Step 1 - Photos', () => {
-    render(
-      <Step1Photos
-        productData={mockProductData}
-        updateField={mockUpdateField}
-        errors={{}}
-      />
-    )
+    render(<Step1Photos productData={mockProductData} updateField={mockUpdateField} errors={{}} />)
     expect(screen.getByText(/Fotos del Producto/i)).toBeInTheDocument()
   })
 
   it('renders Step 2 - Basic Info', () => {
     render(
-      <Step2BasicInfo
-        productData={mockProductData}
-        updateField={mockUpdateField}
-        errors={{}}
-      />
+      <Step2BasicInfo productData={mockProductData} updateField={mockUpdateField} errors={{}} />,
     )
     expect(screen.getByText(/Información Básica/i)).toBeInTheDocument()
   })
 
   it('renders Step 3 - Pricing', () => {
-    render(
-      <Step3Pricing
-        productData={mockProductData}
-        updateField={mockUpdateField}
-        errors={{}}
-      />
-    )
+    render(<Step3Pricing productData={mockProductData} updateField={mockUpdateField} errors={{}} />)
     expect(screen.getByText(/Configurá el precio de tu producto/i)).toBeInTheDocument()
   })
 
@@ -78,37 +66,28 @@ describe('Step Components Integration', () => {
         productData={mockProductData}
         updateField={mockUpdateField}
         errors={{}}
-      />
+        categories={mockCategories}
+      />,
     )
-    expect(screen.getByText(/Seleccioná el tipo de mascota y la categoría del producto/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Seleccioná el tipo de mascota y la categoría del producto/i),
+    ).toBeInTheDocument()
   })
 
   it('renders Step 5 - Sizes and Colors', () => {
     render(
-      <Step5SizesColors
-        productData={mockProductData}
-        updateField={mockUpdateField}
-        errors={{}}
-      />
+      <Step5SizesColors productData={mockProductData} updateField={mockUpdateField} errors={{}} />,
     )
     expect(screen.getByText(/Tallas y Colores/i)).toBeInTheDocument()
   })
 
   it('renders Step 6 - Options', () => {
-    render(
-      <Step6Options
-        productData={mockProductData}
-        updateField={mockUpdateField}
-        errors={{}}
-      />
-    )
+    render(<Step6Options productData={mockProductData} updateField={mockUpdateField} errors={{}} />)
     expect(screen.getByText(/Opciones Finales/i)).toBeInTheDocument()
   })
 
   it('renders Step 7 - Review', () => {
-    render(
-      <Step7Review productData={mockProductData} goToStep={mockGoToStep} />
-    )
+    render(<Step7Review productData={mockProductData} goToStep={mockGoToStep} />)
     expect(screen.getByText(/Revisión Final/i)).toBeInTheDocument()
   })
 })

@@ -72,8 +72,8 @@ export function AboutPageClient({ stats, values }: Props) {
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[var(--color-text-secondary)] sm:text-lg">
               Harry's Boutique es una tienda familiar enfocada en prendas y accesorios que se
-              sienten bien, duran en el tiempo y tienen una identidad clara. Diseñamos para que
-              cada mascota este comoda, y para que cada familia compre con confianza.
+              sienten bien, duran en el tiempo y tienen una identidad clara. Diseñamos para que cada
+              mascota este comoda, y para que cada familia compre con confianza.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -146,8 +146,8 @@ export function AboutPageClient({ stats, values }: Props) {
             De una necesidad familiar a una marca con identidad.
           </h2>
           <p className="mt-5 text-sm leading-7 text-[var(--color-text-secondary)]">
-                Nuestro crecimiento ha sido intencional: menos ruido, mejores productos y una
-                experiencia más clara para quienes buscan vestir o equipar a sus mascotas con buen
+            Nuestro crecimiento ha sido intencional: menos ruido, mejores productos y una
+            experiencia más clara para quienes buscan vestir o equipar a sus mascotas con buen
             gusto.
           </p>
         </div>
@@ -215,9 +215,8 @@ export function AboutPageClient({ stats, values }: Props) {
               Nuestro compromiso es que comprar se sienta simple.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
-              Desde la elección de talla hasta el seguimiento del pedido, buscamos que cada paso
-              sea claro. Si tienes dudas, te acompañamos con información concreta y atención
-              directa.
+              Desde la elección de talla hasta el seguimiento del pedido, buscamos que cada paso sea
+              claro. Si tienes dudas, te acompañamos con información concreta y atención directa.
             </p>
           </div>
           <div className="flex items-center md:justify-end">

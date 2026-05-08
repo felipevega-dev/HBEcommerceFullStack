@@ -32,35 +32,57 @@ export function AdminProductList({ products, total, page, limit, categories }: P
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-  
+
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [duplicating, setDuplicating] = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkAction, setBulkAction] = useState<string>('')
   const [bulkValue, setBulkValue] = useState<string>('')
   const [processing, setProcessing] = useState(false)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
-  
+
   const totalPages = Math.ceil(total / limit)
+  const searchParamsString = searchParams.toString()
+  const categoryFilter = searchParams.get('category') || ''
+  const statusFilter = searchParams.get('status') || ''
+  const stockFilter = searchParams.get('stock') || ''
+
+  const buildListHref = (nextPage?: number) => {
+    const params = new URLSearchParams(searchParamsString)
+    if (nextPage) params.set('page', String(nextPage))
+    return `/admin/products${params.toString() ? `?${params.toString()}` : ''}`
+  }
+
+  const pushFilter = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParamsString)
+    if (value) params.set(key, value)
+    else params.delete(key)
+    params.delete('page')
+
+    startTransition(() => {
+      router.push(`/admin/products${params.toString() ? `?${params.toString()}` : ''}`)
+    })
+  }
 
   // Real-time search with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(searchParamsString)
       if (searchQuery) {
         params.set('search', searchQuery)
       } else {
         params.delete('search')
       }
       params.delete('page') // Reset to page 1 on search
-      
+
       startTransition(() => {
-        router.push(`/admin/products?${params.toString()}`)
+        router.push(`/admin/products${params.toString() ? `?${params.toString()}` : ''}`)
       })
     }, 300) // 300ms debounce
 
     return () => clearTimeout(timer)
-  }, [searchQuery])
+  }, [router, searchParamsString, searchQuery, startTransition])
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -93,10 +115,13 @@ export function AdminProductList({ products, total, page, limit, categories }: P
     setProcessing(true)
     try {
       const ids = Array.from(selectedIds)
-      
+
       let body: any = { ids }
-      
+
       switch (bulkAction) {
+        case 'delete':
+          body.delete = true
+          break
         case 'activate':
           body.active = true
           break
@@ -146,9 +171,9 @@ export function AdminProductList({ products, total, page, limit, categories }: P
       })
 
       const data = await res.json()
-      
+
       if (data.success) {
-        toast.success(`${data.updated} productos actualizados`)
+        toast.success(data.message || `${data.updated} productos actualizados`)
         setSelectedIds(new Set())
         setBulkAction('')
         setBulkValue('')
@@ -182,10 +207,31 @@ export function AdminProductList({ products, total, page, limit, categories }: P
     }
   }
 
+  const handleDuplicate = async (id: string) => {
+    setDuplicating(id)
+    try {
+      const res = await fetch(`/api/products/${id}/duplicate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Producto duplicado como borrador')
+        router.refresh()
+      } else {
+        toast.error(data.message || 'Error al duplicar el producto')
+      }
+    } catch {
+      toast.error('Error al duplicar el producto')
+    } finally {
+      setDuplicating(null)
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Search bar */}
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 lg:flex-row">
         <div className="relative flex-1">
           <input
             type="text"
@@ -211,6 +257,8 @@ export function AdminProductList({ products, total, page, limit, categories }: P
         {categories && categories.length > 0 && (
           <select
             name="category"
+            value={categoryFilter}
+            onChange={(event) => pushFilter('category', event.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">Todas las categorías</option>
@@ -221,6 +269,27 @@ export function AdminProductList({ products, total, page, limit, categories }: P
             ))}
           </select>
         )}
+        <select
+          name="status"
+          value={statusFilter}
+          onChange={(event) => pushFilter('status', event.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          <option value="">Todos los estados</option>
+          <option value="active">Activos</option>
+          <option value="inactive">Inactivos</option>
+        </select>
+        <select
+          name="stock"
+          value={stockFilter}
+          onChange={(event) => pushFilter('stock', event.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          <option value="">Todo el stock</option>
+          <option value="out">Sin stock</option>
+          <option value="low">Stock bajo (1-5)</option>
+          <option value="available">Disponible (+5)</option>
+        </select>
       </div>
 
       {/* Bulk actions */}
@@ -228,9 +297,10 @@ export function AdminProductList({ products, total, page, limit, categories }: P
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-sm font-medium text-blue-900">
-              {selectedIds.size} producto{selectedIds.size > 1 ? 's' : ''} seleccionado{selectedIds.size > 1 ? 's' : ''}
+              {selectedIds.size} producto{selectedIds.size > 1 ? 's' : ''} seleccionado
+              {selectedIds.size > 1 ? 's' : ''}
             </span>
-            
+
             <select
               value={bulkAction}
               onChange={(e) => {
@@ -240,6 +310,7 @@ export function AdminProductList({ products, total, page, limit, categories }: P
               className="border border-blue-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Seleccionar acción...</option>
+              <option value="delete">Eliminar definitivamente</option>
               <option value="activate">Activar</option>
               <option value="deactivate">Desactivar</option>
               <option value="setBestSeller">Marcar como Best Seller</option>
@@ -255,9 +326,11 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                 value={bulkValue}
                 onChange={(e) => setBulkValue(e.target.value)}
                 placeholder={
-                  bulkAction === 'updateStock' ? 'Stock' :
-                  bulkAction === 'updatePrice' ? 'Precio' :
-                  'Porcentaje'
+                  bulkAction === 'updateStock'
+                    ? 'Stock'
+                    : bulkAction === 'updatePrice'
+                      ? 'Precio'
+                      : 'Porcentaje'
                 }
                 className="border border-blue-300 rounded-lg px-3 py-1.5 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -346,8 +419,12 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                   {product.category?.name ?? '—'} / {product.subCategory}
                 </td>
                 <td className="px-4 py-3 font-medium">
-                  ${typeof product.price === 'number' && !isNaN(product.price) 
-                    ? product.price.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                  $
+                  {typeof product.price === 'number' && !isNaN(product.price)
+                    ? product.price.toLocaleString('es-AR', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      })
                     : '0'}
                 </td>
                 <td className="px-4 py-3 text-gray-600 hidden lg:table-cell">
@@ -374,11 +451,18 @@ export function AdminProductList({ products, total, page, limit, categories }: P
                       </span>
                     </Link>
                     <Link
-                      href={`/admin/products/${product.id}/edit`}
+                      href={`/admin/products/wizard/${product.id}`}
                       className="px-3 py-1 text-xs border rounded-lg hover:bg-gray-100"
                     >
                       Editar
                     </Link>
+                    <button
+                      onClick={() => handleDuplicate(product.id)}
+                      disabled={duplicating === product.id}
+                      className="px-3 py-1 text-xs border rounded-lg hover:bg-gray-100 disabled:opacity-50"
+                    >
+                      {duplicating === product.id ? '...' : 'Duplicar'}
+                    </button>
                     {confirmId === product.id ? (
                       <div className="flex gap-1">
                         <button
@@ -424,7 +508,7 @@ export function AdminProductList({ products, total, page, limit, categories }: P
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/admin/products?page=${p}`}
+              href={buildListHref(p)}
               className={`px-3 py-1 rounded-lg text-sm border ${p === page ? 'bg-black text-white border-black' : 'hover:bg-gray-100'}`}
             >
               {p}

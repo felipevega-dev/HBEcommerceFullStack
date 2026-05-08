@@ -1,6 +1,6 @@
 /**
  * Type definitions for the Product Wizard
- * 
+ *
  * This file contains all TypeScript interfaces and types used throughout
  * the 7-step product creation/editing wizard.
  */
@@ -14,13 +14,17 @@ export interface ProductData {
   images: File[] | string[]
   /** Order of images by index (first is principal) */
   imageOrder: number[]
-  
+
   // Step 2: Basic Information
   /** Product name (3-100 characters) */
   name: string
   /** Product description (10-500 characters) */
   description: string
-  
+  /** SEO title override shown in search results (optional) */
+  seoTitle?: string
+  /** SEO meta description override shown in search results (optional) */
+  seoDescription?: string
+
   // Step 3: Pricing
   /** Selling price (must be > 0) */
   price: number
@@ -28,19 +32,19 @@ export interface ProductData {
   hasDiscount: boolean
   /** Original price before discount (optional, must be > price if provided) */
   originalPrice?: number
-  
+
   // Step 4: Category
   /** Main category ID (e.g., "dogs", "cats", "birds", "other") */
   categoryId: string
   /** Subcategory name (e.g., "collars", "toys", "food", "clothing") */
   subCategory: string
-  
+
   // Step 5: Sizes and Colors
   /** Selected sizes (e.g., ["XS", "S", "M", "L", "XL"]) */
   sizes: string[]
   /** Selected colors (e.g., ["black", "white", "red", "blue"]) */
   colors: string[]
-  
+
   // Step 6: Final Options
   /** Stock quantity (0 or positive integer) */
   stock: number
@@ -48,7 +52,7 @@ export interface ProductData {
   bestSeller: boolean
   /** Whether product is active and visible in store */
   active: boolean
-  
+
   // Metadata (only present in edit mode)
   /** Product ID (only in edit mode) */
   id?: string
@@ -117,16 +121,16 @@ export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL'
 /**
  * Available product colors
  */
-export type ProductColor = 
-  | 'black' 
-  | 'white' 
-  | 'red' 
-  | 'blue' 
-  | 'green' 
-  | 'yellow' 
-  | 'pink' 
-  | 'brown' 
-  | 'gray' 
+export type ProductColor =
+  | 'black'
+  | 'white'
+  | 'red'
+  | 'blue'
+  | 'green'
+  | 'yellow'
+  | 'pink'
+  | 'brown'
+  | 'gray'
   | 'orange'
 
 /**

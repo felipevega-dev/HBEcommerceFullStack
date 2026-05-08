@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
 
 const cartItemSchema = z.object({
   productId: z.string().uuid(),
@@ -17,6 +17,14 @@ const mergeBodySchema = z.object({
 export async function POST(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'cart:merge',
+    maxRequests: 20,
+    windowMs: 5 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
 
   const { data, error: validationError } = await validateBody(req, mergeBodySchema)
   if (validationError) return validationError
@@ -34,7 +42,7 @@ export async function POST(req: NextRequest) {
       const { productId, quantity, size, color = '' } = item
 
       const existing = await prisma.cartItem.findFirst({
-        where: { cartId: cart.id, productId, size },
+        where: { cartId: cart.id, productId, size, color },
       })
 
       if (existing) {

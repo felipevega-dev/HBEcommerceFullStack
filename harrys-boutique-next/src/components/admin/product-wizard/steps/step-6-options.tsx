@@ -12,7 +12,7 @@ interface Step6OptionsProps {
 
 /**
  * Step 6: Final Options
- * 
+ *
  * Collects final product configuration options.
  * Features:
  * - Stock quantity input
@@ -59,7 +59,7 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
           aria-invalid={!!errors.stock}
           aria-describedby={errors.stock ? 'stock-error' : 'stock-helper'}
         />
-        
+
         {/* Helper Text */}
         <p id="stock-helper" className="mt-1 text-sm text-gray-500">
           Dejá en 0 si no manejás stock
@@ -91,14 +91,10 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
           />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-900">
-                Mostrar como Más Vendido
-              </span>
+              <span className="text-sm font-medium text-gray-900">Mostrar como Más Vendido</span>
               <Tooltip content="Aparecerá en la sección de productos destacados" />
             </div>
-            <p className="mt-1 text-sm text-gray-500">
-              Este producto se destacará en la tienda
-            </p>
+            <p className="mt-1 text-sm text-gray-500">Este producto se destacará en la tienda</p>
           </div>
         </label>
       </div>
