@@ -59,9 +59,7 @@ describe('useAutoSave', () => {
     it('should save after 2 seconds of inactivity', async () => {
       vi.useFakeTimers()
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       // Initially, nothing should be saved
       expect(result.current.lastSaved).toBeNull()
@@ -88,10 +86,9 @@ describe('useAutoSave', () => {
     it('should debounce multiple rapid changes', async () => {
       vi.useFakeTimers()
 
-      const { result, rerender } = renderHook(
-        ({ data }) => useAutoSave(data, 1, true),
-        { initialProps: { data: mockProductData } }
-      )
+      const { result, rerender } = renderHook(({ data }) => useAutoSave(data, 1, true), {
+        initialProps: { data: mockProductData },
+      })
 
       // Make multiple rapid changes
       const updatedData1 = { ...mockProductData, name: 'Update 1' }
@@ -150,7 +147,7 @@ describe('useAutoSave', () => {
     it('should save immediately when step changes', async () => {
       const { result, rerender } = renderHook(
         ({ step }) => useAutoSave(mockProductData, step, true),
-        { initialProps: { step: 1 } }
+        { initialProps: { step: 1 } },
       )
 
       // Change step
@@ -170,7 +167,7 @@ describe('useAutoSave', () => {
     it('should save on multiple step changes', async () => {
       const { result, rerender } = renderHook(
         ({ step }) => useAutoSave(mockProductData, step, true),
-        { initialProps: { step: 1 } }
+        { initialProps: { step: 1 } },
       )
 
       // Navigate through steps
@@ -195,9 +192,7 @@ describe('useAutoSave', () => {
 
   describe('Manual Save', () => {
     it('should save immediately when saveNow is called', async () => {
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       expect(result.current.lastSaved).toBeNull()
 
@@ -216,9 +211,7 @@ describe('useAutoSave', () => {
     it('should cancel pending debounced save when saveNow is called', async () => {
       vi.useFakeTimers()
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       // Start debounce timer
       await act(async () => {
@@ -257,9 +250,7 @@ describe('useAutoSave', () => {
       }
       localStorageMock.setItem(key, JSON.stringify(draft))
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false))
 
       const loaded = result.current.loadDraft()
       expect(loaded).not.toBeNull()
@@ -268,9 +259,7 @@ describe('useAutoSave', () => {
     })
 
     it('should return null when no draft exists', () => {
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false))
 
       const loaded = result.current.loadDraft()
       expect(loaded).toBeNull()
@@ -288,9 +277,7 @@ describe('useAutoSave', () => {
       }
       localStorageMock.setItem(key, JSON.stringify(draft))
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false))
 
       const loaded = result.current.loadDraft()
       expect(loaded).toBeNull()
@@ -310,9 +297,7 @@ describe('useAutoSave', () => {
       }
       localStorageMock.setItem(key, JSON.stringify(draft))
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false, productId)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false, productId))
 
       const loaded = result.current.loadDraft(productId)
       expect(loaded).not.toBeNull()
@@ -331,9 +316,7 @@ describe('useAutoSave', () => {
       }
       localStorageMock.setItem(key, JSON.stringify(draft))
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false))
 
       // Clear the draft
       act(() => {
@@ -356,9 +339,7 @@ describe('useAutoSave', () => {
       }
       localStorageMock.setItem(key, JSON.stringify(draft))
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false, productId)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false, productId))
 
       act(() => {
         result.current.clearDraft(productId)
@@ -379,9 +360,7 @@ describe('useAutoSave', () => {
         throw error
       })
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       act(() => {
         result.current.saveNow()
@@ -403,9 +382,7 @@ describe('useAutoSave', () => {
         throw new Error('Generic error')
       })
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       act(() => {
         result.current.saveNow()
@@ -424,9 +401,7 @@ describe('useAutoSave', () => {
       const key = getProductDraftKey()
       localStorageMock.setItem(key, 'invalid json {')
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, false)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, false))
 
       const loaded = result.current.loadDraft()
       expect(loaded).toBeNull()
@@ -435,9 +410,7 @@ describe('useAutoSave', () => {
 
   describe('Saving State', () => {
     it('should set isSaving to true during save operation', async () => {
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       act(() => {
         result.current.saveNow()
@@ -456,9 +429,7 @@ describe('useAutoSave', () => {
         throw new Error('Error')
       })
 
-      const { result } = renderHook(() =>
-        useAutoSave(mockProductData, 1, true)
-      )
+      const { result } = renderHook(() => useAutoSave(mockProductData, 1, true))
 
       await act(async () => {
         result.current.saveNow()

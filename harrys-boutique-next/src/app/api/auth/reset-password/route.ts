@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { hashPasswordResetToken } from '@/lib/auth/password-reset'
+import { protectMutation } from '@/lib/api-utils'
 
 const resetPasswordSchema = z.object({
   token: z.string().min(20),
@@ -14,6 +15,13 @@ const resetPasswordSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'auth:reset-password',
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   try {
     const body = await req.json()
     const parsed = resetPasswordSchema.safeParse(body)

@@ -74,8 +74,8 @@ export function USPSection() {
             </span>
           </h2>
           <p className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-3xl mx-auto">
-            No solo vendemos ropa para mascotas. Creamos experiencias que fortalecen el vínculo
-            con tu mejor amigo.
+            No solo vendemos ropa para mascotas. Creamos experiencias que fortalecen el vínculo con
+            tu mejor amigo.
           </p>
         </motion.div>
 

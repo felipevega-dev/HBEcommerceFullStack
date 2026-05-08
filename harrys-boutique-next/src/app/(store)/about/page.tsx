@@ -18,22 +18,26 @@ const stats = [
 const values = [
   {
     title: 'Calidad verificable',
-    description: 'Seleccionamos telas, terminaciones y proveedores con criterios claros de durabilidad.',
+    description:
+      'Seleccionamos telas, terminaciones y proveedores con criterios claros de durabilidad.',
     icon: 'target',
   },
   {
     title: 'Comodidad primero',
-    description: 'Priorizamos calces que respeten el movimiento y el uso cotidiano de cada mascota.',
+    description:
+      'Priorizamos calces que respeten el movimiento y el uso cotidiano de cada mascota.',
     icon: 'ruler',
   },
   {
     title: 'Atención cercana',
-    description: 'Acompañamos la elección con información práctica, cambios claros y respuesta directa.',
+    description:
+      'Acompañamos la elección con información práctica, cambios claros y respuesta directa.',
     icon: 'handshake',
   },
   {
     title: 'Identidad de marca',
-    description: 'Cuidamos que cada colección tenga una estética reconocible sin sacrificar funcionalidad.',
+    description:
+      'Cuidamos que cada colección tenga una estética reconocible sin sacrificar funcionalidad.',
     icon: 'design',
   },
 ] satisfies Array<{ title: string; description: string; icon: BrandIconName }>

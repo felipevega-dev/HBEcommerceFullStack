@@ -8,7 +8,7 @@ import {
   isDraftExpired,
   clearWizardStorage,
   getAllDraftKeys,
-  DRAFT_MAX_AGE_MS
+  DRAFT_MAX_AGE_MS,
 } from '../storage-keys'
 
 describe('getProductDraftKey', () => {
@@ -111,9 +111,9 @@ describe('getAllDraftKeys', () => {
 
   it('should return empty array when no drafts exist', () => {
     localStorage.setItem('other-key', 'data')
-    
+
     const draftKeys = getAllDraftKeys()
-    
+
     expect(draftKeys).toHaveLength(0)
   })
 })

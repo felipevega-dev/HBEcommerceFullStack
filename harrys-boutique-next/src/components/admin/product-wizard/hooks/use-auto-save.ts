@@ -22,16 +22,16 @@ export interface UseAutoSaveReturn {
 
 /**
  * Auto-save hook for the Product Wizard
- * 
+ *
  * Automatically saves wizard progress to localStorage with debouncing.
  * Saves occur 2 seconds after the last change, or immediately on step navigation.
- * 
+ *
  * @param productData - Current product data to save
  * @param currentStep - Current wizard step (1-7)
  * @param isDirty - Whether there are unsaved changes
  * @param productId - Product ID for edit mode (optional)
  * @returns Auto-save state and control functions
- * 
+ *
  * @example
  * ```tsx
  * const { lastSaved, saveNow, loadDraft, clearDraft } = useAutoSave(
@@ -40,7 +40,7 @@ export interface UseAutoSaveReturn {
  *   isDirty,
  *   productId
  * )
- * 
+ *
  * // Load draft on mount
  * useEffect(() => {
  *   const draft = loadDraft(productId)
@@ -48,13 +48,13 @@ export interface UseAutoSaveReturn {
  *     // Restore draft...
  *   }
  * }, [])
- * 
+ *
  * // Save before navigation
  * const handleNext = () => {
  *   saveNow()
  *   nextStep()
  * }
- * 
+ *
  * // Clear on successful save
  * const handleSave = async () => {
  *   await saveProduct()
@@ -66,18 +66,18 @@ export function useAutoSave(
   productData: ProductData,
   currentStep: number,
   isDirty: boolean,
-  productId?: string
+  productId?: string,
 ): UseAutoSaveReturn {
   // Track last save timestamp
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
-  
+
   // Track save operation state
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  
+
   // Debounce timer reference
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
-  
+
   // Previous step reference to detect step changes
   const prevStepRef = useRef<number>(currentStep)
 
@@ -104,14 +104,16 @@ export function useAutoSave(
 
       // Attempt to save to localStorage
       localStorage.setItem(key, JSON.stringify(draftState))
-      
+
       // Update last saved timestamp
       setLastSaved(new Date())
       setIsSaving(false)
     } catch (error) {
       // Handle localStorage quota exceeded error
       if (error instanceof Error && error.name === 'QuotaExceededError') {
-        setSaveError('No hay suficiente espacio para guardar. Intentá liberar espacio en el navegador.')
+        setSaveError(
+          'No hay suficiente espacio para guardar. Intentá liberar espacio en el navegador.',
+        )
         console.error('LocalStorage quota exceeded:', error)
       } else {
         setSaveError('No se pudo guardar el progreso. Intentá de nuevo.')
@@ -131,14 +133,14 @@ export function useAutoSave(
       clearTimeout(debounceTimerRef.current)
       debounceTimerRef.current = null
     }
-    
+
     performSave()
   }, [performSave])
 
   /**
    * Load a draft from localStorage
    * Returns null if no draft exists or if draft is expired
-   * 
+   *
    * @param productId - Product ID for edit mode (optional)
    * @returns Draft state or null
    */
@@ -146,13 +148,13 @@ export function useAutoSave(
     try {
       const key = getProductDraftKey(productId)
       const stored = localStorage.getItem(key)
-      
+
       if (!stored) {
         return null
       }
 
       const draft: DraftState = JSON.parse(stored)
-      
+
       // Check if draft is expired (older than 7 days)
       if (isDraftExpired(draft.timestamp)) {
         // Clear expired draft
@@ -169,7 +171,7 @@ export function useAutoSave(
 
   /**
    * Clear a draft from localStorage
-   * 
+   *
    * @param productId - Product ID for edit mode (optional)
    */
   const clearDraft = useCallback((productId?: string): void => {
@@ -220,7 +222,7 @@ export function useAutoSave(
     if (prevStepRef.current !== currentStep) {
       // Save immediately on step change
       saveNow()
-      
+
       // Update previous step reference
       prevStepRef.current = currentStep
     }

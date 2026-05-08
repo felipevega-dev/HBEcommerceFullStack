@@ -161,7 +161,10 @@ export function LoginPageClient() {
 
           <div className="space-y-4 text-sm text-[var(--color-text-secondary)]">
             <div className="flex items-start gap-3">
-              <BrandIcon name="shopping-bag" className="mt-0.5 h-5 w-5 text-[var(--color-accent)]" />
+              <BrandIcon
+                name="shopping-bag"
+                className="mt-0.5 h-5 w-5 text-[var(--color-accent)]"
+              />
               <p>Continúa compras pendientes y revisa el historial de pedidos.</p>
             </div>
             <div className="flex items-start gap-3">

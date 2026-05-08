@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 
 const patchSchema = z.object({
   active: z.boolean().optional(),
@@ -17,6 +17,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { error } = await requireAdminAuth()
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:testimonials:update',
+    maxRequests: 30,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, patchSchema)
   if (validationError) return validationError
 
@@ -29,9 +36,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdminAuth()
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:testimonials:delete',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
 
   try {
     const { id } = await params

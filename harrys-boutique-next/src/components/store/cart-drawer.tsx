@@ -1,14 +1,13 @@
 'use client'
 
-import { useCartStore } from '@/store/cart-store'
+import { getCartLineKey, useCartStore } from '@/store/cart-store'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
-
-const FREE_SHIPPING_THRESHOLD = 50000
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/commerce'
 
 export function CartDrawer() {
   const { items, isOpen, closeDrawer, removeItem, updateQuantity, getTotal } = useCartStore()
@@ -149,7 +148,7 @@ export function CartDrawer() {
 
                   {/* Items */}
                   {items.map((item) => (
-                    <div key={`${item.productId}-${item.size}`} className="flex gap-3">
+                    <div key={getCartLineKey(item)} className="flex gap-3">
                       {item.image && (
                         <div className="relative w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-[var(--color-surface)]">
                           <Image
@@ -176,7 +175,12 @@ export function CartDrawer() {
                           <ButtonWithFeedback
                             onClick={async () => {
                               await new Promise((resolve) => setTimeout(resolve, 200))
-                              updateQuantity(item.productId, item.size, item.quantity - 1)
+                              updateQuantity(
+                                item.productId,
+                                item.size,
+                                item.color,
+                                item.quantity - 1,
+                              )
                             }}
                             variant="outline"
                             size="sm"
@@ -189,7 +193,12 @@ export function CartDrawer() {
                           <ButtonWithFeedback
                             onClick={async () => {
                               await new Promise((resolve) => setTimeout(resolve, 200))
-                              updateQuantity(item.productId, item.size, item.quantity + 1)
+                              updateQuantity(
+                                item.productId,
+                                item.size,
+                                item.color,
+                                item.quantity + 1,
+                              )
                             }}
                             variant="outline"
                             size="sm"
@@ -201,7 +210,7 @@ export function CartDrawer() {
                         </div>
                       </div>
                       <button
-                        onClick={() => removeItem(item.productId, item.size)}
+                        onClick={() => removeItem(item.productId, item.size, item.color)}
                         className="text-[var(--color-text-muted)] hover:text-red-500 self-start p-1 transition-colors"
                       >
                         <svg

@@ -99,8 +99,10 @@ if [ -f .env ]; then
         "BLOB_READ_WRITE_TOKEN"
         "MERCADOPAGO_ACCESS_TOKEN"
         "NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY"
+        "MERCADOPAGO_WEBHOOK_SECRET"
         "RESEND_API_KEY"
         "RESEND_FROM_EMAIL"
+        "NEXT_PUBLIC_FRONTEND_URL"
     )
     
     for var in "${required_vars[@]}"; do

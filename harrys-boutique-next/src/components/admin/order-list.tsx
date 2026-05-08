@@ -112,7 +112,7 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
     }
 
     const confirmed = confirm(
-      `¿Cambiar el estado de ${selectedOrders.size} orden(es) a ${STATUS_LABELS[status]}?`
+      `¿Cambiar el estado de ${selectedOrders.size} orden(es) a ${STATUS_LABELS[status]}?`,
     )
     if (!confirmed) return
 
@@ -122,7 +122,7 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status }),
-        })
+        }),
       )
 
       await Promise.all(promises)

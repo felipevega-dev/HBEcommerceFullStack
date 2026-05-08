@@ -3,7 +3,7 @@ import { BrandIcon } from '@/components/ui/brand-icon'
 
 /**
  * Not Found page for edit product wizard
- * 
+ *
  * Displayed when the requested product ID doesn't exist in the database.
  */
 export default function ProductNotFound() {
@@ -14,14 +14,12 @@ export default function ProductNotFound() {
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <BrandIcon name="search" className="h-8 w-8 text-gray-500" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Producto no encontrado
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Producto no encontrado</h2>
           <p className="text-gray-600 text-sm mb-6">
             El producto que estás buscando no existe o fue eliminado.
           </p>
         </div>
-        
+
         <div className="space-y-3">
           <Link
             href="/admin/products/wizard/new"

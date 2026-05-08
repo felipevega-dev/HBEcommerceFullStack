@@ -41,16 +41,14 @@ describe('CharacterCounter', () => {
   })
 
   it('uses custom warning threshold', () => {
-    const { container } = render(
-      <CharacterCounter current={80} max={100} warningThreshold={0.8} />
-    )
+    const { container } = render(<CharacterCounter current={80} max={100} warningThreshold={0.8} />)
     const counter = container.firstChild as HTMLElement
     expect(counter).toHaveClass('text-amber-600')
   })
 
   it('applies custom className', () => {
     const { container } = render(
-      <CharacterCounter current={50} max={100} className="custom-class" />
+      <CharacterCounter current={50} max={100} className="custom-class" />,
     )
     const counter = container.firstChild as HTMLElement
     expect(counter).toHaveClass('custom-class')

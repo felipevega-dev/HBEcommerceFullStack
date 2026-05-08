@@ -29,22 +29,28 @@ vi.mock('next/link', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
+  motion: new Proxy(
+    {},
+    {
+      get:
+        () =>
+        ({
+          children,
+          className,
+          ...props
+        }: {
+          children?: React.ReactNode
+          className?: string
+          [key: string]: unknown
+        }) => (
+          <div className={className} {...props}>
+            {children}
+          </div>
+        ),
+    },
+  ),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  motion: {
-    div: ({
-      children,
-      className,
-      ...props
-    }: {
-      children: React.ReactNode
-      className?: string
-      [key: string]: unknown
-    }) => (
-      <div className={className} {...props}>
-        {children}
-      </div>
-    ),
-  },
+  useReducedMotion: () => false,
 }))
 
 beforeAll(() => {

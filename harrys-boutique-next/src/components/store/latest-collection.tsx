@@ -3,42 +3,29 @@ import { prisma } from '@/lib/prisma'
 import { ProductCard } from './product-card'
 
 export async function LatestCollection() {
-  let products: {
-    id: string
-    slug?: string
-    name: string
-    price: number
-    images: string[]
-    ratingAverage: number
-    ratingCount: number
-  }[] = []
-  try {
-    const raw = await prisma.product.findMany({
-      where: { active: true },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        price: true,
-        images: true,
-        ratingAverage: true,
-        ratingCount: true,
-      },
-    })
-    products = raw.map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      name: p.name,
-      price: p.price.toNumber(),
-      images: p.images,
-      ratingAverage: p.ratingAverage,
-      ratingCount: p.ratingCount,
-    }))
-  } catch {
-    // DB not connected
-  }
+  const raw = await prisma.product.findMany({
+    where: { active: true },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      price: true,
+      images: true,
+      ratingAverage: true,
+      ratingCount: true,
+    },
+  })
+  const products = raw.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    price: p.price.toNumber(),
+    images: p.images,
+    ratingAverage: p.ratingAverage,
+    ratingCount: p.ratingCount,
+  }))
 
   return (
     <section className="space-y-12">

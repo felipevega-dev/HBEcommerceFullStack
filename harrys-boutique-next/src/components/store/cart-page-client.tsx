@@ -1,12 +1,19 @@
 'use client'
 
-import { useCartStore } from '@/store/cart-store'
+import { getCartLineKey, useCartStore } from '@/store/cart-store'
 import Link from 'next/link'
 import Image from 'next/image'
+import {
+  DEFAULT_PRICING_SETTINGS,
+  calculateShippingForSubtotal,
+  type PricingSettings,
+} from '@/lib/checkout'
 
-const SHIPPING_FEE = 10
-
-export function CartPageClient() {
+export function CartPageClient({
+  pricingSettings = DEFAULT_PRICING_SETTINGS,
+}: {
+  pricingSettings?: PricingSettings
+}) {
   const { items, removeItem, updateQuantity, getTotal } = useCartStore()
 
   if (items.length === 0) {
@@ -42,7 +49,8 @@ export function CartPageClient() {
   }
 
   const subtotal = getTotal()
-  const total = subtotal + SHIPPING_FEE
+  const shippingFee = calculateShippingForSubtotal(subtotal, pricingSettings)
+  const total = subtotal + shippingFee
 
   return (
     <div className="flex flex-col border-t pt-14">
@@ -57,9 +65,9 @@ export function CartPageClient() {
             <div />
           </div>
 
-          {items.map((item, index) => (
+          {items.map((item) => (
             <div
-              key={`${item.productId}-${item.size}`}
+              key={getCartLineKey(item)}
               className="py-6 border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
             >
               <Link
@@ -101,7 +109,9 @@ export function CartPageClient() {
                     value={item.quantity}
                     onChange={(e) => {
                       const value = parseInt(e.target.value)
-                      if (value > 0) updateQuantity(item.productId, item.size, value)
+                      if (value > 0) {
+                        updateQuantity(item.productId, item.size, item.color, value)
+                      }
                     }}
                     className="w-16 px-2 py-1 border rounded-md focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none text-sm"
                   />
@@ -115,7 +125,7 @@ export function CartPageClient() {
               </div>
 
               <button
-                onClick={() => removeItem(item.productId, item.size)}
+                onClick={() => removeItem(item.productId, item.size, item.color)}
                 className="group p-2 hover:bg-red-50 rounded-full transition-colors"
                 title="Eliminar producto"
               >
@@ -147,7 +157,9 @@ export function CartPageClient() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Envío</span>
-              <span>${SHIPPING_FEE.toLocaleString('es-CL')}</span>
+              <span>
+                {shippingFee === 0 ? 'Gratis' : `$${shippingFee.toLocaleString('es-CL')}`}
+              </span>
             </div>
             <div className="flex justify-between font-semibold text-lg border-t pt-3">
               <span>Total</span>

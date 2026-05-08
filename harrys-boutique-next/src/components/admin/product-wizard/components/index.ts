@@ -1,6 +1,6 @@
 /**
  * Product Wizard Reusable Components
- * 
+ *
  * This directory contains reusable UI components used across multiple steps:
  * - ImageDropZone: Drag-and-drop file upload area
  * - ImageThumbnail: Image preview with delete button
@@ -17,5 +17,5 @@
 // export { CategoryCard } from './category-card';
 // export { SizeToggle } from './size-toggle';
 // export { ColorSwatch } from './color-swatch';
-export { Tooltip } from './tooltip';
-export { CharacterCounter } from './character-counter';
+export { Tooltip } from './tooltip'
+export { CharacterCounter } from './character-counter'

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
 
 const addItemSchema = z.object({
   productId: z.string().uuid(),
@@ -49,6 +49,14 @@ export async function POST(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'cart:mutate',
+    maxRequests: 60,
+    windowMs: 5 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, addItemSchema)
   if (validationError) return validationError
 
@@ -64,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     // Check if item already exists
     const existing = await prisma.cartItem.findFirst({
-      where: { cartId: cart.id, productId, size },
+      where: { cartId: cart.id, productId, size, color },
     })
 
     if (existing) {
@@ -97,20 +105,41 @@ export async function PUT(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'cart:mutate',
+    maxRequests: 60,
+    windowMs: 5 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, updateItemSchema)
   if (validationError) return validationError
 
   try {
+    const userId = session!.user.id
     const { cartItemId, quantity } = data!
 
+    const cartItem = await prisma.cartItem.findFirst({
+      where: { id: cartItemId, cart: { userId } },
+      select: { id: true },
+    })
+
+    if (!cartItem) {
+      return NextResponse.json(
+        { success: false, message: 'Item de carrito no encontrado' },
+        { status: 404 },
+      )
+    }
+
     if (quantity === 0) {
-      await prisma.cartItem.delete({ where: { id: cartItemId } })
+      await prisma.cartItem.delete({ where: { id: cartItem.id } })
     } else {
-      await prisma.cartItem.update({ where: { id: cartItemId }, data: { quantity } })
+      await prisma.cartItem.update({ where: { id: cartItem.id }, data: { quantity } })
     }
 
     const cart = await prisma.cart.findUnique({
-      where: { userId: session!.user.id },
+      where: { userId },
       include: {
         items: {
           include: { product: { select: { id: true, name: true, price: true, images: true } } },
@@ -127,6 +156,14 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'cart:mutate',
+    maxRequests: 60,
+    windowMs: 5 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
 
   try {
     await prisma.cart.deleteMany({ where: { userId: session!.user.id } })

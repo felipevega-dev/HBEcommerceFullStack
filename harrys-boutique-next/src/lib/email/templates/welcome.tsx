@@ -23,7 +23,16 @@ export function WelcomeEmail({ name, frontendUrl }: WelcomeEmailProps) {
       <Body style={{ backgroundColor: '#fdfaf7', fontFamily: "'Helvetica Neue', sans-serif" }}>
         <Container style={{ maxWidth: '600px', margin: '0 auto', padding: '0 0 24px' }}>
           <div style={{ backgroundColor: '#1a1a1a', padding: '24px 32px', textAlign: 'center' }}>
-            <Heading style={{ color: '#ffffff', fontSize: '22px', fontWeight: '700', margin: 0, letterSpacing: '2px', textTransform: 'uppercase' }}>
+            <Heading
+              style={{
+                color: '#ffffff',
+                fontSize: '22px',
+                fontWeight: '700',
+                margin: 0,
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+              }}
+            >
               Harry&apos;s Boutique
             </Heading>
           </div>
@@ -53,7 +62,9 @@ export function WelcomeEmail({ name, frontendUrl }: WelcomeEmailProps) {
             </Button>
           </div>
           <Hr style={{ borderColor: '#e8ddd5' }} />
-          <Text style={{ color: '#9e8e84', fontSize: '12px', textAlign: 'center', padding: '0 32px' }}>
+          <Text
+            style={{ color: '#9e8e84', fontSize: '12px', textAlign: 'center', padding: '0 32px' }}
+          >
             © {new Date().getFullYear()} Harry&apos;s Boutique — Ropa y accesorios para mascotas
           </Text>
         </Container>

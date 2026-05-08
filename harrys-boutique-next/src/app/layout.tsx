@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Playfair_Display } from 'next/font/google'
 import { Providers } from '@/components/providers'
+import { getSiteOrigin } from '@/lib/site'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-body' })
@@ -11,6 +12,7 @@ const playfairDisplay = Playfair_Display({
 })
 
 export const metadata: Metadata = {
+  metadataBase: getSiteOrigin(),
   title: "Harry's Boutique — Ropa y accesorios para mascotas",
   description: 'Descubre nuestra colección de ropa y accesorios para tu mascota.',
   openGraph: {

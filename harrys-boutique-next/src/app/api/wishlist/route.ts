@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
 
 const wishlistSchema = z.object({ productId: z.string().uuid() })
 
@@ -10,6 +10,18 @@ export async function GET(req: NextRequest) {
   if (error) return error
 
   try {
+    const { searchParams } = new URL(req.url)
+
+    if (searchParams.get('idsOnly') === 'true') {
+      const items = await prisma.wishlist.findMany({
+        where: { userId: session!.user.id },
+        select: { productId: true },
+        orderBy: { createdAt: 'desc' },
+      })
+
+      return NextResponse.json({ success: true, productIds: items.map((item) => item.productId) })
+    }
+
     const wishlist = await prisma.wishlist.findMany({
       where: { userId: session!.user.id },
       include: {
@@ -29,6 +41,14 @@ export async function POST(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'wishlist:mutate',
+    maxRequests: 40,
+    windowMs: 5 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, wishlistSchema)
   if (validationError) return validationError
 
@@ -47,6 +67,14 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const { error, session } = await requireAuth(req)
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'wishlist:mutate',
+    maxRequests: 40,
+    windowMs: 5 * 60 * 1000,
+    keySuffix: session!.user.id,
+  })
+  if (protectionError) return protectionError
 
   const { searchParams } = new URL(req.url)
   const productId = searchParams.get('productId')

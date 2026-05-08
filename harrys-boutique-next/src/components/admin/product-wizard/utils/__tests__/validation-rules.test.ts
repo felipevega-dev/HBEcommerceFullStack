@@ -11,7 +11,7 @@ import {
   validateStep5SizesColors,
   validateStep6Options,
   validateImageFile,
-  validateWizardStep
+  validateWizardStep,
 } from '../validation-rules'
 import type { ProductData } from '../../types'
 
@@ -49,7 +49,7 @@ describe('validateStep2BasicInfo', () => {
   it('should pass with valid name and description', () => {
     const result = validateStep2BasicInfo(
       'Collar para Perro',
-      'Collar ajustable de nylon resistente'
+      'Collar ajustable de nylon resistente',
     )
     expect(result.valid).toBe(true)
     expect(result.errors).toHaveLength(0)
@@ -58,27 +58,27 @@ describe('validateStep2BasicInfo', () => {
   it('should fail with name too short', () => {
     const result = validateStep2BasicInfo('AB', 'Valid description here')
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'name')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'name')).toBe(true)
   })
 
   it('should fail with name too long', () => {
     const longName = 'A'.repeat(101)
     const result = validateStep2BasicInfo(longName, 'Valid description')
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'name')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'name')).toBe(true)
   })
 
   it('should fail with description too short', () => {
     const result = validateStep2BasicInfo('Valid Name', 'Short')
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'description')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'description')).toBe(true)
   })
 
   it('should fail with description too long', () => {
     const longDesc = 'A'.repeat(501)
     const result = validateStep2BasicInfo('Valid Name', longDesc)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'description')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'description')).toBe(true)
   })
 
   it('should trim whitespace when validating', () => {
@@ -104,31 +104,31 @@ describe('validateStep3Pricing', () => {
   it('should fail with price of 0', () => {
     const result = validateStep3Pricing(0, false)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'price')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'price')).toBe(true)
   })
 
   it('should fail with negative price', () => {
     const result = validateStep3Pricing(-100, false)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'price')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'price')).toBe(true)
   })
 
   it('should fail when discount enabled but no original price', () => {
     const result = validateStep3Pricing(2500, true)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'originalPrice')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'originalPrice')).toBe(true)
   })
 
   it('should fail when original price is less than sale price', () => {
     const result = validateStep3Pricing(3500, true, 2500)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'originalPrice')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'originalPrice')).toBe(true)
   })
 
   it('should fail when original price equals sale price', () => {
     const result = validateStep3Pricing(2500, true, 2500)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'originalPrice')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'originalPrice')).toBe(true)
   })
 })
 
@@ -142,13 +142,13 @@ describe('validateStep4Category', () => {
   it('should fail with empty category', () => {
     const result = validateStep4Category('', 'collars')
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'categoryId')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'categoryId')).toBe(true)
   })
 
   it('should fail with empty subcategory', () => {
     const result = validateStep4Category('dogs', '')
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'subCategory')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'subCategory')).toBe(true)
   })
 
   it('should fail with both empty', () => {
@@ -168,13 +168,13 @@ describe('validateStep5SizesColors', () => {
   it('should fail with no sizes', () => {
     const result = validateStep5SizesColors([], ['black'])
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'sizes')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'sizes')).toBe(true)
   })
 
   it('should fail with no colors', () => {
     const result = validateStep5SizesColors(['M'], [])
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'colors')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'colors')).toBe(true)
   })
 
   it('should fail with both empty', () => {
@@ -200,13 +200,13 @@ describe('validateStep6Options', () => {
   it('should fail with negative stock', () => {
     const result = validateStep6Options(-5)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'stock')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'stock')).toBe(true)
   })
 
   it('should fail with non-integer stock', () => {
     const result = validateStep6Options(15.5)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.field === 'stock')).toBe(true)
+    expect(result.errors.some((e) => e.field === 'stock')).toBe(true)
   })
 })
 
@@ -236,7 +236,7 @@ describe('validateImageFile', () => {
     const file = new File(['content'], 'document.pdf', { type: 'application/pdf' })
     const result = validateImageFile(file)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.message.includes('JPG, PNG, WEBP'))).toBe(true)
+    expect(result.errors.some((e) => e.message.includes('JPG, PNG, WEBP'))).toBe(true)
   })
 
   it('should fail with file larger than 5MB', () => {
@@ -244,7 +244,7 @@ describe('validateImageFile', () => {
     const file = new File([largeContent], 'large.jpg', { type: 'image/jpeg' })
     const result = validateImageFile(file)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(e => e.message.includes('5MB'))).toBe(true)
+    expect(result.errors.some((e) => e.message.includes('5MB'))).toBe(true)
   })
 })
 
@@ -262,7 +262,7 @@ describe('validateWizardStep', () => {
     colors: ['black'],
     stock: 10,
     bestSeller: false,
-    active: true
+    active: true,
   }
 
   it('should validate step 1 correctly', () => {

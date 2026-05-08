@@ -23,7 +23,7 @@ const createMockProductData = (overrides?: Partial<ProductData>): ProductData =>
   stock: 10,
   bestSeller: false,
   active: true,
-  ...overrides
+  ...overrides,
 })
 
 describe('useValidation', () => {
@@ -56,7 +56,7 @@ describe('useValidation', () => {
 
     it('should fail validation with more than 4 images', () => {
       const productData = createMockProductData({
-        images: ['img1.jpg', 'img2.jpg', 'img3.jpg', 'img4.jpg', 'img5.jpg']
+        images: ['img1.jpg', 'img2.jpg', 'img3.jpg', 'img4.jpg', 'img5.jpg'],
       })
       const { result } = renderHook(() => useValidation(1, productData))
 
@@ -108,13 +108,13 @@ describe('useValidation', () => {
 
       expect(isValid).toBe(false)
       expect(result.current.errors.description).toBe(
-        'La descripción debe tener al menos 10 caracteres (sin contar espacios al inicio o final)'
+        'La descripción debe tener al menos 10 caracteres (sin contar espacios al inicio o final)',
       )
     })
 
     it('should fail validation with name over 100 characters', () => {
       const productData = createMockProductData({
-        name: 'A'.repeat(101)
+        name: 'A'.repeat(101),
       })
       const { result } = renderHook(() => useValidation(2, productData))
 
@@ -129,7 +129,7 @@ describe('useValidation', () => {
 
     it('should fail validation with description over 500 characters', () => {
       const productData = createMockProductData({
-        description: 'A'.repeat(501)
+        description: 'A'.repeat(501),
       })
       const { result } = renderHook(() => useValidation(2, productData))
 
@@ -139,7 +139,9 @@ describe('useValidation', () => {
       })
 
       expect(isValid).toBe(false)
-      expect(result.current.errors.description).toBe('La descripción no puede superar los 500 caracteres')
+      expect(result.current.errors.description).toBe(
+        'La descripción no puede superar los 500 caracteres',
+      )
     })
   })
 
@@ -174,7 +176,7 @@ describe('useValidation', () => {
       const productData = createMockProductData({
         price: 80,
         hasDiscount: true,
-        originalPrice: 100
+        originalPrice: 100,
       })
       const { result } = renderHook(() => useValidation(3, productData))
 
@@ -191,7 +193,7 @@ describe('useValidation', () => {
       const productData = createMockProductData({
         price: 80,
         hasDiscount: true,
-        originalPrice: undefined
+        originalPrice: undefined,
       })
       const { result } = renderHook(() => useValidation(3, productData))
 
@@ -201,14 +203,16 @@ describe('useValidation', () => {
       })
 
       expect(isValid).toBe(false)
-      expect(result.current.errors.originalPrice).toBe('El precio original es requerido cuando hay descuento')
+      expect(result.current.errors.originalPrice).toBe(
+        'El precio original es requerido cuando hay descuento',
+      )
     })
 
     it('should fail validation when original price is not greater than selling price', () => {
       const productData = createMockProductData({
         price: 100,
         hasDiscount: true,
-        originalPrice: 90
+        originalPrice: 90,
       })
       const { result } = renderHook(() => useValidation(3, productData))
 
@@ -218,7 +222,9 @@ describe('useValidation', () => {
       })
 
       expect(isValid).toBe(false)
-      expect(result.current.errors.originalPrice).toBe('El precio original debe ser mayor al precio de venta')
+      expect(result.current.errors.originalPrice).toBe(
+        'El precio original debe ser mayor al precio de venta',
+      )
     })
   })
 
@@ -405,7 +411,9 @@ describe('useValidation', () => {
         result.current.validateStep()
       })
 
-      expect(result.current.getFieldError('name')).toBe('El nombre debe tener al menos 3 caracteres')
+      expect(result.current.getFieldError('name')).toBe(
+        'El nombre debe tener al menos 3 caracteres',
+      )
       expect(result.current.getFieldError('description')).toBeUndefined()
     })
 
@@ -452,7 +460,7 @@ describe('useValidation', () => {
       // Create mock element
       const mockElement = {
         focus: vi.fn(),
-        scrollIntoView: vi.fn()
+        scrollIntoView: vi.fn(),
       } as unknown as HTMLElement
 
       act(() => {
@@ -470,7 +478,7 @@ describe('useValidation', () => {
       expect(mockElement.focus).toHaveBeenCalled()
       expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
       })
     })
 
@@ -496,7 +504,7 @@ describe('useValidation', () => {
 
       const mockElement = {
         focus: vi.fn(),
-        scrollIntoView: vi.fn()
+        scrollIntoView: vi.fn(),
       } as unknown as HTMLElement
 
       act(() => {

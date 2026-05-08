@@ -8,9 +8,10 @@ interface FormState {
   email: string
   asunto: string
   mensaje: string
+  website: string
 }
 
-const EMPTY_FORM: FormState = { nombre: '', email: '', asunto: '', mensaje: '' }
+const EMPTY_FORM: FormState = { nombre: '', email: '', asunto: '', mensaje: '', website: '' }
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -31,6 +32,9 @@ export default function ContactForm() {
     }
     if (!form.asunto.trim()) newErrors.asunto = 'El asunto es requerido'
     if (!form.mensaje.trim()) newErrors.mensaje = 'El mensaje es requerido'
+    if (form.mensaje.trim().length > 0 && form.mensaje.trim().length < 10) {
+      newErrors.mensaje = 'El mensaje debe tener al menos 10 caracteres'
+    }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -47,11 +51,27 @@ export default function ContactForm() {
     e.preventDefault()
     if (!validate()) return
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setLoading(false)
-    toast.success('¡Mensaje enviado! Te responderemos pronto.')
-    setForm(EMPTY_FORM)
-    setErrors({})
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        toast.error(data.message ?? 'No se pudo enviar el mensaje')
+        return
+      }
+
+      toast.success('Mensaje enviado. Te responderemos pronto.')
+      setForm(EMPTY_FORM)
+      setErrors({})
+    } catch {
+      toast.error('No se pudo enviar el mensaje')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const inputClass =
@@ -59,6 +79,16 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <input
+        type="text"
+        name="website"
+        value={form.website}
+        onChange={handleChange}
+        className="hidden"
+        tabIndex={-1}
+        autoComplete="off"
+      />
+
       <div>
         <label
           htmlFor="nombre"

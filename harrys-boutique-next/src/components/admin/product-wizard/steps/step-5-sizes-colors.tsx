@@ -30,7 +30,7 @@ const COLORS = [
 
 /**
  * Step 5: Sizes and Colors
- * 
+ *
  * Multi-select for product sizes and colors with visual feedback.
  * Features:
  * - Size toggle buttons
@@ -43,9 +43,7 @@ export function Step5SizesColors({ productData, updateField, errors = {} }: Step
   const { sizes = [], colors = [] } = productData
 
   const toggleSize = (size: string) => {
-    const newSizes = sizes.includes(size)
-      ? sizes.filter((s) => s !== size)
-      : [...sizes, size]
+    const newSizes = sizes.includes(size) ? sizes.filter((s) => s !== size) : [...sizes, size]
     updateField('sizes', newSizes)
   }
 
@@ -99,9 +97,7 @@ export function Step5SizesColors({ productData, updateField, errors = {} }: Step
         </div>
 
         {/* Selection Counter */}
-        <p className="mt-2 text-sm text-gray-600">
-          {formatSelectionCount(sizes.length, 'talla')}
-        </p>
+        <p className="mt-2 text-sm text-gray-600">{formatSelectionCount(sizes.length, 'talla')}</p>
 
         {/* Error Message */}
         {errors.sizes && (
@@ -136,9 +132,7 @@ export function Step5SizesColors({ productData, updateField, errors = {} }: Step
                 type="button"
                 onClick={() => toggleColor(color.id)}
                 className={`relative p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                  isSelected
-                    ? 'border-black bg-gray-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                  isSelected ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -147,7 +141,7 @@ export function Step5SizesColors({ productData, updateField, errors = {} }: Step
                     className="w-12 h-12 rounded-full border-2 border-gray-300"
                     style={{ backgroundColor: color.hex }}
                   />
-                  
+
                   {/* Color Name */}
                   <span className="text-sm font-medium text-gray-900">{color.name}</span>
                 </div>
@@ -170,9 +164,7 @@ export function Step5SizesColors({ productData, updateField, errors = {} }: Step
         </div>
 
         {/* Selection Counter */}
-        <p className="mt-2 text-sm text-gray-600">
-          {formatSelectionCount(colors.length, 'color')}
-        </p>
+        <p className="mt-2 text-sm text-gray-600">{formatSelectionCount(colors.length, 'color')}</p>
 
         {/* Error Message */}
         {errors.colors && (

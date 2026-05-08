@@ -33,8 +33,8 @@ export function PasswordResetEmail({ name, resetUrl }: PasswordResetEmailProps) 
               Hola, {name}
             </Heading>
             <Text style={{ color: '#6b5c52', lineHeight: '1.6' }}>
-              Recibimos una solicitud para restablecer la contraseña de tu cuenta. Este enlace
-              vence en {PASSWORD_RESET_TOKEN_TTL_MINUTES} minutos.
+              Recibimos una solicitud para restablecer la contraseña de tu cuenta. Este enlace vence
+              en {PASSWORD_RESET_TOKEN_TTL_MINUTES} minutos.
             </Text>
             <Button
               href={resetUrl}
@@ -52,12 +52,16 @@ export function PasswordResetEmail({ name, resetUrl }: PasswordResetEmailProps) 
             >
               Restablecer contraseña
             </Button>
-            <Text style={{ color: '#9e8e84', fontSize: '13px', lineHeight: '1.6', marginTop: '24px' }}>
+            <Text
+              style={{ color: '#9e8e84', fontSize: '13px', lineHeight: '1.6', marginTop: '24px' }}
+            >
               Si no solicitaste este cambio, puedes ignorar este correo.
             </Text>
           </div>
           <Hr style={{ borderColor: '#e8ddd5' }} />
-          <Text style={{ color: '#9e8e84', fontSize: '12px', textAlign: 'center', padding: '0 32px' }}>
+          <Text
+            style={{ color: '#9e8e84', fontSize: '12px', textAlign: 'center', padding: '0 32px' }}
+          >
             © {new Date().getFullYear()} Harry&apos;s Boutique
           </Text>
         </Container>

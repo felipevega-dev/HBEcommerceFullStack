@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
 import { validateImageFile } from '../utils/validation-rules'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { ImageOptimizer } from '@/components/admin/image-optimizer'
 
 interface Step1PhotosProps {
   productData: ProductData
@@ -14,7 +15,7 @@ interface Step1PhotosProps {
 
 /**
  * Step 1: Photo Upload
- * 
+ *
  * Allows users to upload up to 4 product images with drag-and-drop support.
  * Features:
  * - Drag and drop zone
@@ -26,71 +27,90 @@ interface Step1PhotosProps {
 export function Step1Photos({ productData, updateField, errors = {} }: Step1PhotosProps) {
   const images = productData.images || []
   const maxImages = 4
+  const [showOptimizer, setShowOptimizer] = useState(false)
 
-  const handleFileSelect = useCallback((files: FileList | null) => {
-    if (!files || files.length === 0) return
+  const handleFileSelect = useCallback(
+    (files: FileList | null) => {
+      if (!files || files.length === 0) return
 
-    const newFiles: File[] = []
-    const fileErrors: string[] = []
+      const newFiles: File[] = []
+      const fileErrors: string[] = []
 
-    // Validate each file
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const validation = validateImageFile(file)
-      
-      if (validation.valid) {
-        newFiles.push(file)
-      } else {
-        fileErrors.push(validation.errors[0]?.message || 'Error al validar imagen')
-      }
-    }
+      // Validate each file
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const validation = validateImageFile(file)
 
-    if (fileErrors.length > 0) {
-      alert(fileErrors.join('\n'))
-    }
-
-    if (newFiles.length > 0) {
-      const currentImages = images as (string[] | File[]) | undefined
-      const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
-      const totalImages = existing.length + newFiles.length
-
-      if (totalImages > maxImages) {
-        alert(`Solo podés subir hasta ${maxImages} imágenes. Seleccionaste ${totalImages}.`)
-        return
+        if (validation.valid) {
+          newFiles.push(file)
+        } else {
+          fileErrors.push(validation.errors[0]?.message || 'Error al validar imagen')
+        }
       }
 
-      if (existing.length === 0 || typeof existing[0] === 'object') {
-        updateField('images', [...(existing as File[]), ...newFiles])
-      } else {
-        updateField('images', [...(existing as string[]), ...newFiles.map(f => f.name)])
+      if (fileErrors.length > 0) {
+        alert(fileErrors.join('\n'))
       }
-    }
-  }, [images, updateField])
 
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    handleFileSelect(e.dataTransfer.files)
-  }, [handleFileSelect])
+      if (newFiles.length > 0) {
+        const currentImages = images as (string[] | File[]) | undefined
+        const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
+        const totalImages = existing.length + newFiles.length
+
+        if (totalImages > maxImages) {
+          alert(`Solo podés subir hasta ${maxImages} imágenes. Seleccionaste ${totalImages}.`)
+          return
+        }
+
+        if (existing.length === 0 || typeof existing[0] === 'object') {
+          updateField('images', [...(existing as File[]), ...newFiles])
+        } else {
+          updateField('images', [...(existing as string[]), ...newFiles.map((f) => f.name)])
+        }
+      }
+    },
+    [images, updateField],
+  )
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      e.stopPropagation()
+      handleFileSelect(e.dataTransfer.files)
+    },
+    [handleFileSelect],
+  )
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
   }, [])
 
-  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileSelect(e.target.files)
-  }, [handleFileSelect])
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleFileSelect(e.target.files)
+    },
+    [handleFileSelect],
+  )
 
-  const handleDeleteImage = useCallback((index: number) => {
-    const currentImages = images as (string[] | File[]) | undefined
-    const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
-    if (existing.length === 0 || typeof existing[0] === 'object') {
-      updateField('images', (existing as File[]).filter((_, i) => i !== index))
-    } else {
-      updateField('images', (existing as string[]).filter((_, i) => i !== index))
-    }
-  }, [images, updateField])
+  const handleDeleteImage = useCallback(
+    (index: number) => {
+      const currentImages = images as (string[] | File[]) | undefined
+      const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
+      if (existing.length === 0 || typeof existing[0] === 'object') {
+        updateField(
+          'images',
+          (existing as File[]).filter((_, i) => i !== index),
+        )
+      } else {
+        updateField(
+          'images',
+          (existing as string[]).filter((_, i) => i !== index),
+        )
+      }
+    },
+    [images, updateField],
+  )
 
   const getImageUrl = (image: File | string): string => {
     if (typeof image === 'string') {
@@ -107,9 +127,7 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
           <BrandIcon name="camera" className="mr-2 h-5 w-5" />
           Fotos del Producto
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Subí hasta 4 imágenes de tu producto
-        </p>
+        <p className="mt-1 text-sm text-gray-500">Subí hasta 4 imágenes de tu producto</p>
       </div>
 
       {/* Drop Zone */}
@@ -181,12 +199,7 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
                   className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600"
                   aria-label="Eliminar imagen"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -206,6 +219,37 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
             ))}
           </div>
         </div>
+      )}
+
+      {/* Optimizer Toggle */}
+      {images.length > 0 && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowOptimizer(!showOptimizer)}
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {showOptimizer ? 'Cerrar optimizador' : 'Optimizar imágenes'}
+          </button>
+        </div>
+      )}
+
+      {/* Image Optimizer */}
+      {showOptimizer && images.length > 0 && (
+        <ImageOptimizer
+          images={images}
+          onImagesChange={(processedImages) => {
+            updateField('images', processedImages as ProductData['images'])
+          }}
+        />
       )}
 
       {/* Validation Error */}

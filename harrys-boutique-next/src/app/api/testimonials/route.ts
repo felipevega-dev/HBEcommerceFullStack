@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -27,14 +27,21 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
 
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:testimonials:create',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   const { data, error: validationError } = await validateBody(req, createSchema)
   if (validationError) return validationError
 
   try {
     const maxOrder = await prisma.testimonial.aggregate({ _max: { order: true } })
     const testimonial = await prisma.testimonial.create({
-      data: { 
-        ...data!, 
+      data: {
+        ...data!,
         order: (maxOrder._max.order ?? 0) + 1,
         status: data!.status ?? 'PENDING',
       },

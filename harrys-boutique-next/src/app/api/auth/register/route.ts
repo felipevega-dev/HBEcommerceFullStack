@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/email'
 import { WelcomeEmail } from '@/lib/email/templates/welcome'
 import React from 'react'
+import { getSiteUrl } from '@/lib/site'
+import { protectMutation } from '@/lib/api-utils'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -17,6 +19,13 @@ const registerSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'auth:register',
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   try {
     const body = await req.json()
     const parsed = registerSchema.safeParse(body)
@@ -51,7 +60,7 @@ export async function POST(req: NextRequest) {
       subject: "¡Bienvenido a Harry's Boutique!",
       react: React.createElement(WelcomeEmail, {
         name,
-        frontendUrl: process.env.NEXT_PUBLIC_FRONTEND_URL ?? 'http://localhost:3000',
+        frontendUrl: getSiteUrl(),
       }),
     })
 

@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/email'
 import { PasswordResetEmail } from '@/lib/email/templates/password-reset'
 import { createPasswordResetToken, getPasswordResetExpiry } from '@/lib/auth/password-reset'
+import { getSiteUrl } from '@/lib/site'
+import { protectMutation } from '@/lib/api-utils'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),
@@ -16,6 +18,13 @@ const genericResponse = {
 }
 
 export async function POST(req: NextRequest) {
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'auth:forgot-password',
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
+
   try {
     const body = await req.json()
     const parsed = forgotPasswordSchema.safeParse(body)
@@ -44,7 +53,7 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL ?? 'http://localhost:3000'
+    const frontendUrl = getSiteUrl()
     const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(token)}`
 
     await sendEmail({

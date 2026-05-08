@@ -44,7 +44,7 @@ const SUBCATEGORY_ICONS: Record<string, BrandIconName> = {
 
 /**
  * Step 4: Category Selection
- * 
+ *
  * Visual category and subcategory selection with icons.
  * Features:
  * - Main category cards with pet icons
@@ -53,7 +53,12 @@ const SUBCATEGORY_ICONS: Record<string, BrandIconName> = {
  * - Automatic subcategory clearing on category change
  * - Fetches categories from API
  */
-export function Step4Category({ productData, updateField, errors = {}, categories: propCategories }: Step4CategoryProps) {
+export function Step4Category({
+  productData,
+  updateField,
+  errors = {},
+  categories: propCategories,
+}: Step4CategoryProps) {
   const { categoryId = '', subCategory = '' } = productData
   const [categories, setCategories] = useState<any[]>(propCategories || [])
   const [loading, setLoading] = useState(!propCategories)
@@ -70,7 +75,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
       setLoading(true)
       const response = await fetch('/api/categories')
       const data = await response.json()
-      
+
       if (data.success && data.categories) {
         setCategories(data.categories)
       }
@@ -94,7 +99,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
   }
 
   // Get selected category object
-  const selectedCategory = categories.find(cat => cat.id === categoryId)
+  const selectedCategory = categories.find((cat) => cat.id === categoryId)
   const selectedSubcategories = selectedCategory?.subcategories || []
 
   // Get icon for category name
@@ -117,9 +122,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
             <BrandIcon name="tag" className="mr-2 h-5 w-5" />
             Categoría
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Cargando categorías...
-          </p>
+          <p className="mt-1 text-sm text-gray-500">Cargando categorías...</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
@@ -163,7 +166,10 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
               }`}
             >
               <div className="flex flex-col items-center gap-2">
-                <BrandIcon name={getCategoryIcon(category.name)} className="h-9 w-9 text-gray-700" />
+                <BrandIcon
+                  name={getCategoryIcon(category.name)}
+                  className="h-9 w-9 text-gray-700"
+                />
                 <span className="text-sm font-medium text-gray-900">{category.name}</span>
               </div>
 
@@ -201,9 +207,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
       {/* Subcategories (conditional) */}
       {categoryId && selectedSubcategories.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Subcategoría *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Subcategoría *</label>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {selectedSubcategories.map((subcategory: string) => (
@@ -218,8 +222,13 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
-                  <BrandIcon name={getSubcategoryIcon(subcategory)} className="h-7 w-7 text-gray-700" />
-                  <span className="text-sm font-medium text-gray-900 capitalize">{subcategory}</span>
+                  <BrandIcon
+                    name={getSubcategoryIcon(subcategory)}
+                    className="h-7 w-7 text-gray-700"
+                  />
+                  <span className="text-sm font-medium text-gray-900 capitalize">
+                    {subcategory}
+                  </span>
                 </div>
 
                 {/* Checkmark */}
@@ -231,7 +240,7 @@ export function Step4Category({ productData, updateField, errors = {}, categorie
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                         clipRule="evenodd"
                       />
-                  </svg>
+                    </svg>
                   </div>
                 )}
               </button>

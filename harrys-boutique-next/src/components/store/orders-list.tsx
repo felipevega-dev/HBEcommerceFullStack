@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import type { OrderStatus } from '@prisma/client'
+import { SHIPPING_FEE } from '@/lib/commerce'
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: 'Pendiente',
@@ -19,8 +20,6 @@ const STATUS_DOT_COLORS: Record<OrderStatus, string> = {
   DELIVERED: 'bg-purple-500',
   CANCELLED: 'bg-red-500',
 }
-
-const SHIPPING_FEE = 10
 
 interface OrderItem {
   id: string

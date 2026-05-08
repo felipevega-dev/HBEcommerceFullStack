@@ -170,9 +170,18 @@ export function HeroManager({ slides: initial, products }: Props) {
             <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+                <div
+                  className="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full blur-3xl animate-pulse"
+                  style={{ animationDelay: '1s' }}
+                />
               </div>
-              <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+              <div
+                className="absolute inset-0 opacity-5"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+                  backgroundSize: '30px 30px',
+                }}
+              />
             </div>
 
             {/* Imagen centrada */}
@@ -217,8 +226,18 @@ export function HeroManager({ slides: initial, products }: Props) {
               onClick={() => setPreviewSlide(null)}
               className="absolute top-4 right-4 bg-white/10 backdrop-blur-md hover:bg-white/20 rounded-full p-3 transition-colors z-10"
             >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </motion.div>
@@ -228,11 +247,24 @@ export function HeroManager({ slides: initial, products }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
         <div>
-          <form onSubmit={handleCreate} className="bg-white rounded-xl border shadow-sm p-6 space-y-5">
+          <form
+            onSubmit={handleCreate}
+            className="bg-white rounded-xl border shadow-sm p-6 space-y-5"
+          >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
               </div>
               <h2 className="text-lg font-semibold">Añadir nuevo slide</h2>
@@ -293,8 +325,19 @@ export function HeroManager({ slides: initial, products }: Props) {
               {saving ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                   Añadiendo...
                 </span>
@@ -305,156 +348,206 @@ export function HeroManager({ slides: initial, products }: Props) {
           </form>
         </div>
 
-      {/* Slides list */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              </svg>
+        {/* Slides list */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Slides actuales</h2>
+                <p className="text-sm text-gray-500">
+                  {slides.length} slide{slides.length !== 1 ? 's' : ''} configurado
+                  {slides.length !== 1 ? 's' : ''}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold">Slides actuales</h2>
-              <p className="text-sm text-gray-500">{slides.length} slide{slides.length !== 1 ? 's' : ''} configurado{slides.length !== 1 ? 's' : ''}</p>
-            </div>
+            {slides.length > 1 && (
+              <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
+                Arrastra para reordenar
+              </div>
+            )}
           </div>
-          {slides.length > 1 && (
-            <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
-              Arrastra para reordenar
+
+          {slides.length === 0 && (
+            <div className="bg-white rounded-xl border-2 border-dashed p-12 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-500 font-medium">No hay slides configurados</p>
+              <p className="text-sm text-gray-400 mt-1">
+                Añade tu primer slide usando el formulario
+              </p>
             </div>
           )}
-        </div>
 
-        {slides.length === 0 && (
-          <div className="bg-white rounded-xl border-2 border-dashed p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <p className="text-gray-500 font-medium">No hay slides configurados</p>
-            <p className="text-sm text-gray-400 mt-1">Añade tu primer slide usando el formulario</p>
-          </div>
-        )}
-
-        <Reorder.Group axis="y" values={slides} onReorder={handleReorder} className="space-y-3">
-          {slides.map((slide, index) => (
-            <Reorder.Item
-              key={slide.id}
-              value={slide}
-              className="bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <div className="flex gap-4 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                    </svg>
-                  </div>
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">
-                    {index + 1}
-                  </div>
-                </div>
-                <div
-                  className="relative w-40 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 cursor-pointer group"
-                  onClick={() => setPreviewSlide(index)}
-                >
-                  <Image
-                    src={slide.image}
-                    alt={slide.title}
-                    fill
-                    sizes="160px"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  {editingId === slide.id ? (
-                    <div className="space-y-2">
-                      <input
-                        value={editForm.title}
-                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                        className={inputClass}
-                        placeholder="Título"
-                      />
-                      <input
-                        value={editForm.subtitle}
-                        onChange={(e) => setEditForm({ ...editForm, subtitle: e.target.value })}
-                        className={inputClass}
-                        placeholder="Subtítulo"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleSaveEdit(slide.id)}
-                          className="px-4 py-2 bg-black text-white rounded-lg text-xs font-medium hover:bg-gray-800"
-                        >
-                          Guardar
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="px-4 py-2 border rounded-lg text-xs font-medium hover:bg-gray-50"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
+          <Reorder.Group axis="y" values={slides} onReorder={handleReorder} className="space-y-3">
+            {slides.map((slide, index) => (
+              <Reorder.Item
+                key={slide.id}
+                value={slide}
+                className="bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <div className="flex gap-4 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 8h16M4 16h16"
+                        />
+                      </svg>
                     </div>
-                  ) : (
-                    <>
-                      <p className="font-semibold truncate text-gray-900">{slide.title}</p>
-                      <p className="text-sm text-gray-600 truncate mt-0.5">{slide.subtitle}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs text-gray-400">Producto:</span>
-                        <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                          {slide.product.name}
-                        </span>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600">
+                      {index + 1}
+                    </div>
+                  </div>
+                  <div
+                    className="relative w-40 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 cursor-pointer group"
+                    onClick={() => setPreviewSlide(index)}
+                  >
+                    <Image
+                      src={slide.image}
+                      alt={slide.title}
+                      fill
+                      sizes="160px"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                      <svg
+                        className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {editingId === slide.id ? (
+                      <div className="space-y-2">
+                        <input
+                          value={editForm.title}
+                          onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                          className={inputClass}
+                          placeholder="Título"
+                        />
+                        <input
+                          value={editForm.subtitle}
+                          onChange={(e) => setEditForm({ ...editForm, subtitle: e.target.value })}
+                          className={inputClass}
+                          placeholder="Subtítulo"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSaveEdit(slide.id)}
+                            className="px-4 py-2 bg-black text-white rounded-lg text-xs font-medium hover:bg-gray-800"
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            onClick={() => setEditingId(null)}
+                            className="px-4 py-2 border rounded-lg text-xs font-medium hover:bg-gray-50"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={() => handleEdit(slide)}
-                          className="px-3 py-1.5 text-xs font-medium border rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <span className="inline-flex items-center gap-1">
-                            <BrandIcon name="edit" className="h-3 w-3" />
-                            Editar
+                    ) : (
+                      <>
+                        <p className="font-semibold truncate text-gray-900">{slide.title}</p>
+                        <p className="text-sm text-gray-600 truncate mt-0.5">{slide.subtitle}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs text-gray-400">Producto:</span>
+                          <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                            {slide.product.name}
                           </span>
-                        </button>
-                        <button
-                          onClick={() => setPreviewSlide(index)}
-                          className="px-3 py-1.5 text-xs font-medium border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-                        >
-                          <span className="inline-flex items-center gap-1">
-                            <BrandIcon name="eye" className="h-3 w-3" />
-                            Vista previa
-                          </span>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(slide.id)}
-                          disabled={deleting === slide.id}
-                          className="px-3 py-1.5 text-xs font-medium border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <span className="inline-flex items-center gap-1">
-                            <BrandIcon
-                              name={deleting === slide.id ? 'loader' : 'trash'}
-                              className={`h-3 w-3 ${deleting === slide.id ? 'animate-spin' : ''}`}
-                            />
-                            {deleting === slide.id ? 'Eliminando...' : 'Eliminar'}
-                          </span>
-                        </button>
-                      </div>
-                    </>
-                  )}
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={() => handleEdit(slide)}
+                            className="px-3 py-1.5 text-xs font-medium border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <span className="inline-flex items-center gap-1">
+                              <BrandIcon name="edit" className="h-3 w-3" />
+                              Editar
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => setPreviewSlide(index)}
+                            className="px-3 py-1.5 text-xs font-medium border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                          >
+                            <span className="inline-flex items-center gap-1">
+                              <BrandIcon name="eye" className="h-3 w-3" />
+                              Vista previa
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(slide.id)}
+                            disabled={deleting === slide.id}
+                            className="px-3 py-1.5 text-xs font-medium border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <span className="inline-flex items-center gap-1">
+                              <BrandIcon
+                                name={deleting === slide.id ? 'loader' : 'trash'}
+                                className={`h-3 w-3 ${deleting === slide.id ? 'animate-spin' : ''}`}
+                              />
+                              {deleting === slide.id ? 'Eliminando...' : 'Eliminar'}
+                            </span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
-      </div>
+              </Reorder.Item>
+            ))}
+          </Reorder.Group>
+        </div>
       </div>
     </div>
   )

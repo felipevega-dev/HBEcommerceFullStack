@@ -24,7 +24,7 @@ export default async function AdminCustomersPage({
     }),
   }
 
-  const allUsers = await prisma.user.findMany({
+  const allUsers = (await prisma.user.findMany({
     where,
     select: {
       id: true,
@@ -37,7 +37,7 @@ export default async function AdminCustomersPage({
         where: { status: { in: ['PROCESSING', 'SHIPPED', 'DELIVERED'] } },
       },
     },
-  }) as unknown as {
+  })) as unknown as {
     id: string
     name: string
     email: string
@@ -61,8 +61,17 @@ export default async function AdminCustomersPage({
 
     if (totalSpent >= 500000) return 'vip'
     if (orderCount >= 5) return 'frequent'
-    if (recentOrders === 0 && lastOrderDate && lastOrderDate < new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)) return 'at_risk'
-    if (orderCount === 0 || (orderCount === 1 && now.getTime() - user.createdAt.getTime() < 30 * 24 * 60 * 60 * 1000)) return 'new'
+    if (
+      recentOrders === 0 &&
+      lastOrderDate &&
+      lastOrderDate < new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+    )
+      return 'at_risk'
+    if (
+      orderCount === 0 ||
+      (orderCount === 1 && now.getTime() - user.createdAt.getTime() < 30 * 24 * 60 * 60 * 1000)
+    )
+      return 'new'
     return 'regular'
   }
 
@@ -96,12 +105,7 @@ export default async function AdminCustomersPage({
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Clientes</h1>
-      <AdminCustomerList
-        users={paginatedUsers}
-        total={total}
-        page={page}
-        limit={limit}
-      />
+      <AdminCustomerList users={paginatedUsers} total={total} page={page} limit={limit} />
     </div>
   )
 }

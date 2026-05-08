@@ -11,7 +11,10 @@ interface Category {
   subcategories: string[]
 }
 
-const categoryImages: Record<string, { icon: BrandIconName; gradient: string; description: string }> = {
+const categoryImages: Record<
+  string,
+  { icon: BrandIconName; gradient: string; description: string }
+> = {
   Ropa: {
     icon: 'shirt',
     gradient: 'from-blue-500 to-purple-600',
@@ -243,7 +246,12 @@ function CategoryCard({
               transform: 'translateZ(40px)',
             }}
           >
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

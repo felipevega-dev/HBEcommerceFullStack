@@ -50,7 +50,10 @@ export function InstagramSection() {
   const isInView = useInView(ref, { once: true, amount: 0.2 })
 
   return (
-    <section ref={ref} className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white to-[var(--color-surface)]">
+    <section
+      ref={ref}
+      className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white to-[var(--color-surface)]"
+    >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
         {/* Header */}
         <motion.div
@@ -79,8 +82,8 @@ export function InstagramSection() {
           </motion.div>
           <p className="text-lg sm:text-xl text-[var(--color-text-secondary)] max-w-2xl mx-auto">
             Únete a nuestra comunidad de más de 5,000 mascotas felices. Comparte tu foto con{' '}
-            <span className="font-bold text-[var(--color-accent)]">#HarrysBoutique</span> y
-            aparece aquí
+            <span className="font-bold text-[var(--color-accent)]">#HarrysBoutique</span> y aparece
+            aquí
           </p>
         </motion.div>
 

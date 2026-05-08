@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { DiscountType } from '@prisma/client'
 
 const createCouponSchema = z.object({
-  code: z.string().min(3).max(20).transform((val) => val.toUpperCase()),
+  code: z
+    .string()
+    .min(3)
+    .max(20)
+    .transform((val) => val.toUpperCase()),
   discountType: z.nativeEnum(DiscountType),
   discountValue: z.number().positive(),
   minOrderAmount: z.number().positive().nullable().optional(),
@@ -28,6 +32,13 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:coupons:create',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
 
   const { data, error: validationError } = await validateBody(req, createCouponSchema)
   if (validationError) return validationError

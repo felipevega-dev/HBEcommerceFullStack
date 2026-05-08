@@ -45,9 +45,7 @@ export async function POST() {
 
     // Run all updates in a transaction
     await prisma.$transaction(
-      updates.map(({ id, slug }) =>
-        prisma.product.update({ where: { id }, data: { slug } }),
-      ),
+      updates.map(({ id, slug }) => prisma.product.update({ where: { id }, data: { slug } })),
     )
 
     return NextResponse.json({

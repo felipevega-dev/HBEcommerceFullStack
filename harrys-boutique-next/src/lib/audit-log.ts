@@ -18,9 +18,10 @@ export async function logAuditAction(
         resource,
         resourceId,
         // Cast to Prisma's InputJsonValue — safe because Record<string, unknown> is JSON-serializable
-        changes: changes !== null && changes !== undefined
-          ? (changes as Prisma.InputJsonValue)
-          : undefined,
+        changes:
+          changes !== null && changes !== undefined
+            ? (changes as Prisma.InputJsonValue)
+            : undefined,
         ip,
         userAgent,
       },

@@ -1,6 +1,6 @@
 /**
  * Loading state for the edit product wizard page
- * 
+ *
  * Displays a loading spinner while fetching the product data
  * and categories for editing.
  */

@@ -20,10 +20,10 @@ describe('Tooltip', () => {
 
   it('shows tooltip on hover', () => {
     render(<Tooltip content="Test tooltip content" />)
-    
+
     const button = screen.getByRole('button', { name: /más información/i })
     fireEvent.mouseEnter(button)
-    
+
     const tooltip = screen.getByRole('tooltip')
     expect(tooltip).toBeInTheDocument()
     expect(tooltip).toHaveTextContent('Test tooltip content')
@@ -31,30 +31,30 @@ describe('Tooltip', () => {
 
   it('hides tooltip on mouse leave', () => {
     render(<Tooltip content="Test tooltip content" />)
-    
+
     const button = screen.getByRole('button', { name: /más información/i })
     fireEvent.mouseEnter(button)
-    
+
     expect(screen.getByRole('tooltip')).toBeInTheDocument()
-    
+
     fireEvent.mouseLeave(button)
-    
+
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 
   it('auto-hides tooltip after 5 seconds', () => {
     render(<Tooltip content="Test tooltip content" />)
-    
+
     const button = screen.getByRole('button', { name: /más información/i })
     fireEvent.mouseEnter(button)
-    
+
     expect(screen.getByRole('tooltip')).toBeInTheDocument()
-    
+
     // Fast-forward 5 seconds - wrapped in act to handle state updates
     act(() => {
       vi.runAllTimers()
     })
-    
+
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 
@@ -65,19 +65,17 @@ describe('Tooltip', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(
-      <Tooltip content="Test content" className="custom-class" />
-    )
+    const { container } = render(<Tooltip content="Test content" className="custom-class" />)
     const wrapper = container.firstChild as HTMLElement
     expect(wrapper).toHaveClass('custom-class')
   })
 
   it('shows tooltip on focus', () => {
     render(<Tooltip content="Test tooltip content" />)
-    
+
     const button = screen.getByRole('button', { name: /más información/i })
     fireEvent.focus(button)
-    
+
     expect(screen.getByRole('tooltip')).toBeInTheDocument()
   })
 
@@ -86,16 +84,16 @@ describe('Tooltip', () => {
       <>
         <Tooltip content="Test tooltip content" />
         <button>Other button</button>
-      </>
+      </>,
     )
-    
+
     const tooltipButton = screen.getByRole('button', { name: /más información/i })
     fireEvent.focus(tooltipButton)
-    
+
     expect(screen.getByRole('tooltip')).toBeInTheDocument()
-    
+
     fireEvent.blur(tooltipButton)
-    
+
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 })

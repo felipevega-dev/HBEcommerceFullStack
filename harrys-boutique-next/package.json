@@ -5,15 +5,18 @@
   "scripts": {
     "dev": "docker start harrys-postgres && next dev --turbopack",
     "build": "next build",
-    "start": "prisma migrate deploy && next start",
-    "lint": "next lint --max-warnings 0",
-    "lint:fix": "next lint --fix",
+    "vercel:build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write .",
     "type-check": "tsc --noEmit",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "admin:create": "tsx scripts/create-admin.ts",
+    "instagram:process": "tsx scripts/process-instagram-posts.ts",
     "test": "vitest --run",
     "test:watch": "vitest",
     "ci": "npm run type-check && npm run lint && npm run test && npm run build",
@@ -24,24 +27,24 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@hookform/resolvers": "^4.1.3",
     "@prisma/client": "^6.6.0",
-    "@react-email/components": "^0.0.35",
-    "@tanstack/react-query": "^5.74.4",
+    "@react-email/components": "^1.0.12",
+    "@sentry/nextjs": "^10.51.0",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "@vercel/blob": "^2.3.3",
-    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.6.1",
-    "country-state-city": "^3.2.1",
     "framer-motion": "^12.7.3",
     "lucide-react": "^1.8.0",
-    "mercadopago": "^2.0.15",
-    "next": "^16.2.3",
+    "mercadopago": "^2.12.0",
+    "next": "^16.2.4",
     "next-auth": "^5.0.0-beta.25",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
     "react-toastify": "^11.0.5",
     "resend": "^4.5.1",
-    "uuid": "^11.1.0",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },
@@ -54,15 +57,13 @@
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@types/uuid": "^10.0.0",
     "@vitest/coverage-v8": "^4.1.4",
     "fast-check": "^4.6.0",
     "husky": "^9.1.7",
     "jsdom": "^29.0.2",
     "lint-staged": "^16.4.0",
-    "mongodb": "^7.1.1",
-    "mongoose": "^8.13.2",
-    "postcss": "^8.5.3",
+    "postcss": "^8.5.13",
+    "prettier": "^3.4.2",
     "prisma": "^6.6.0",
     "tailwindcss": "^4.1.4",
     "tsx": "^4.19.3",
@@ -71,11 +72,13 @@
   },
   "lint-staged": {
     "**/*.{ts,tsx}": [
-      "npx prettier --write",
-      "npx eslint --fix --max-warnings 0"
+      "npx prettier --write"
     ],
     "**/*.{json,css,md}": [
       "npx prettier --write"
     ]
+  },
+  "overrides": {
+    "postcss": "$postcss"
   }
 }

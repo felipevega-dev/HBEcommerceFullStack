@@ -25,9 +25,7 @@ export function AdminCouponList({ coupons: initial }: { coupons: Coupon[] }) {
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'expired'>(
-    'all'
-  )
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'expired'>('all')
   const [form, setForm] = useState({
     code: '',
     discountType: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED',
@@ -319,9 +317,7 @@ export function AdminCouponList({ coupons: initial }: { coupons: Coupon[] }) {
           className="bg-white rounded-xl border p-6 space-y-4"
         >
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-lg">
-              {editingId ? 'Editar cupón' : 'Crear cupón'}
-            </h2>
+            <h2 className="font-semibold text-lg">{editingId ? 'Editar cupón' : 'Crear cupón'}</h2>
             {editingId && (
               <button
                 type="button"
@@ -386,9 +382,7 @@ export function AdminCouponList({ coupons: initial }: { coupons: Coupon[] }) {
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
-                {form.discountType === 'PERCENTAGE'
-                  ? 'Entre 0 y 100%'
-                  : 'Monto en pesos chilenos'}
+                {form.discountType === 'PERCENTAGE' ? 'Entre 0 y 100%' : 'Monto en pesos chilenos'}
               </p>
             </div>
 
@@ -409,9 +403,7 @@ export function AdminCouponList({ coupons: initial }: { coupons: Coupon[] }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Usos máximos
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Usos máximos</label>
               <input
                 type="number"
                 value={form.maxUses}
@@ -468,8 +460,8 @@ export function AdminCouponList({ coupons: initial }: { coupons: Coupon[] }) {
 
           {editingId && (
             <p className="text-xs text-amber-600 bg-amber-50 p-3 rounded-lg">
-              ℹ️ Solo se pueden editar los usos máximos y la fecha de expiración. Para cambiar
-              otros valores, crea un nuevo cupón.
+              ℹ️ Solo se pueden editar los usos máximos y la fecha de expiración. Para cambiar otros
+              valores, crea un nuevo cupón.
             </p>
           )}
         </form>

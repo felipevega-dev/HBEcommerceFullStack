@@ -18,18 +18,18 @@ interface CharacterCounterProps {
 
 /**
  * Character counter component for input fields
- * 
+ *
  * Features:
  * - Shows "X/MAX caracteres" format
  * - Turns red when approaching limit (default: 90% threshold)
  * - Fully typed with TypeScript
  * - Accessible with aria-live for screen readers
- * 
+ *
  * @example
  * ```tsx
  * <CharacterCounter current={25} max={100} />
  * // Displays: "25/100 caracteres"
- * 
+ *
  * <CharacterCounter current={95} max={100} />
  * // Displays in red: "95/100 caracteres"
  * ```
@@ -38,7 +38,7 @@ export function CharacterCounter({
   current,
   max,
   className = '',
-  warningThreshold = 0.9
+  warningThreshold = 0.9,
 }: CharacterCounterProps) {
   // Calculate if we're approaching the limit
   const isApproachingLimit = current >= max * warningThreshold
@@ -48,8 +48,8 @@ export function CharacterCounter({
   const colorClass = isOverLimit
     ? 'text-red-600 font-medium'
     : isApproachingLimit
-    ? 'text-amber-600 font-medium'
-    : 'text-gray-400'
+      ? 'text-amber-600 font-medium'
+      : 'text-gray-400'
 
   // Determine aria-live level based on state
   const ariaLive = isOverLimit ? 'assertive' : isApproachingLimit ? 'polite' : 'off'

@@ -26,10 +26,7 @@ interface Product {
 }
 
 const stripEmoji = (text: string) =>
-  text.replace(
-    /[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu,
-    ''
-  )
+  text.replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
 
 export function ProductInfo({
   product,
@@ -47,17 +44,19 @@ export function ProductInfo({
 
   const sizes = Array.isArray(product.sizes) ? (product.sizes as string[]) : []
   const price = product.price
-  const description = stripEmoji(product.description).replace(/\s{2,}/g, ' ').trim()
+  const description = stripEmoji(product.description)
+    .replace(/\s{2,}/g, ' ')
+    .trim()
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
       toast.warning('Por favor selecciona una talla')
       throw new Error('No size selected')
     }
-    
+
     // Simulate async operation
     await new Promise((resolve) => setTimeout(resolve, 500))
-    
+
     addItem({
       productId: product.id,
       name: product.name,
@@ -67,7 +66,7 @@ export function ProductInfo({
       color: selectedColor,
       image: product.images[0] ?? '',
     })
-    
+
     setShowModal(true)
   }
 
