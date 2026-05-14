@@ -10,8 +10,8 @@
  */
 export interface ProductData {
   // Step 1: Photo Upload
-  /** Array of image files (for new uploads) or URLs (for existing products) */
-  images: File[] | string[]
+  /** Array of image files (for new uploads) and/or URLs (for existing products) */
+  images: Array<File | string>
   /** Order of images by index (first is principal) */
   imageOrder: number[]
 

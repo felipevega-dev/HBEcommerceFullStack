@@ -30,7 +30,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   try {
     const { id } = await params
-    const source = await prisma.product.findUnique({ where: { id } })
+    const source = await prisma.product.findUnique({
+      where: { id },
+      include: { variants: true },
+    })
 
     if (!source) {
       return NextResponse.json(
@@ -59,6 +62,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         bestSeller: false,
         active: false,
         stock: source.stock,
+        variants: {
+          create: source.variants.map((variant) => ({
+            size: variant.size,
+            color: variant.color,
+            stock: variant.stock,
+            sku: null,
+            active: variant.active,
+          })),
+        },
       },
     })
 

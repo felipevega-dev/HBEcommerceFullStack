@@ -17,6 +17,8 @@ const navItems = [
   { href: '/contact', label: 'CONTACTO' },
 ]
 
+const ADMIN_ROLES: Role[] = ['OWNER', 'ADMIN', 'MODERATOR']
+
 const socialLinks = [
   {
     icon: () => (
@@ -60,6 +62,7 @@ export function Navbar() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+  const isAdmin = Boolean(session?.user?.role && ADMIN_ROLES.includes(session.user.role))
 
   useEffect(() => {
     setMenuOpen(false)
@@ -138,9 +141,7 @@ export function Navbar() {
                     </button>
                     <div className="absolute right-0 top-full z-[70] pt-3 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto">
                       <div className="min-w-[196px] overflow-hidden rounded-lg border border-[var(--color-border)] bg-white shadow-xl ring-1 ring-black/5">
-                        {(session.user.role === 'OWNER' ||
-                          session.user.role === 'ADMIN' ||
-                          session.user.role === 'MODERATOR') && (
+                        {isAdmin && (
                           <>
                             <Link
                               href="/admin/dashboard"
@@ -581,6 +582,19 @@ export function Navbar() {
                           </div>
                         </div>
                       </div>
+                      {isAdmin && (
+                        <>
+                          <Link
+                            href="/admin/dashboard"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-2 px-6 py-3 text-blue-700 bg-blue-50 border-b border-[var(--color-border)] hover:bg-blue-100 transition-colors font-medium"
+                          >
+                            <BrandIcon name="layout-dashboard" className="h-4 w-4" />
+                            Panel Admin
+                          </Link>
+                          <div className="border-b-4 border-[var(--color-border)]" />
+                        </>
+                      )}
                       <Link
                         href="/profile"
                         onClick={() => setMenuOpen(false)}

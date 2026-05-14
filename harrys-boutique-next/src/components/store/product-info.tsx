@@ -21,6 +21,7 @@ interface Product {
   colors: string[]
   images: string[]
   stock?: number
+  variants?: { id: string; size: string; color: string; stock: number; active: boolean }[]
   ratingAverage: number
   ratingCount: number
 }
@@ -43,6 +44,14 @@ export function ProductInfo({
   const addItem = useCartStore((s) => s.addItem)
 
   const sizes = Array.isArray(product.sizes) ? (product.sizes as string[]) : []
+  const activeVariants = product.variants?.filter((variant) => variant.active) ?? []
+  const hasVariantStock = activeVariants.length > 0
+  const selectedVariant = hasVariantStock
+    ? activeVariants.find(
+        (variant) => variant.size === selectedSize && variant.color === (selectedColor ?? ''),
+      )
+    : null
+  const selectedStock = hasVariantStock ? (selectedVariant?.stock ?? 0) : (product.stock ?? 0)
   const price = product.price
   const description = stripEmoji(product.description)
     .replace(/\s{2,}/g, ' ')
@@ -52,6 +61,11 @@ export function ProductInfo({
     if (!selectedSize) {
       toast.warning('Por favor selecciona una talla')
       throw new Error('No size selected')
+    }
+
+    if (selectedStock < quantity) {
+      toast.warning('No hay stock suficiente para esta talla/color')
+      throw new Error('Insufficient stock')
     }
 
     // Simulate async operation
@@ -141,11 +155,11 @@ export function ProductInfo({
       {/* Stock indicator */}
       {product.stock !== undefined && (
         <div className="flex items-center gap-2 text-sm">
-          {product.stock === 0 ? (
+          {selectedStock === 0 ? (
             <span className="text-[var(--color-error)] font-medium">Sin stock</span>
-          ) : product.stock <= 5 ? (
+          ) : selectedStock <= 5 ? (
             <span className="text-[var(--color-warning)] font-medium">
-              ¡Últimas {product.stock} unidades!
+              ¡Últimas {selectedStock} unidades!
             </span>
           ) : (
             <span className="text-[var(--color-success)] font-medium flex items-center gap-1">
@@ -165,15 +179,22 @@ export function ProductInfo({
             Color: <span className="font-normal">{selectedColor}</span>
           </p>
           <div className="flex gap-2 flex-wrap">
-            {product.colors.map((color) => (
-              <button
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                title={color}
-                className={`w-8 h-8 rounded-full border-2 transition-all ${selectedColor === color ? 'border-[var(--color-accent)] scale-110' : 'border-gray-200 hover:border-gray-400'}`}
-                style={{ backgroundColor: colorToHex(color) }}
-              />
-            ))}
+            {product.colors.map((color) => {
+              const colorHasStock =
+                !hasVariantStock ||
+                activeVariants.some((variant) => variant.color === color && variant.stock > 0)
+
+              return (
+                <button
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  disabled={!colorHasStock}
+                  title={color}
+                  className={`w-8 h-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${selectedColor === color ? 'border-[var(--color-accent)] scale-110' : 'border-gray-200 hover:border-gray-400'}`}
+                  style={{ backgroundColor: colorToHex(color) }}
+                />
+              )
+            })}
           </div>
         </div>
       )}
@@ -183,15 +204,27 @@ export function ProductInfo({
         <div>
           <p className="text-sm font-medium mb-3">Selecciona Talla</p>
           <div className="flex flex-wrap gap-2">
-            {sizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`px-4 py-2 rounded-lg border text-sm transition-colors ${selectedSize === size ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : 'border-gray-200 hover:border-gray-300'}`}
-              >
-                {size}
-              </button>
-            ))}
+            {sizes.map((size) => {
+              const sizeHasStock =
+                !hasVariantStock ||
+                activeVariants.some(
+                  (variant) =>
+                    variant.size === size &&
+                    variant.color === (selectedColor ?? '') &&
+                    variant.stock > 0,
+                )
+
+              return (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  disabled={!sizeHasStock}
+                  className={`px-4 py-2 rounded-lg border text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${selectedSize === size ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : 'border-gray-200 hover:border-gray-300'}`}
+                >
+                  {size}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
@@ -209,9 +242,10 @@ export function ProductInfo({
           </button>
           <span className="w-8 text-center font-medium">{quantity}</span>
           <button
-            onClick={() => setQuantity((q) => q + 1)}
+            onClick={() => setQuantity((q) => Math.min(selectedStock || q + 1, q + 1))}
             className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
             aria-label="Aumentar cantidad"
+            disabled={selectedStock > 0 && quantity >= selectedStock}
           >
             +
           </button>
@@ -219,7 +253,7 @@ export function ProductInfo({
       </div>
 
       {/* Add to cart */}
-      {product.stock === 0 ? (
+      {selectedStock === 0 ? (
         <button
           disabled
           className="w-full py-3 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-not-allowed"

@@ -17,7 +17,7 @@ import type { ProductData, ValidationError, ValidationResult } from '../types'
  * @param images - Array of image files or URLs
  * @returns Validation result with any errors
  */
-export function validateStep1Photos(images: File[] | string[]): ValidationResult {
+export function validateStep1Photos(images: Array<File | string>): ValidationResult {
   const errors: ValidationError[] = []
 
   if (!images || images.length === 0) {

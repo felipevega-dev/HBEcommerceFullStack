@@ -39,20 +39,18 @@ function hasValidImageSignature(type: string, bytes: Uint8Array) {
   return false
 }
 
-async function validateImages(files: File[]) {
-  for (const file of files) {
-    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-      throw new Error('Solo se permiten imagenes JPG, PNG o WEBP')
-    }
+async function validateImage(file: File) {
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    throw new Error('Solo se permiten imágenes JPG, PNG o WEBP')
+  }
 
-    if (file.size > MAX_FILE_SIZE) {
-      throw new Error('Cada imagen debe pesar menos de 5MB')
-    }
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('Cada imagen debe pesar menos de 5MB')
+  }
 
-    const signature = new Uint8Array(await file.slice(0, 12).arrayBuffer())
-    if (!hasValidImageSignature(file.type, signature)) {
-      throw new Error('El archivo no coincide con un formato de imagen permitido')
-    }
+  const signature = new Uint8Array(await file.slice(0, 12).arrayBuffer())
+  if (!hasValidImageSignature(file.type, signature)) {
+    throw new Error('El archivo no coincide con un formato de imagen permitido')
   }
 }
 
@@ -75,22 +73,40 @@ export async function POST(req: NextRequest) {
       const { error } = await requireAdminAuth()
       if (error) return error
 
-      await validateImages(multipleFiles)
+      const results = await Promise.all(
+        multipleFiles.map(async (file) => {
+          try {
+            await validateImage(file)
+            const timestamp = Date.now()
+            const filename = `products/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
 
-      const uploadPromises = multipleFiles.map(async (file) => {
-        const timestamp = Date.now()
-        const filename = `products/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+            const blob = await put(filename, file, {
+              access: 'public',
+              addRandomSuffix: true,
+            })
 
-        const blob = await put(filename, file, {
-          access: 'public',
-          addRandomSuffix: true,
-        })
+            return { success: true, fileName: file.name, url: blob.url, error: null }
+          } catch (error) {
+            return {
+              success: false,
+              fileName: file.name,
+              url: null,
+              error: error instanceof Error ? error.message : 'No se pudo subir la imagen',
+            }
+          }
+        }),
+      )
 
-        return blob.url
+      const urls = results.flatMap((result) => (result.url ? [result.url] : []))
+      const allSucceeded = results.every((result) => result.success)
+
+      return NextResponse.json({
+        success: allSucceeded,
+        partial: !allSucceeded && urls.length > 0,
+        results,
+        urls,
+        url: urls[0] ?? null,
       })
-
-      const urls = await Promise.all(uploadPromises)
-      return NextResponse.json({ success: true, urls, url: urls[0] ?? null })
     }
 
     if (!(singleFile instanceof File)) {
@@ -105,7 +121,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'No autenticado' }, { status: 401 })
     }
 
-    await validateImages([singleFile])
+    await validateImage(singleFile)
 
     const timestamp = Date.now()
     const filename = `profiles/${session.user.id}/${timestamp}-${singleFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`

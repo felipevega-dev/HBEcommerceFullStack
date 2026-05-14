@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { serialize } from '@/lib/serialize'
-import { ProductBulkForm } from '@/components/admin/product-bulk-form'
 import { ProductCsvImportForm } from '@/components/admin/product-csv-import-form'
 
 export const metadata: Metadata = { title: "Carga Masiva de Productos — Admin Harry's Boutique" }
@@ -20,7 +19,6 @@ export default async function NewBulkProductsPage() {
         <h1 className="text-2xl font-semibold">Carga Masiva</h1>
       </div>
       <ProductCsvImportForm categories={categories} />
-      <ProductBulkForm categories={categories} />
     </div>
   )
 }

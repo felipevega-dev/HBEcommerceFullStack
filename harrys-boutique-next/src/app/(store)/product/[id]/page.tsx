@@ -64,6 +64,7 @@ export default async function ProductPage({ params }: Props) {
     colors: rawProduct.colors,
     sizes: rawProduct.sizes,
     stock: rawProduct.stock,
+    variants: rawProduct.variants,
     ratingAverage: rawProduct.ratingAverage,
     ratingCount: rawProduct.ratingCount,
     categoryId: rawProduct.categoryId,

@@ -21,6 +21,11 @@ export const getProductByIdOrSlug = cache(async (idOrSlug: string) => {
       ratingCount: true,
       categoryId: true,
       subCategory: true,
+      variants: {
+        where: { active: true },
+        select: { id: true, size: true, color: true, stock: true, active: true },
+        orderBy: [{ size: 'asc' }, { color: 'asc' }],
+      },
       category: { select: { name: true } },
     },
   })

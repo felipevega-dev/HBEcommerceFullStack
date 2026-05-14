@@ -75,7 +75,7 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
               </p>
             </div>
             <Link
-              href={`/admin/products/wizard/${product.id}`}
+              href={`/admin/products/${product.id}/edit`}
               className="text-xs text-blue-600 hover:underline"
             >
               Editar

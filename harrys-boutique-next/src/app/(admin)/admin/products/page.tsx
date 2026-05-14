@@ -13,8 +13,10 @@ export default async function AdminProductsPage({
     page?: string
     search?: string
     category?: string
+    subCategory?: string
     status?: string
     stock?: string
+    bestSeller?: string
   }>
 }) {
   const params = await searchParams
@@ -25,8 +27,10 @@ export default async function AdminProductsPage({
   const where: Prisma.ProductWhereInput = {
     ...(params.search ? { name: { contains: params.search, mode: 'insensitive' as const } } : {}),
     ...(params.category ? { category: { name: params.category } } : {}),
+    ...(params.subCategory ? { subCategory: params.subCategory } : {}),
     ...(params.status === 'active' ? { active: true } : {}),
     ...(params.status === 'inactive' ? { active: false } : {}),
+    ...(params.bestSeller === 'true' ? { bestSeller: true } : {}),
     ...(params.stock === 'out' ? { stock: 0 } : {}),
     ...(params.stock === 'low' ? { stock: { gt: 0, lte: 5 } } : {}),
     ...(params.stock === 'available' ? { stock: { gt: 5 } } : {}),
@@ -35,7 +39,7 @@ export default async function AdminProductsPage({
   const [rawProducts, total, rawCategories] = await Promise.all([
     prisma.product.findMany({
       where,
-      include: { category: { select: { name: true } } },
+      include: { category: { select: { name: true } }, _count: { select: { variants: true } } },
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
@@ -43,7 +47,7 @@ export default async function AdminProductsPage({
     prisma.product.count({ where }),
     prisma.category.findMany({
       orderBy: { name: 'asc' },
-      select: { name: true },
+      select: { id: true, name: true, subcategories: true },
     }),
   ])
 
@@ -58,9 +62,8 @@ export default async function AdminProductsPage({
     stock: product.stock,
     subCategory: product.subCategory,
     category: product.category,
+    variantCount: product._count.variants,
   }))
-
-  const categories = rawCategories.map((category) => category.name)
 
   return (
     <div className="space-y-6">
@@ -96,7 +99,7 @@ export default async function AdminProductsPage({
         total={total}
         page={page}
         limit={limit}
-        categories={categories}
+        categories={rawCategories}
       />
     </div>
   )

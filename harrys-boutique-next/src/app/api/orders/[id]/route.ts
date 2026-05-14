@@ -83,6 +83,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         for (const item of existing.items) {
           if (!item.productId) continue
 
+          if (item.variantId) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            })
+          }
+
           await tx.product.update({
             where: { id: item.productId },
             data: { stock: { increment: item.quantity } },
@@ -156,6 +163,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       if (existing.status !== 'CANCELLED') {
         for (const item of existing.items) {
           if (!item.productId) continue
+
+          if (item.variantId) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            })
+          }
 
           await tx.product.update({
             where: { id: item.productId },

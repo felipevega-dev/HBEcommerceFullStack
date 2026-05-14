@@ -49,7 +49,7 @@ export function TopProducts({ products }: { products: TopProduct[] }) {
               <p className="text-xs text-gray-500">vendidos</p>
             </div>
             <Link
-              href={`/admin/products/wizard/${product.id}`}
+              href={`/admin/products/${product.id}/edit`}
               className="text-xs text-blue-600 hover:underline"
             >
               Editar

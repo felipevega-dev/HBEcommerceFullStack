@@ -143,6 +143,9 @@ export async function POST(req: NextRequest) {
         active: true,
         colors: true,
         sizes: true,
+        variants: {
+          select: { id: true, size: true, color: true, stock: true, active: true },
+        },
       },
     })
 
@@ -180,17 +183,37 @@ export async function POST(req: NextRequest) {
 
     const order = await prisma.$transaction(async (tx) => {
       for (const item of resolvedItems) {
-        const stockUpdate = await tx.product.updateMany({
-          where: {
-            id: item.productId,
-            active: true,
-            stock: { gte: item.quantity },
-          },
-          data: { stock: { decrement: item.quantity } },
-        })
+        if (item.variantId) {
+          const variantUpdate = await tx.productVariant.updateMany({
+            where: {
+              id: item.variantId,
+              active: true,
+              stock: { gte: item.quantity },
+            },
+            data: { stock: { decrement: item.quantity } },
+          })
 
-        if (stockUpdate.count !== 1) {
-          throw new Error(`STOCK_INSUFFICIENT:${item.name}`)
+          if (variantUpdate.count !== 1) {
+            throw new Error(`STOCK_INSUFFICIENT:${item.name}`)
+          }
+
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.quantity } },
+          })
+        } else {
+          const stockUpdate = await tx.product.updateMany({
+            where: {
+              id: item.productId,
+              active: true,
+              stock: { gte: item.quantity },
+            },
+            data: { stock: { decrement: item.quantity } },
+          })
+
+          if (stockUpdate.count !== 1) {
+            throw new Error(`STOCK_INSUFFICIENT:${item.name}`)
+          }
         }
       }
 
@@ -221,6 +244,7 @@ export async function POST(req: NextRequest) {
           items: {
             create: resolvedItems.map((item) => ({
               productId: item.productId,
+              variantId: item.variantId,
               name: item.name,
               price: item.price,
               quantity: item.quantity,

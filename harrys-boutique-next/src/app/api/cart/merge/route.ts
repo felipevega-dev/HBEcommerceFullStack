@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
+import { findMatchingVariant, getAvailableStockForSelection } from '@/lib/product-variants'
 
 const cartItemSchema = z.object({
   productId: z.string().uuid(),
@@ -40,19 +41,39 @@ export async function POST(req: NextRequest) {
 
     for (const item of data!.items) {
       const { productId, quantity, size, color = '' } = item
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+        select: {
+          id: true,
+          name: true,
+          stock: true,
+          active: true,
+          variants: { select: { id: true, size: true, color: true, stock: true, active: true } },
+        },
+      })
+
+      if (!product?.active) continue
+
+      const variant = findMatchingVariant(product.variants, size, color)
+      const availableStock = getAvailableStockForSelection(product, size, color)
 
       const existing = await prisma.cartItem.findFirst({
         where: { cartId: cart.id, productId, size, color },
       })
 
       if (existing) {
+        const nextQuantity = Math.min(existing.quantity + quantity, availableStock)
+        if (nextQuantity <= 0) continue
+
         await prisma.cartItem.update({
           where: { id: existing.id },
-          data: { quantity: existing.quantity + quantity },
+          data: { quantity: nextQuantity, variantId: variant?.id },
         })
       } else {
+        if (quantity > availableStock) continue
+
         await prisma.cartItem.create({
-          data: { cartId: cart.id, productId, quantity, size, color },
+          data: { cartId: cart.id, productId, variantId: variant?.id, quantity, size, color },
         })
       }
     }
@@ -70,6 +91,9 @@ export async function POST(req: NextRequest) {
                 images: true,
                 colors: true,
                 sizes: true,
+                variants: {
+                  select: { id: true, size: true, color: true, stock: true, active: true },
+                },
               },
             },
           },

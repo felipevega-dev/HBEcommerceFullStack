@@ -53,7 +53,7 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
       }
 
       if (newFiles.length > 0) {
-        const currentImages = images as (string[] | File[]) | undefined
+        const currentImages = images as Array<File | string> | undefined
         const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
         const totalImages = existing.length + newFiles.length
 
@@ -62,11 +62,7 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
           return
         }
 
-        if (existing.length === 0 || typeof existing[0] === 'object') {
-          updateField('images', [...(existing as File[]), ...newFiles])
-        } else {
-          updateField('images', [...(existing as string[]), ...newFiles.map((f) => f.name)])
-        }
+        updateField('images', [...existing, ...newFiles])
       }
     },
     [images, updateField],
@@ -95,19 +91,12 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
 
   const handleDeleteImage = useCallback(
     (index: number) => {
-      const currentImages = images as (string[] | File[]) | undefined
+      const currentImages = images as Array<File | string> | undefined
       const existing = currentImages && Array.isArray(currentImages) ? currentImages : []
-      if (existing.length === 0 || typeof existing[0] === 'object') {
-        updateField(
-          'images',
-          (existing as File[]).filter((_, i) => i !== index),
-        )
-      } else {
-        updateField(
-          'images',
-          (existing as string[]).filter((_, i) => i !== index),
-        )
-      }
+      updateField(
+        'images',
+        existing.filter((_, i) => i !== index),
+      )
     },
     [images, updateField],
   )

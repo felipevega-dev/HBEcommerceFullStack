@@ -169,7 +169,7 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
    * Upload images to Vercel Blob Storage
    * Handles both new File objects and existing URL strings
    */
-  const uploadImages = async (images: File[] | string[]): Promise<string[]> => {
+  const uploadImages = async (images: Array<File | string>): Promise<string[]> => {
     const urls: string[] = []
 
     for (const image of images) {

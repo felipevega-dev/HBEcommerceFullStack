@@ -104,8 +104,6 @@ export default async function AdminDashboardPage() {
   const lastMonthAOV = lastMonthOrdersCount > 0 ? lastMonthRevenueValue / lastMonthOrdersCount : 0
   const aovChange = lastMonthAOV > 0 ? ((avgOrderValue - lastMonthAOV) / lastMonthAOV) * 100 : 0
 
-  const conversionRate = 2.5
-
   const metrics = {
     totalOrders,
     pendingOrders,
@@ -122,7 +120,6 @@ export default async function AdminDashboardPage() {
         : 0,
     avgOrderValue,
     aovChange,
-    conversionRate,
     pendingReviews,
   }
 

@@ -1,10 +1,14 @@
 import type { Coupon, Product } from '@prisma/client'
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE, calculateShipping } from '@/lib/commerce'
+import { findMatchingVariant, getAvailableStockForSelection } from '@/lib/product-variants'
 
 type ProductSnapshot = Pick<
   Product,
-  'id' | 'name' | 'price' | 'images' | 'stock' | 'active' | 'colors' | 'sizes'
->
+  'id' | 'name' | 'images' | 'stock' | 'active' | 'colors' | 'sizes'
+> & {
+  price: Product['price'] | number
+  variants?: { id: string; size: string; color: string; stock: number; active: boolean }[]
+}
 
 export interface CheckoutRequestItem {
   productId: string
@@ -15,6 +19,7 @@ export interface CheckoutRequestItem {
 
 export interface ResolvedCheckoutItem {
   productId: string
+  variantId?: string
   name: string
   price: number
   quantity: number
@@ -59,7 +64,9 @@ export function resolveCheckoutItems(
       throw new Error('Uno de los productos ya no está disponible')
     }
 
-    if (product.stock < item.quantity) {
+    const color = item.color ?? ''
+    const availableStock = getAvailableStockForSelection(product, item.size, color)
+    if (availableStock < item.quantity) {
       throw new Error(`Stock insuficiente para ${product.name}`)
     }
 
@@ -68,13 +75,15 @@ export function resolveCheckoutItems(
       throw new Error(`La talla seleccionada no está disponible para ${product.name}`)
     }
 
-    const color = item.color ?? ''
     if (color && product.colors.length > 0 && !product.colors.includes(color)) {
       throw new Error(`El color seleccionado no está disponible para ${product.name}`)
     }
 
+    const variant = findMatchingVariant(product.variants, item.size, color)
+
     return {
       productId: product.id,
+      variantId: variant?.id,
       name: product.name,
       price: Number(product.price),
       quantity: item.quantity,

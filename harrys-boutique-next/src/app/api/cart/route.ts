@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
+import { findMatchingVariant, getAvailableStockForSelection } from '@/lib/product-variants'
 
 const addItemSchema = z.object({
   productId: z.string().uuid(),
@@ -33,6 +34,9 @@ export async function GET(req: NextRequest) {
                 images: true,
                 colors: true,
                 sizes: true,
+                variants: {
+                  select: { id: true, size: true, color: true, stock: true, active: true },
+                },
               },
             },
           },
@@ -63,6 +67,26 @@ export async function POST(req: NextRequest) {
   try {
     const userId = session!.user.id
     const { productId, quantity, size, color = '' } = data!
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: {
+        id: true,
+        name: true,
+        stock: true,
+        active: true,
+        variants: { select: { id: true, size: true, color: true, stock: true, active: true } },
+      },
+    })
+
+    if (!product?.active) {
+      return NextResponse.json(
+        { success: false, message: 'Producto no disponible' },
+        { status: 400 },
+      )
+    }
+
+    const variant = findMatchingVariant(product.variants, size, color)
+    const availableStock = getAvailableStockForSelection(product, size, color)
 
     const cart = await prisma.cart.upsert({
       where: { userId },
@@ -76,13 +100,27 @@ export async function POST(req: NextRequest) {
     })
 
     if (existing) {
+      if (existing.quantity + quantity > availableStock) {
+        return NextResponse.json(
+          { success: false, message: 'Stock insuficiente para esta talla/color' },
+          { status: 409 },
+        )
+      }
+
       await prisma.cartItem.update({
         where: { id: existing.id },
-        data: { quantity: existing.quantity + quantity },
+        data: { quantity: existing.quantity + quantity, variantId: variant?.id },
       })
     } else {
+      if (quantity > availableStock) {
+        return NextResponse.json(
+          { success: false, message: 'Stock insuficiente para esta talla/color' },
+          { status: 409 },
+        )
+      }
+
       await prisma.cartItem.create({
-        data: { cartId: cart.id, productId, quantity, size, color },
+        data: { cartId: cart.id, productId, variantId: variant?.id, quantity, size, color },
       })
     }
 
@@ -90,7 +128,19 @@ export async function POST(req: NextRequest) {
       where: { userId },
       include: {
         items: {
-          include: { product: { select: { id: true, name: true, price: true, images: true } } },
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                images: true,
+                variants: {
+                  select: { id: true, size: true, color: true, stock: true, active: true },
+                },
+              },
+            },
+          },
         },
       },
     })
@@ -122,7 +172,17 @@ export async function PUT(req: NextRequest) {
 
     const cartItem = await prisma.cartItem.findFirst({
       where: { id: cartItemId, cart: { userId } },
-      select: { id: true },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            stock: true,
+            active: true,
+            variants: { select: { id: true, size: true, color: true, stock: true, active: true } },
+          },
+        },
+      },
     })
 
     if (!cartItem) {
@@ -130,6 +190,20 @@ export async function PUT(req: NextRequest) {
         { success: false, message: 'Item de carrito no encontrado' },
         { status: 404 },
       )
+    }
+
+    if (quantity > 0) {
+      const availableStock = getAvailableStockForSelection(
+        cartItem.product,
+        cartItem.size,
+        cartItem.color,
+      )
+      if (quantity > availableStock) {
+        return NextResponse.json(
+          { success: false, message: 'Stock insuficiente para esta talla/color' },
+          { status: 409 },
+        )
+      }
     }
 
     if (quantity === 0) {
@@ -142,7 +216,19 @@ export async function PUT(req: NextRequest) {
       where: { userId },
       include: {
         items: {
-          include: { product: { select: { id: true, name: true, price: true, images: true } } },
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                images: true,
+                variants: {
+                  select: { id: true, size: true, color: true, stock: true, active: true },
+                },
+              },
+            },
+          },
         },
       },
     })

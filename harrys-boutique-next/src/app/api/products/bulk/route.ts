@@ -11,6 +11,8 @@ const bulkUpdateSchema = z.object({
   bestSeller: z.boolean().optional(),
   stock: z.number().int().min(0).optional(),
   price: z.number().positive().optional(),
+  categoryId: z.string().uuid().optional(),
+  subCategory: z.string().min(1).optional(),
   discountPercent: z.number().min(0).max(100).optional(),
   delete: z.boolean().optional(),
 })
@@ -152,7 +154,17 @@ export async function PATCH(req: NextRequest) {
   if (validationError) return validationError
 
   try {
-    const { ids, active, bestSeller, stock, price, discountPercent, delete: shouldDelete } = data!
+    const {
+      ids,
+      active,
+      bestSeller,
+      stock,
+      price,
+      categoryId,
+      subCategory,
+      discountPercent,
+      delete: shouldDelete,
+    } = data!
 
     if (shouldDelete) {
       const result = await prisma.product.deleteMany({ where: { id: { in: ids } } })
@@ -171,6 +183,8 @@ export async function PATCH(req: NextRequest) {
     if (active !== undefined) updateData.active = active
     if (bestSeller !== undefined) updateData.bestSeller = bestSeller
     if (stock !== undefined) updateData.stock = stock
+    if (categoryId !== undefined) updateData.categoryId = categoryId
+    if (subCategory !== undefined) updateData.subCategory = subCategory
 
     // Handle price updates
     if (price !== undefined) {

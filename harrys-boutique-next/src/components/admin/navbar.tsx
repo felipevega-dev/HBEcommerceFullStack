@@ -1,8 +1,8 @@
 'use client'
 
 import { signOut } from 'next-auth/react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import type { Role } from '@prisma/client'
 import { BrandIcon } from '@/components/ui/brand-icon'
 
@@ -12,7 +12,7 @@ interface Props {
 
 export function AdminNavbar({ user }: Props) {
   return (
-    <header className="flex h-14 items-center justify-between border-b border-[var(--color-border)] bg-white px-6">
+    <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-4 py-2 md:px-6">
       <Link href="/admin/dashboard" className="flex-shrink-0">
         <Image
           src="/harrys_logo.png"
@@ -22,7 +22,7 @@ export function AdminNavbar({ user }: Props) {
           className="object-contain"
         />
       </Link>
-      <div className="flex items-center gap-4 text-sm text-gray-600">
+      <div className="flex flex-wrap items-center justify-end gap-3 text-sm text-gray-600">
         <Link
           href="/"
           target="_blank"
