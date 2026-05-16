@@ -101,6 +101,20 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
     [images, updateField],
   )
 
+  const moveImage = useCallback(
+    (fromIndex: number, direction: -1 | 1) => {
+      const toIndex = fromIndex + direction
+      const currentImages = images as Array<File | string>
+      if (toIndex < 0 || toIndex >= currentImages.length) return
+
+      const reordered = [...currentImages]
+      const [moved] = reordered.splice(fromIndex, 1)
+      reordered.splice(toIndex, 0, moved)
+      updateField('images', reordered)
+    },
+    [images, updateField],
+  )
+
   const getImageUrl = (image: File | string): string => {
     if (typeof image === 'string') {
       return image
@@ -204,6 +218,26 @@ export function Step1Photos({ productData, updateField, errors = {} }: Step1Phot
                     Principal
                   </div>
                 )}
+                <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button
+                    type="button"
+                    onClick={() => moveImage(index, -1)}
+                    disabled={index === 0}
+                    className="rounded bg-white/90 px-2 py-1 text-xs text-gray-700 disabled:opacity-40"
+                    aria-label="Mover imagen a la izquierda"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveImage(index, 1)}
+                    disabled={index === images.length - 1}
+                    className="rounded bg-white/90 px-2 py-1 text-xs text-gray-700 disabled:opacity-40"
+                    aria-label="Mover imagen a la derecha"
+                  >
+                    &gt;
+                  </button>
+                </div>
               </div>
             ))}
           </div>

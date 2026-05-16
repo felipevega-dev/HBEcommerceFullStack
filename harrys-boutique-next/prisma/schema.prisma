@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
@@ -25,6 +26,13 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
 }
 
 enum DiscountType {
@@ -60,6 +68,7 @@ model User {
   reviews             Review[]
   wishlist            Wishlist[]
   auditLogs           AuditLog[]
+  couponRedemptions   CouponRedemption[]
   passwordResetTokens PasswordResetToken[]
 
   @@map("users")
@@ -216,16 +225,36 @@ model Order {
   status          OrderStatus @default(PENDING)
   paymentMethod   String
   payment         Boolean     @default(false)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paidAt          DateTime?
+  paymentProvider String?
+  paymentProviderId String?   @unique
+  stockReservedAt DateTime?
+  stockReservationExpiresAt DateTime?
+  stockReleasedAt DateTime?
   couponCode      String?
   discountAmount  Decimal?    @db.Decimal(10, 2)
+  internalNotes   String      @default("") @db.Text
+  courier         String?
+  trackingNumber  String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelReason    String?
+  refundReason    String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  user  User        @relation(fields: [userId], references: [id])
-  items OrderItem[]
+  user              User                 @relation(fields: [userId], references: [id])
+  items             OrderItem[]
+  statusHistory     OrderStatusHistory[]
+  couponRedemptions CouponRedemption[]
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([status])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([payment, createdAt(sort: Desc)])
+  @@index([paymentStatus, createdAt(sort: Desc)])
+  @@index([stockReservationExpiresAt])
   @@map("orders")
 }
 
@@ -246,7 +275,22 @@ model OrderItem {
   variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
   @@index([variantId])
+  @@index([productId])
   @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id             String      @id @default(uuid())
+  orderId        String
+  previousStatus OrderStatus?
+  status         OrderStatus
+  note           String?     @db.Text
+  createdAt      DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt(sort: Desc)])
+  @@map("order_status_history")
 }
 
 // ─── Reviews ──────────────────────────────────────────────────────────────────
@@ -299,7 +343,29 @@ model Coupon {
   active         Boolean      @default(true)
   createdAt      DateTime     @default(now())
 
+  redemptions CouponRedemption[]
+
+  @@index([active, expiresAt])
   @@map("coupons")
+}
+
+model CouponRedemption {
+  id            String    @id @default(uuid())
+  couponId      String
+  userId        String
+  orderId       String    @unique
+  amount        Decimal   @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime  @default(now())
+  releasedAt    DateTime?
+  releaseReason String?
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([couponId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("coupon_redemptions")
 }
 
 // ─── Audit Log ────────────────────────────────────────────────────────────────

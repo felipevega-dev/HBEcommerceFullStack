@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { DashboardMetrics } from '@/components/admin/dashboard-metrics'
 import { RecentOrders } from '@/components/admin/recent-orders'
@@ -27,6 +28,8 @@ export default async function AdminDashboardPage() {
     recentOrders,
     ordersByStatus,
     lowStockProducts,
+    outOfStockProducts,
+    outOfStockVariants,
     topProducts,
     pendingReviews,
   ] = await Promise.all([
@@ -59,6 +62,8 @@ export default async function AdminDashboardPage() {
       take: 10,
       select: { id: true, name: true, stock: true, images: true },
     }),
+    prisma.product.count({ where: { active: true, stock: 0 } }),
+    prisma.productVariant.count({ where: { active: true, stock: 0 } }),
     prisma.orderItem.groupBy({
       by: ['productId'],
       _sum: { quantity: true },
@@ -127,6 +132,30 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
       <DashboardMetrics metrics={metrics} />
+      <div className="rounded-xl border bg-white p-5">
+        <h2 className="text-lg font-semibold">Próximas acciones</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <Link
+            href="/admin/orders?status=PENDING"
+            className="rounded-lg border p-4 hover:bg-gray-50"
+          >
+            <p className="text-sm text-gray-500">Órdenes pendientes</p>
+            <p className="mt-1 text-2xl font-semibold">{pendingOrders}</p>
+          </Link>
+          <Link href="/admin/products?stock=out" className="rounded-lg border p-4 hover:bg-gray-50">
+            <p className="text-sm text-gray-500">Productos sin stock</p>
+            <p className="mt-1 text-2xl font-semibold">{outOfStockProducts}</p>
+          </Link>
+          <Link href="/admin/products" className="rounded-lg border p-4 hover:bg-gray-50">
+            <p className="text-sm text-gray-500">Variantes sin stock</p>
+            <p className="mt-1 text-2xl font-semibold">{outOfStockVariants}</p>
+          </Link>
+          <Link href="/admin/reviews" className="rounded-lg border p-4 hover:bg-gray-50">
+            <p className="text-sm text-gray-500">Reseñas pendientes</p>
+            <p className="mt-1 text-2xl font-semibold">{pendingReviews}</p>
+          </Link>
+        </div>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <OrderStatusBreakdown ordersByStatus={ordersByStatus} />
         <LowStockAlert products={lowStockProducts} />

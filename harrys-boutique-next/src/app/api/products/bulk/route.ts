@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidateCatalogCache } from '@/lib/cache'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
+import { syncProductVariantStock } from '@/lib/product-variants'
 
 const bulkUpdateSchema = z.object({
   ids: z.array(z.string().uuid()).min(1),
@@ -36,6 +37,17 @@ const bulkCreateSchema = z.object({
         stock: z.number().int().min(0).optional(),
         active: z.boolean().optional(),
         bestSeller: z.boolean().optional(),
+        variants: z
+          .array(
+            z.object({
+              size: z.string().trim().min(1),
+              color: z.string().trim().optional(),
+              sku: z.string().trim().min(1).optional(),
+              stock: z.number().int().min(0),
+              active: z.boolean().optional(),
+            }),
+          )
+          .optional(),
       }),
     )
     .min(1)
@@ -60,9 +72,15 @@ export async function POST(req: NextRequest) {
     const created = await prisma.$transaction(async (tx) => {
       const products = []
       const skuValues = data!.products.flatMap((item) => (item.sku ? [item.sku] : []))
+      const variantSkuValues = data!.products.flatMap(
+        (item) => item.variants?.flatMap((variant) => (variant.sku ? [variant.sku] : [])) ?? [],
+      )
 
       if (new Set(skuValues).size !== skuValues.length) {
         throw new Error('DUPLICATE_SKU_IN_IMPORT')
+      }
+      if (new Set(variantSkuValues).size !== variantSkuValues.length) {
+        throw new Error('DUPLICATE_VARIANT_SKU_IN_IMPORT')
       }
 
       if (skuValues.length > 0) {
@@ -73,6 +91,18 @@ export async function POST(req: NextRequest) {
 
         if (existingSkus.length > 0) {
           throw new Error(`SKU_ALREADY_EXISTS:${existingSkus.map((item) => item.sku).join(', ')}`)
+        }
+      }
+      if (variantSkuValues.length > 0) {
+        const existingVariantSkus = await tx.productVariant.findMany({
+          where: { sku: { in: variantSkuValues } },
+          select: { sku: true },
+        })
+
+        if (existingVariantSkus.length > 0) {
+          throw new Error(
+            `VARIANT_SKU_ALREADY_EXISTS:${existingVariantSkus.map((item) => item.sku).join(', ')}`,
+          )
         }
       }
 
@@ -104,6 +134,10 @@ export async function POST(req: NextRequest) {
           },
         })
 
+        if (item.variants?.length) {
+          await syncProductVariantStock(tx, product.id, item.variants)
+        }
+
         products.push(product)
       }
 
@@ -123,12 +157,27 @@ export async function POST(req: NextRequest) {
           { status: 409 },
         )
       }
+      if (e.message === 'DUPLICATE_VARIANT_SKU_IN_IMPORT') {
+        return NextResponse.json(
+          { success: false, message: 'El CSV contiene SKUs de variante repetidos' },
+          { status: 409 },
+        )
+      }
 
       if (e.message.startsWith('SKU_ALREADY_EXISTS:')) {
         return NextResponse.json(
           {
             success: false,
             message: `Ya existen productos con estos SKUs: ${e.message.replace('SKU_ALREADY_EXISTS:', '')}`,
+          },
+          { status: 409 },
+        )
+      }
+      if (e.message.startsWith('VARIANT_SKU_ALREADY_EXISTS:')) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Ya existen variantes con estos SKUs: ${e.message.replace('VARIANT_SKU_ALREADY_EXISTS:', '')}`,
           },
           { status: 409 },
         )

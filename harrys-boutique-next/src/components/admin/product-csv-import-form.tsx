@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 import { BrandIcon } from '@/components/ui/brand-icon'
 import {
   buildImportTemplate,
-  buildProductImportPayload,
+  buildGroupedProductImportPayloads,
   findImageForRow,
   parseProductImportCsv,
   type ImportCategory,
@@ -75,8 +75,17 @@ export function ProductCsvImportForm({ categories }: Props) {
       return draft.errors.length > 0 || !hasImage
     }).length
 
+    const productKeys = new Set(
+      matchedRows.map(({ draft }) => draft.sku || draft.name.trim().toLowerCase()).filter(Boolean),
+    )
+    const variantRows = matchedRows.filter(
+      ({ draft }) => draft.variantSize || draft.variantSku || draft.variantStock !== undefined,
+    ).length
+
     return {
       total: matchedRows.length,
+      products: productKeys.size,
+      variants: variantRows,
       valid: matchedRows.length - invalid,
       invalid,
       matchedImages: matchedRows.filter((row) => row.localFile).length,
@@ -200,15 +209,15 @@ export function ProductCsvImportForm({ categories }: Props) {
       )
       const uploadedUrls = await uploadImages(filesToUpload)
 
-      const payloads = validRows.flatMap(({ draft, localFile }) => {
+      const rowsWithImages = validRows.map(({ draft, localFile }) => {
         const images = draft.imageUrls.length
           ? draft.imageUrls
           : localFile && uploadedUrls.get(localFile)
             ? [uploadedUrls.get(localFile)!]
             : []
-        const payload = buildProductImportPayload(draft, images)
-        return payload ? [payload] : []
+        return { row: draft, images }
       })
+      const payloads = buildGroupedProductImportPayloads(rowsWithImages)
 
       if (payloads.length === 0) {
         toast.error('No hay productos listos para crear después de subir imágenes')
@@ -299,17 +308,21 @@ export function ProductCsvImportForm({ categories }: Props) {
         <div className="rounded-lg border bg-gray-50 p-4">
           <span className="block text-sm font-medium text-gray-900">3. Revisión</span>
           <span className="mt-1 block text-sm text-gray-500">
-            {summary.valid} listas / {summary.invalid} con problemas
+            {summary.products} productos / {summary.variants} variantes
           </span>
         </div>
       </div>
 
       {drafts.length > 0 && (
         <>
-          <div className="grid gap-3 text-sm md:grid-cols-5">
+          <div className="grid gap-3 text-sm md:grid-cols-6">
             <div className="rounded-lg bg-gray-50 p-3">
               <p className="text-gray-500">Filas</p>
               <p className="text-xl font-semibold">{summary.total}</p>
+            </div>
+            <div className="rounded-lg bg-gray-50 p-3">
+              <p className="text-gray-500">Productos</p>
+              <p className="text-xl font-semibold">{summary.products}</p>
             </div>
             <div className="rounded-lg bg-green-50 p-3">
               <p className="text-green-700">Listas</p>
@@ -326,6 +339,10 @@ export function ProductCsvImportForm({ categories }: Props) {
             <div className="rounded-lg bg-slate-50 p-3">
               <p className="text-slate-700">URLs</p>
               <p className="text-xl font-semibold text-slate-900">{summary.urlImages}</p>
+            </div>
+            <div className="rounded-lg bg-purple-50 p-3">
+              <p className="text-purple-700">Variantes</p>
+              <p className="text-xl font-semibold text-purple-900">{summary.variants}</p>
             </div>
           </div>
 
@@ -364,6 +381,7 @@ export function ProductCsvImportForm({ categories }: Props) {
                   <th className="px-3 py-2">Precio</th>
                   <th className="px-3 py-2">Categoría</th>
                   <th className="px-3 py-2">Stock</th>
+                  <th className="px-3 py-2">Variante</th>
                   <th className="px-3 py-2">Estado</th>
                 </tr>
               </thead>
@@ -410,6 +428,11 @@ export function ProductCsvImportForm({ categories }: Props) {
                         {draft.categoryLabel} / {draft.subCategory || '-'}
                       </td>
                       <td className="px-3 py-2">{draft.stock}</td>
+                      <td className="px-3 py-2 text-xs text-gray-600">
+                        {draft.variantSize || draft.variantSku || draft.variantStock !== undefined
+                          ? `${draft.variantSize || '-'} / ${draft.variantColor || '-'} / ${draft.variantStock ?? draft.stock}`
+                          : 'Stock global'}
+                      </td>
                       <td className="px-3 py-2">
                         {problems.length ? (
                           <span className="text-xs text-red-700">{problems.join('; ')}</span>

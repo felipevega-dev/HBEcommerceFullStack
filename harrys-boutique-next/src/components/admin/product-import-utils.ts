@@ -20,6 +20,11 @@ export interface ParsedProductRow {
   colors: string[]
   sizes: string[]
   sku?: string
+  variantSku?: string
+  variantSize?: string
+  variantColor?: string
+  variantStock?: number
+  variantActive?: boolean
   stock: number
   active: boolean
   bestSeller: boolean
@@ -49,6 +54,15 @@ export interface ProductImportPayload {
   stock: number
   active: boolean
   bestSeller: boolean
+  variants?: ProductImportVariantPayload[]
+}
+
+export interface ProductImportVariantPayload {
+  size: string
+  color?: string
+  sku?: string
+  stock: number
+  active: boolean
 }
 
 export const REQUIRED_IMPORT_COLUMNS = ['name', 'description', 'price', 'category', 'subCategory']
@@ -175,6 +189,14 @@ export function parseProductImportCsv(text: string, categories: ImportCategory[]
     const originalPrice = parseImportMoney(get('originalPrice'))
     const subCategory = get('subCategory')
     const stock = Math.max(0, Number.parseInt(get('stock') || '0', 10) || 0)
+    const variantStockRaw = get('variantStock')
+    const variantStock = variantStockRaw
+      ? Math.max(0, Number.parseInt(variantStockRaw, 10) || 0)
+      : undefined
+    const variantSize = get('size') || undefined
+    const variantColor = get('color') || undefined
+    const variantSku = get('variantSku') || undefined
+    const hasVariantData = Boolean(variantSize || variantColor || variantSku || variantStockRaw)
     const errors: string[] = []
     const warnings: string[] = []
 
@@ -189,6 +211,9 @@ export function parseProductImportCsv(text: string, categories: ImportCategory[]
     if (category && !category.subcategories.includes(subCategory)) {
       errors.push(`Subcategoría no existe en ${category.name}`)
     }
+
+    if (hasVariantData && !variantSize) errors.push('Variante sin talla')
+    if (variantSku && !variantSize) errors.push('variantSku requiere size')
 
     return {
       row: index + 2,
@@ -206,6 +231,11 @@ export function parseProductImportCsv(text: string, categories: ImportCategory[]
       colors: parseImportList(get('colors')).length ? parseImportList(get('colors')) : ['Único'],
       sizes: parseImportList(get('sizes')).length ? parseImportList(get('sizes')) : ['ÚNICA'],
       sku: get('sku') || undefined,
+      variantSku,
+      variantSize,
+      variantColor,
+      variantStock,
+      variantActive: hasVariantData ? parseImportBoolean(get('variantActive'), true) : undefined,
       stock,
       active: parseImportBoolean(get('active'), true),
       bestSeller: parseImportBoolean(get('bestSeller'), false),
@@ -255,7 +285,7 @@ export function buildProductImportPayload(row: ParsedProductRow, images: string[
   if (!images.length) return null
   if (row.errors.length) return null
 
-  return {
+  const payload: ProductImportPayload = {
     name: row.name.trim(),
     description: row.description.trim(),
     seoTitle: row.seoTitle?.trim() || undefined,
@@ -271,7 +301,62 @@ export function buildProductImportPayload(row: ParsedProductRow, images: string[
     stock: row.stock,
     active: row.active,
     bestSeller: row.bestSeller,
-  } satisfies ProductImportPayload
+  }
+
+  return payload
+}
+
+function importGroupKey(row: ParsedProductRow) {
+  return row.sku ? `sku:${row.sku}` : `name:${normalizeImportKey(row.name)}`
+}
+
+export function buildGroupedProductImportPayloads(
+  rows: Array<{ row: ParsedProductRow; images: string[] }>,
+) {
+  const grouped = new Map<
+    string,
+    { source: ParsedProductRow; images: string[]; rows: ParsedProductRow[] }
+  >()
+
+  for (const item of rows) {
+    const key = importGroupKey(item.row)
+    const current = grouped.get(key)
+    if (current) {
+      current.rows.push(item.row)
+      if (!current.images.length) current.images = item.images
+    } else {
+      grouped.set(key, { source: item.row, images: item.images, rows: [item.row] })
+    }
+  }
+
+  return Array.from(grouped.values()).flatMap(({ source, images, rows }) => {
+    const payload = buildProductImportPayload(source, images)
+    if (!payload) return []
+
+    const variants = rows.flatMap((row) => {
+      if (!row.variantSize && !row.variantSku && row.variantStock === undefined) return []
+      return [
+        {
+          size: row.variantSize || row.sizes[0] || 'UNICA',
+          color: row.variantColor ?? row.colors[0] ?? '',
+          sku: row.variantSku,
+          stock: row.variantStock ?? row.stock,
+          active: row.variantActive ?? true,
+        },
+      ]
+    })
+
+    if (variants.length > 0) {
+      payload.variants = variants
+      payload.stock = variants
+        .filter((variant) => variant.active)
+        .reduce((sum, variant) => sum + variant.stock, 0)
+      payload.sizes = Array.from(new Set(variants.map((variant) => variant.size)))
+      payload.colors = Array.from(new Set(variants.map((variant) => variant.color || 'Unico')))
+    }
+
+    return [payload]
+  })
 }
 
 export function buildImportTemplate() {
@@ -290,6 +375,11 @@ export function buildImportTemplate() {
     'colors',
     'sizes',
     'stock',
+    'size',
+    'color',
+    'variantSku',
+    'variantStock',
+    'variantActive',
     'active',
     'bestSeller',
   ]
@@ -308,6 +398,11 @@ export function buildImportTemplate() {
     'Negro|Rojo',
     'S|M|L',
     '20',
+    'S',
+    'Negro',
+    'HB-001-S-NEGRO',
+    '8',
+    'true',
     'true',
     'false',
   ]

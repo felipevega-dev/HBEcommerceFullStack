@@ -13,6 +13,7 @@ const navItems: Array<{ href: string; label: string; icon: BrandIconName }> = [
   { href: '/admin/testimonials', label: 'Testimonios', icon: 'message' },
   { href: '/admin/coupons', label: 'Cupones', icon: 'coupon' },
   { href: '/admin/hero', label: 'Hero Slides', icon: 'image' },
+  { href: '/admin/content/about', label: 'Nosotros', icon: 'review' },
   { href: '/admin/instagram', label: 'Instagram', icon: 'camera' },
   { href: '/admin/settings', label: 'Configuración', icon: 'settings' },
 ]

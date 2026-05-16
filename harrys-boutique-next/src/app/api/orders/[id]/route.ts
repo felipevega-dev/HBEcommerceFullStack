@@ -14,7 +14,8 @@ import OrderStatusUpdate from '@/lib/email/templates/order-status-update'
 import { getSiteUrl } from '@/lib/site'
 
 const updateStatusSchema = z.object({
-  status: z.nativeEnum(OrderStatus),
+  status: z.nativeEnum(OrderStatus).optional(),
+  internalNotes: z.string().max(5000).optional(),
 })
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -68,7 +69,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ success: false, message: 'Orden no encontrada' }, { status: 404 })
     }
 
-    if (existing.status === 'CANCELLED' && data!.status !== 'CANCELLED') {
+    if (data!.status && existing.status === 'CANCELLED' && data!.status !== 'CANCELLED') {
       return NextResponse.json(
         { success: false, message: 'Una orden cancelada no se reactiva desde este panel' },
         { status: 409 },
@@ -106,12 +107,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
       return tx.order.update({
         where: { id },
-        data: { status: data!.status },
+        data: {
+          ...(data!.status ? { status: data!.status } : {}),
+          ...(data!.internalNotes !== undefined ? { internalNotes: data!.internalNotes } : {}),
+        },
         include: { user: { select: { email: true, name: true } } },
       })
     })
 
-    if (order.user?.email) {
+    if (data!.status && data!.status !== previousStatus && order.user?.email) {
       try {
         await sendEmail({
           to: order.user.email,
@@ -127,7 +131,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       } catch (emailError) {
         console.error('[Order PUT] Failed to send status update email:', emailError)
       }
-    } else {
+    } else if (data!.status && data!.status !== previousStatus) {
       console.warn(`[Order PUT] No email for order ${id}, skipping status update email`)
     }
 

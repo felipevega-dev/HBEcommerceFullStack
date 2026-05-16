@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildGroupedProductImportPayloads,
   buildProductImportPayload,
   findImageForRow,
   normalizeImportKey,
@@ -81,5 +82,24 @@ describe('product import utils', () => {
 
   it('normalizes accents, extensions, and separators', () => {
     expect(normalizeImportKey('Arnés Premium_01.WEBP')).toBe('arnes-premium-01')
+  })
+  it('groups variant rows into one product payload with active variant stock', () => {
+    const result = parseProductImportCsv(
+      [
+        'sku,name,description,price,imageFile,category,subCategory,colors,sizes,stock,size,color,variantSku,variantStock,variantActive',
+        '"HB-010","PolerÃ³n Barbie","Suave y cÃ³modo","19990","HB-010.webp","Perros","Arneses","Rosa","S|M","0","S","Rosa","HB-010-S","3","true"',
+        '"HB-010","PolerÃ³n Barbie","Suave y cÃ³modo","19990","HB-010.webp","Perros","Arneses","Rosa","S|M","0","M","Rosa","HB-010-M","4","false"',
+      ].join('\n'),
+      categories,
+    )
+
+    const payloads = buildGroupedProductImportPayloads(
+      result.rows.map((row) => ({ row, images: ['https://example.com/hb-010.webp'] })),
+    )
+
+    expect(payloads).toHaveLength(1)
+    expect(payloads[0].variants).toHaveLength(2)
+    expect(payloads[0].stock).toBe(3)
+    expect(payloads[0].sizes).toEqual(['S', 'M'])
   })
 })

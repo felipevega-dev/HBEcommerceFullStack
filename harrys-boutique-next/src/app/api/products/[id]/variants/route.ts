@@ -15,7 +15,7 @@ const variantSchema = z.object({
 })
 
 const variantsBodySchema = z.object({
-  variants: z.array(variantSchema).min(1).max(200),
+  variants: z.array(variantSchema).max(200),
 })
 
 function getSizes(value: unknown) {

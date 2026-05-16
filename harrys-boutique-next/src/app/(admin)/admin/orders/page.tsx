@@ -57,7 +57,10 @@ export default async function AdminOrdersPage({
   const [orders, total, stats] = await Promise.all([
     prisma.order.findMany({
       where,
-      include: { user: { select: { name: true, email: true } }, items: true },
+      include: {
+        user: { select: { name: true, email: true } },
+        items: { include: { variant: { select: { sku: true } } } },
+      },
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
@@ -87,6 +90,7 @@ export default async function AdminOrdersPage({
           addressSnapshot: o.addressSnapshot,
           couponCode: o.couponCode,
           discountAmount: o.discountAmount ? Number(o.discountAmount) : null,
+          internalNotes: o.internalNotes,
           user: { name: o.user.name, email: o.user.email },
           items: o.items.map((i) => ({
             id: i.id,
@@ -96,6 +100,8 @@ export default async function AdminOrdersPage({
             size: i.size,
             color: i.color,
             image: i.image,
+            variantId: i.variantId,
+            variantSku: i.variant?.sku ?? null,
           })),
         }))}
         total={total}

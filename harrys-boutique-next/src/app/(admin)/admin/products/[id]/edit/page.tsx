@@ -31,6 +31,17 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         active: true,
         createdAt: true,
         updatedAt: true,
+        variants: {
+          orderBy: [{ size: 'asc' }, { color: 'asc' }],
+          select: {
+            id: true,
+            size: true,
+            color: true,
+            sku: true,
+            stock: true,
+            active: true,
+          },
+        },
       },
     }),
     prisma.category.findMany({
@@ -74,6 +85,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       <ProductEditForm
         productId={id}
         initialData={serialize(initialData)}
+        initialVariants={serialize(rawProduct.variants)}
         categories={serialize(rawCategories)}
       />
     </div>

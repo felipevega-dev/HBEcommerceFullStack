@@ -16,6 +16,8 @@ interface OrderItem {
   size: string
   color: string
   image?: string | null
+  variantId?: string | null
+  variantSku?: string | null
 }
 
 interface Order {
@@ -29,6 +31,7 @@ interface Order {
   addressSnapshot: unknown
   couponCode?: string | null
   discountAmount?: number | null
+  internalNotes: string
   items: OrderItem[]
   user: { name: string; email: string }
 }
@@ -82,6 +85,10 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
   const [searchInput, setSearchInput] = useState(currentSearch)
   const [dateFrom, setDateFrom] = useState(searchParams.get('dateFrom') || '')
   const [dateTo, setDateTo] = useState(searchParams.get('dateTo') || '')
+  const [notesDrafts, setNotesDrafts] = useState<Record<string, string>>(
+    Object.fromEntries(orders.map((order) => [order.id, order.internalNotes || ''])),
+  )
+  const [emailing, setEmailing] = useState<string | null>(null)
   const totalPages = Math.ceil(total / limit)
 
   const setStatus = async (orderId: string, status: OrderStatus) => {
@@ -114,6 +121,43 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
     setSelectedOrders(new Set())
   }
 
+  const saveNotes = async (orderId: string) => {
+    setUpdating(orderId)
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ internalNotes: notesDrafts[orderId] ?? '' }),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message ?? 'Error al guardar notas')
+      toast.success('Notas guardadas')
+      router.refresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al guardar notas')
+    } finally {
+      setUpdating(null)
+    }
+  }
+
+  const resendEmail = async (orderId: string, type: 'confirmation' | 'status') => {
+    setEmailing(`${orderId}:${type}`)
+    try {
+      const response = await fetch(`/api/orders/${orderId}/resend-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type }),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message ?? 'No se pudo reenviar')
+      toast.success('Email reenviado')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al reenviar email')
+    } finally {
+      setEmailing(null)
+    }
+  }
+
   const toggleSelectOrder = (orderId: string) => {
     setSelectedOrders((current) => {
       const next = new Set(current)
@@ -142,6 +186,8 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
       'Método de pago',
       'Cupón',
       'Descuento',
+      'Productos',
+      'Notas internas',
     ]
     const rows = orders.map((order) => [
       order.id,
@@ -154,6 +200,13 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
       order.paymentMethod,
       order.couponCode || '',
       order.discountAmount || 0,
+      order.items
+        .map(
+          (item) =>
+            `${item.name} x${item.quantity} talla:${item.size} color:${item.color || '-'} sku:${item.variantSku || '-'}`,
+        )
+        .join(' | '),
+      order.internalNotes || '',
     ])
     const csv = [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
@@ -459,6 +512,56 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+                    <div className="rounded-lg bg-white p-3 text-sm">
+                      <label className="mb-2 block font-medium" htmlFor={`notes-${order.id}`}>
+                        Notas internas
+                      </label>
+                      <textarea
+                        id={`notes-${order.id}`}
+                        value={notesDrafts[order.id] ?? ''}
+                        onChange={(event) =>
+                          setNotesDrafts((current) => ({
+                            ...current,
+                            [order.id]: event.target.value,
+                          }))
+                        }
+                        rows={4}
+                        className="w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                        placeholder="Notas visibles solo para el equipo admin..."
+                      />
+                      <button
+                        type="button"
+                        disabled={updating === order.id}
+                        onClick={() => void saveNotes(order.id)}
+                        className="mt-2 rounded-lg bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:bg-gray-400"
+                      >
+                        Guardar notas
+                      </button>
+                    </div>
+                    <div className="rounded-lg bg-white p-3 text-sm">
+                      <p className="mb-2 font-medium">Emails</p>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          type="button"
+                          disabled={emailing === `${order.id}:confirmation`}
+                          onClick={() => void resendEmail(order.id, 'confirmation')}
+                          className="rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          Reenviar confirmación
+                        </button>
+                        <button
+                          type="button"
+                          disabled={emailing === `${order.id}:status`}
+                          onClick={() => void resendEmail(order.id, 'status')}
+                          className="rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          Reenviar estado
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Productos ({order.items.length})</p>
                     {order.items.map((item) => (
@@ -482,6 +585,7 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                             <p className="text-xs text-gray-500">
                               Talla: {item.size}
                               {item.color ? ` · Color: ${item.color}` : ''} · Cant: {item.quantity}
+                              {item.variantSku ? ` · SKU: ${item.variantSku}` : ''}
                             </p>
                           </div>
                         </div>
