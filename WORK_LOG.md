@@ -3,6 +3,34 @@
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
+## 2026-05-17 - SEO Tecnico Con Datos Estructurados
+
+- Rama usada: `codex/docs-workflow-methodology`.
+- Objetivo de la fase: mejorar SEO tecnico con JSON-LD reutilizable para la
+  tienda y para la pagina de preguntas frecuentes.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/app/layout.tsx`
+  - `harrys-boutique-next/src/app/(store)/faq/page.tsx`
+  - `harrys-boutique-next/src/lib/structured-data.ts`
+- Cambios realizados:
+  - Se agrego helper central para serializar JSON-LD de forma segura.
+  - Se agregaron schemas `Organization` y `PetStore` en el layout raiz.
+  - Se agregaron schemas `BreadcrumbList` y `FAQPage` en FAQ.
+  - Se actualizo el copy de FAQ a español chileno y contenido mas claro para
+    envios, pagos, cambios y tallas.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run lint`.
+  - `npm run build`.
+- Resultado:
+  - Validaciones completas en verde.
+- Pendientes:
+  - Commitear la fase.
+- Riesgos detectados:
+  - Los datos de direccion siguen siendo conservadores: Arica, Chile, sin calle
+    exacta ni telefono hasta que el negocio confirme datos publicos.
+
 ## 2026-05-17 - Scripts Operativos De Validacion
 
 - Rama usada: `codex/docs-workflow-methodology`.

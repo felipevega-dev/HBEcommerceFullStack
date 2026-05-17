@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Playfair_Display } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import { getSiteOrigin } from '@/lib/site'
+import { getStoreStructuredData, stringifyJsonLd } from '@/lib/structured-data'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-body' })
@@ -35,9 +36,15 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const storeStructuredData = getStoreStructuredData()
+
   return (
     <html lang="es">
       <body className={`${geist.variable} ${playfairDisplay.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: stringifyJsonLd(storeStructuredData) }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
