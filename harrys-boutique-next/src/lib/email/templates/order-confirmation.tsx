@@ -40,7 +40,7 @@ export default function OrderConfirmation({
   address,
 }: OrderConfirmationProps) {
   const formatPrice = (amount: number) =>
-    new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount)
+    new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount)
 
   return (
     <Html lang="es">
@@ -59,7 +59,7 @@ export default function OrderConfirmation({
               ¡Gracias por tu compra, {customerName}!
             </Heading>
             <Text style={textStyle}>
-              Tu pedido fue confirmado y está siendo procesado. A continuación encontrás el resumen
+              Tu pedido fue confirmado y está siendo procesado. A continuación encuentras el resumen
               de tu compra.
             </Text>
             <Text style={orderIdStyle}>Número de pedido: #{orderId}</Text>
@@ -88,7 +88,7 @@ export default function OrderConfirmation({
                 <Column style={itemDetailsStyle}>
                   <Text style={itemNameStyle}>{item.name}</Text>
                   <Text style={itemMetaStyle}>
-                    Talle: {item.size} · Cantidad: {item.quantity}
+                    Talla: {item.size} · Cantidad: {item.quantity}
                   </Text>
                 </Column>
                 <Column style={itemPriceColumnStyle}>
@@ -147,7 +147,7 @@ export default function OrderConfirmation({
           {/* Footer */}
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              Si tenés alguna pregunta sobre tu pedido, respondé este correo o contactanos por
+              Si tienes alguna pregunta sobre tu pedido, responde este correo o contáctanos por
               nuestras redes sociales.
             </Text>
             <Text style={footerTextStyle}>© {new Date().getFullYear()} Harry&apos;s Boutique</Text>

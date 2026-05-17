@@ -38,11 +38,11 @@ export default async function AdminDashboardPage() {
     prisma.product.count({ where: { active: true } }),
     prisma.user.count({ where: { role: 'USER' } }),
     prisma.order.aggregate({
-      where: { payment: true, createdAt: { gte: startOfMonth } },
+      where: { paymentStatus: 'PAID', createdAt: { gte: startOfMonth } },
       _sum: { amount: true },
     }),
     prisma.order.aggregate({
-      where: { payment: true, createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } },
+      where: { paymentStatus: 'PAID', createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } },
       _sum: { amount: true },
     }),
     prisma.order.count({ where: { createdAt: { gte: startOfMonth } } }),
@@ -67,7 +67,7 @@ export default async function AdminDashboardPage() {
     prisma.orderItem.groupBy({
       by: ['productId'],
       _sum: { quantity: true },
-      where: { order: { payment: true }, productId: { not: null } },
+      where: { order: { paymentStatus: 'PAID' }, productId: { not: null } },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
     }),

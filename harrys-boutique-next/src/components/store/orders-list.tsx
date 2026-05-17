@@ -2,12 +2,11 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import type { OrderStatus } from '@prisma/client'
-import { SHIPPING_FEE } from '@/lib/commerce'
+import type { OrderStatus, PaymentStatus } from '@prisma/client'
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: 'Pendiente',
-  PROCESSING: 'En proceso',
+  PROCESSING: 'Preparando',
   SHIPPED: 'Enviado',
   DELIVERED: 'Entregado',
   CANCELLED: 'Cancelado',
@@ -19,6 +18,13 @@ const STATUS_DOT_COLORS: Record<OrderStatus, string> = {
   SHIPPED: 'bg-green-500',
   DELIVERED: 'bg-purple-500',
   CANCELLED: 'bg-red-500',
+}
+
+const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  PENDING: 'Pago pendiente',
+  PAID: 'Pagado',
+  FAILED: 'Pago fallido',
+  REFUNDED: 'Reembolsado',
 }
 
 interface OrderItem {
@@ -35,9 +41,13 @@ export interface OrderWithItems {
   amount: number
   status: OrderStatus
   payment: boolean
+  paymentStatus: PaymentStatus
   paymentMethod: string
   createdAt: string
   addressSnapshot: unknown
+  discountAmount?: number | null
+  courier?: string | null
+  trackingNumber?: string | null
   items: OrderItem[]
 }
 
@@ -57,6 +67,12 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
       {orders.map((order) => {
         const address = order.addressSnapshot as Record<string, string> | null
         const isExpanded = expanded === order.id
+        const itemsSubtotal = order.items.reduce(
+          (sum, item) => sum + Number(item.price) * item.quantity,
+          0,
+        )
+        const discountAmount = Number(order.discountAmount ?? 0)
+        const shippingFee = Math.max(0, Number(order.amount) + discountAmount - itemsSubtotal)
 
         return (
           <div key={order.id} className="bg-white rounded-lg shadow-sm overflow-hidden border">
@@ -89,10 +105,8 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
 
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">{order.paymentMethod}</span>
-                    <span
-                      className={`text-sm ${order.payment ? 'text-green-500' : 'text-yellow-500'}`}
-                    >
-                      {order.payment ? 'Pagado' : 'Pendiente'}
+                    <span className="text-sm text-gray-500">
+                      {PAYMENT_STATUS_LABELS[order.paymentStatus]}
                     </span>
                   </div>
 
@@ -158,11 +172,19 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                   <div className="bg-white p-4 rounded-lg space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal:</span>
-                      <span>${(Number(order.amount) - SHIPPING_FEE).toLocaleString('es-CL')}</span>
+                      <span>${itemsSubtotal.toLocaleString('es-CL')}</span>
                     </div>
+                    {discountAmount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Descuento:</span>
+                        <span>-${discountAmount.toLocaleString('es-CL')}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Envío:</span>
-                      <span>${SHIPPING_FEE.toLocaleString('es-CL')}</span>
+                      <span>
+                        {shippingFee === 0 ? 'Gratis' : `$${shippingFee.toLocaleString('es-CL')}`}
+                      </span>
                     </div>
                     <div className="flex justify-between font-medium text-lg pt-2 border-t">
                       <span>Total:</span>
@@ -205,6 +227,18 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                           <div>
                             <span className="text-gray-600">Región:</span>
                             <p>{address.region}</p>
+                          </div>
+                        )}
+                        {order.courier && (
+                          <div>
+                            <span className="text-gray-600">Courier:</span>
+                            <p>{order.courier}</p>
+                          </div>
+                        )}
+                        {order.trackingNumber && (
+                          <div>
+                            <span className="text-gray-600">Seguimiento:</span>
+                            <p>{order.trackingNumber}</p>
                           </div>
                         )}
                       </div>

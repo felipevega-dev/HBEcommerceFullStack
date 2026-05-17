@@ -49,7 +49,7 @@ const EMPTY_FORM: FormData = {
   city: '',
   region: '',
   postalCode: '',
-  country: 'Argentina',
+  country: 'Chile',
 }
 
 export function CheckoutPageClient({
@@ -365,13 +365,10 @@ export function CheckoutPageClient({
       const prefData = await prefRes.json()
 
       if (!prefData.success) {
-        toast.error('Error al iniciar el pago con MercadoPago')
+        toast.error(prefData.message ?? 'Error al iniciar el pago con MercadoPago')
         return
       }
 
-      // Clear cart optimistically and redirect to MP
-      clearCart()
-      localStorage.removeItem('checkout-progress') // Clear saved progress
       setMpInitUrl(prefData.initPoint ?? null)
 
       // Redirect to MercadoPago checkout

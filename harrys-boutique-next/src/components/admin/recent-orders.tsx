@@ -13,7 +13,7 @@ interface RecentOrder {
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: 'Pendiente',
-  PROCESSING: 'En proceso',
+  PROCESSING: 'Preparando',
   SHIPPED: 'Enviado',
   DELIVERED: 'Entregado',
   CANCELLED: 'Cancelado',

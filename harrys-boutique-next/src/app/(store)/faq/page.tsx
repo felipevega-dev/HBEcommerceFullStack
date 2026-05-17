@@ -30,7 +30,7 @@ const faqs = [
     items: [
       {
         q: '¿Cuánto tarda en llegar mi pedido?',
-        a: 'Los envíos dentro de Argentina demoran entre 3 y 7 días hábiles dependiendo de tu ubicación. Para el interior del país puede demorar hasta 10 días hábiles.',
+        a: 'Los envíos dentro de Chile demoran entre 2 y 7 días hábiles dependiendo de tu comuna y región. Para zonas extremas puede demorar hasta 15 días hábiles.',
       },
       {
         q: '¿Tienen envío gratis?',

@@ -8,14 +8,20 @@ import {
   requireAdminAuth,
   validateBody,
 } from '@/lib/api-utils'
-import { OrderStatus } from '@prisma/client'
+import { OrderStatus, PaymentStatus } from '@prisma/client'
 import { sendEmail } from '@/lib/email'
 import OrderStatusUpdate from '@/lib/email/templates/order-status-update'
 import { getSiteUrl } from '@/lib/site'
+import { releaseCouponRedemption, releaseOrderStockReservation } from '@/lib/order-lifecycle'
 
 const updateStatusSchema = z.object({
   status: z.nativeEnum(OrderStatus).optional(),
+  paymentStatus: z.nativeEnum(PaymentStatus).optional(),
   internalNotes: z.string().max(5000).optional(),
+  courier: z.string().max(100).optional(),
+  trackingNumber: z.string().max(120).optional(),
+  cancelReason: z.string().max(500).optional(),
+  refundReason: z.string().max(500).optional(),
 })
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -45,7 +51,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error } = await requireAdminAuth()
+  const { error, session } = await requireAdminAuth()
   if (error) return error
 
   const protectionError = await protectMutation(req, {
@@ -81,38 +87,77 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const order = await prisma.$transaction(async (tx) => {
       if (shouldReleaseInventory) {
-        for (const item of existing.items) {
-          if (!item.productId) continue
+        await releaseOrderStockReservation(tx, existing, {
+          cancelReason: data!.cancelReason ?? 'Cancelada desde admin',
+        })
 
-          if (item.variantId) {
-            await tx.productVariant.update({
-              where: { id: item.variantId },
-              data: { stock: { increment: item.quantity } },
-            })
-          }
-
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { increment: item.quantity } },
-          })
-        }
-
-        if (existing.couponCode && (existing.payment || existing.paymentMethod === 'COD')) {
-          await tx.coupon.updateMany({
-            where: { code: existing.couponCode, usedCount: { gt: 0 } },
-            data: { usedCount: { decrement: 1 } },
-          })
-        }
+        await releaseCouponRedemption(
+          tx,
+          existing.id,
+          data!.cancelReason ?? 'Cancelada desde admin',
+        )
       }
 
-      return tx.order.update({
+      const updatedOrder = await tx.order.update({
         where: { id },
         data: {
           ...(data!.status ? { status: data!.status } : {}),
+          ...(data!.paymentStatus
+            ? {
+                paymentStatus: data!.paymentStatus,
+                payment: data!.paymentStatus === 'PAID',
+                paidAt:
+                  data!.paymentStatus === 'PAID' && !existing.paidAt ? new Date() : existing.paidAt,
+              }
+            : {}),
           ...(data!.internalNotes !== undefined ? { internalNotes: data!.internalNotes } : {}),
+          ...(data!.courier !== undefined ? { courier: data!.courier } : {}),
+          ...(data!.trackingNumber !== undefined ? { trackingNumber: data!.trackingNumber } : {}),
+          ...(data!.cancelReason !== undefined ? { cancelReason: data!.cancelReason } : {}),
+          ...(data!.refundReason !== undefined ? { refundReason: data!.refundReason } : {}),
+          ...(data!.status === 'SHIPPED' && !existing.shippedAt ? { shippedAt: new Date() } : {}),
+          ...(data!.status === 'DELIVERED' && !existing.deliveredAt
+            ? { deliveredAt: new Date() }
+            : {}),
         },
         include: { user: { select: { email: true, name: true } } },
       })
+
+      if (data!.status && data!.status !== previousStatus) {
+        await tx.orderStatusHistory.create({
+          data: {
+            orderId: id,
+            previousStatus,
+            status: data!.status,
+            note: data!.cancelReason,
+          },
+        })
+      }
+
+      const auditChanges = Object.fromEntries(
+        Object.entries({
+          previousStatus,
+          status: data!.status,
+          paymentStatus: data!.paymentStatus,
+          internalNotesChanged: data!.internalNotes !== undefined,
+          courier: data!.courier,
+          trackingNumber: data!.trackingNumber,
+          cancelReason: data!.cancelReason,
+          refundReason: data!.refundReason,
+        }).filter(([, value]) => value !== undefined),
+      )
+
+      await tx.auditLog.create({
+        data: {
+          userId: session!.user.id,
+          action: 'order.update',
+          resource: 'order',
+          resourceId: id,
+          changes: auditChanges,
+        },
+      })
+
+      return updatedOrder
     })
 
     if (data!.status && data!.status !== previousStatus && order.user?.email) {
@@ -142,7 +187,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error } = await requireAdminAuth()
+  const { error, session } = await requireAdminAuth()
   if (error) return error
 
   const protectionError = await protectMutation(req, {
@@ -165,31 +210,25 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     await prisma.$transaction(async (tx) => {
       if (existing.status !== 'CANCELLED') {
-        for (const item of existing.items) {
-          if (!item.productId) continue
+        await releaseOrderStockReservation(tx, existing, {
+          status: 'CANCELLED',
+          cancelReason: 'Eliminada desde admin',
+        })
 
-          if (item.variantId) {
-            await tx.productVariant.update({
-              where: { id: item.variantId },
-              data: { stock: { increment: item.quantity } },
-            })
-          }
-
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { increment: item.quantity } },
-          })
-        }
-
-        if (existing.couponCode && (existing.payment || existing.paymentMethod === 'COD')) {
-          await tx.coupon.updateMany({
-            where: { code: existing.couponCode, usedCount: { gt: 0 } },
-            data: { usedCount: { decrement: 1 } },
-          })
-        }
+        await releaseCouponRedemption(tx, existing.id, 'Eliminada desde admin')
       }
 
       await tx.order.delete({ where: { id } })
+
+      await tx.auditLog.create({
+        data: {
+          userId: session!.user.id,
+          action: 'order.delete',
+          resource: 'order',
+          resourceId: id,
+          changes: { previousStatus: existing.status },
+        },
+      })
     })
     return NextResponse.json({ success: true, message: 'Orden eliminada' })
   } catch (e) {

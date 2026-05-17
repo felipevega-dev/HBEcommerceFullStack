@@ -132,7 +132,7 @@ describe('formatRelativeTime', () => {
     const date = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
     const result = formatRelativeTime(date)
     // Should contain date components
-    expect(result).toMatch(/\d{2}\/\d{2}\/\d{4}/)
+    expect(result).toMatch(/\d{2}[/-]\d{2}[/-]\d{4}/)
   })
 })
 

@@ -22,7 +22,7 @@ export interface OrderStatusUpdateProps {
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING: 'Pendiente',
-  PROCESSING: 'En proceso',
+  PROCESSING: 'Preparando',
   SHIPPED: 'Enviado',
   DELIVERED: 'Entregado',
   CANCELLED: 'Cancelado',
@@ -61,7 +61,7 @@ export default function OrderStatusUpdate({
               Hola, {customerName}
             </Heading>
             <Text style={textStyle}>
-              El estado de tu pedido ha sido actualizado. A continuación encontrás los detalles del
+              El estado de tu pedido ha sido actualizado. A continuación encuentras los detalles del
               cambio.
             </Text>
             <Text style={orderIdStyle}>Número de pedido: #{orderId}</Text>
@@ -109,7 +109,7 @@ export default function OrderStatusUpdate({
           {/* Footer */}
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              Si tenés alguna pregunta sobre tu pedido, respondé este correo o contactanos por
+              Si tienes alguna pregunta sobre tu pedido, responde este correo o contáctanos por
               nuestras redes sociales.
             </Text>
             <Text style={footerTextStyle}>© {new Date().getFullYear()} Harry&apos;s Boutique</Text>

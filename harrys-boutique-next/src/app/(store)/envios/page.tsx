@@ -4,8 +4,7 @@ import { BrandIcon } from '@/components/ui/brand-icon'
 
 export const metadata: Metadata = {
   title: "Información de Envíos — Harry's Boutique",
-  description:
-    'Conocé nuestras opciones de envío, tiempos de entrega y costos para todo Argentina.',
+  description: 'Conoce nuestras opciones de envío, tiempos de entrega y costos para Chile.',
 }
 
 export default function EnviosPage() {
@@ -30,7 +29,7 @@ export default function EnviosPage() {
         Información de Envíos
       </h1>
       <p className="text-[var(--color-text-secondary)] mb-12">
-        Enviamos a todo el país con las mejores opciones de entrega.
+        Enviamos dentro de Chile con opciones de entrega claras y seguimiento del pedido.
       </p>
 
       <div className="space-y-8">
@@ -44,8 +43,7 @@ export default function EnviosPage() {
               Envío gratis en compras +$50.000
             </h2>
             <p className="text-sm text-[var(--color-text-secondary)]">
-              Todas las compras superiores a $50.000 tienen envío sin costo a cualquier punto del
-              país.
+              Todas las compras superiores a $50.000 tienen envío sin costo dentro de Chile.
             </p>
           </div>
         </div>
@@ -57,10 +55,10 @@ export default function EnviosPage() {
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              { zona: 'AMBA (Buenos Aires)', tiempo: '2 a 4 días hábiles' },
-              { zona: 'Interior de Buenos Aires', tiempo: '3 a 6 días hábiles' },
-              { zona: 'Resto del país', tiempo: '5 a 10 días hábiles' },
-              { zona: 'Zonas remotas', tiempo: '7 a 15 días hábiles' },
+              { zona: 'Región Metropolitana', tiempo: '2 a 4 días hábiles' },
+              { zona: 'Valparaíso y O’Higgins', tiempo: '3 a 6 días hábiles' },
+              { zona: 'Norte y sur de Chile', tiempo: '5 a 10 días hábiles' },
+              { zona: 'Zonas extremas', tiempo: '7 a 15 días hábiles' },
             ].map((item) => (
               <div key={item.zona} className="bg-[var(--color-surface)] rounded-xl p-4">
                 <p className="font-medium text-sm text-[var(--color-text-primary)]">{item.zona}</p>

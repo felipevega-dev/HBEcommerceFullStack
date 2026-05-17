@@ -17,6 +17,11 @@ import {
   validateCouponForSubtotal,
 } from '@/lib/checkout'
 import { getPricingSettings } from '@/lib/commerce-settings'
+import {
+  getStockReservationExpiresAt,
+  releaseExpiredStockReservations,
+  reserveCouponForOrder,
+} from '@/lib/order-lifecycle'
 
 const addressSchema = z.object({
   firstname: z.string().min(1),
@@ -59,10 +64,15 @@ export async function GET(req: NextRequest) {
     const { page, limit, skip } = getPagination(searchParams)
     const status = searchParams.get('status')
     const paymentMethod = searchParams.get('paymentMethod')
+    const paymentStatus = searchParams.get('paymentStatus')?.toUpperCase()
 
     const where = {
       ...(status && { status: status as never }),
       ...(paymentMethod && { paymentMethod }),
+      ...(paymentStatus &&
+        ['PENDING', 'PAID', 'FAILED', 'REFUNDED'].includes(paymentStatus) && {
+          paymentStatus: paymentStatus as never,
+        }),
     }
 
     const [orders, total] = await Promise.all([
@@ -129,6 +139,10 @@ export async function POST(req: NextRequest) {
   if (validationError) return validationError
 
   try {
+    await releaseExpiredStockReservations().catch((cleanupError) => {
+      console.warn('[Orders POST] Failed to release expired reservations:', cleanupError)
+    })
+
     const { items, address, paymentMethod, couponCode } = data!
 
     const productIds = [...new Set(items.map((item) => item.productId))]
@@ -182,6 +196,9 @@ export async function POST(req: NextRequest) {
     const totals = calculateCheckoutTotals(resolvedItems, couponToApply, pricingSettings)
 
     const order = await prisma.$transaction(async (tx) => {
+      const now = new Date()
+      const stockReservationExpiresAt = getStockReservationExpiresAt(paymentMethod, now)
+
       for (const item of resolvedItems) {
         if (item.variantId) {
           const variantUpdate = await tx.productVariant.updateMany({
@@ -217,28 +234,16 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      if (appliedCouponId && paymentMethod === 'COD') {
-        const couponUpdate = await tx.coupon.updateMany({
-          where: {
-            id: appliedCouponId,
-            active: true,
-            ...(couponToApply?.expiresAt && { expiresAt: { gt: new Date() } }),
-            ...(couponToApply?.maxUses && { usedCount: { lt: couponToApply.maxUses } }),
-          },
-          data: { usedCount: { increment: 1 } },
-        })
-
-        if (couponUpdate.count !== 1) {
-          throw new Error('COUPON_EXHAUSTED')
-        }
-      }
-
       const createdOrder = await tx.order.create({
         data: {
           userId: session!.user.id,
           amount: totals.total,
           addressSnapshot: address,
           paymentMethod,
+          paymentStatus: 'PENDING',
+          paymentProvider: paymentMethod === 'mercadopago' ? 'mercadopago' : 'cash_on_delivery',
+          stockReservedAt: now,
+          stockReservationExpiresAt,
           couponCode: appliedCouponCode,
           discountAmount: totals.discountAmount > 0 ? totals.discountAmount : undefined,
           items: {
@@ -256,6 +261,15 @@ export async function POST(req: NextRequest) {
         },
         include: { items: true },
       })
+
+      if (appliedCouponId) {
+        await reserveCouponForOrder(tx, {
+          couponId: appliedCouponId,
+          userId: session!.user.id,
+          orderId: createdOrder.id,
+          amount: totals.discountAmount,
+        })
+      }
 
       if (paymentMethod === 'COD') {
         await tx.cart.deleteMany({ where: { userId: session!.user.id } })

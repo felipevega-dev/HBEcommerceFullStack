@@ -13,18 +13,24 @@ const playfairDisplay = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin(),
-  title: "Harry's Boutique — Ropa y accesorios para mascotas",
-  description: 'Descubre nuestra colección de ropa y accesorios para tu mascota.',
+  title: "Harry's Boutique — Ropa y accesorios para mascotas en Chile",
+  description:
+    'Ropa para perros, gatos y accesorios para mascotas en Chile. Compra online con envíos, cambios y pagos seguros.',
   openGraph: {
     siteName: "Harry's Boutique",
     type: 'website',
+    locale: 'es_CL',
   },
   keywords: [
     'ropa para mascotas',
+    'ropa para mascotas chile',
     'accesorios para perros',
     'ropa para perros',
+    'ropa para gatos',
+    'ropa para perros pequeños',
+    'tienda de mascotas en chile',
     'boutique mascotas',
-    'moda mascotas argentina',
+    'moda mascotas chile',
   ],
 }
 

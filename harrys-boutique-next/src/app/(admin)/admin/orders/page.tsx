@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import { AdminOrderList } from '@/components/admin/order-list'
-import { OrderStatus } from '@prisma/client'
+import { OrderStatus, PaymentStatus } from '@prisma/client'
 
 export const metadata: Metadata = { title: "Órdenes — Admin Harry's Boutique" }
 
@@ -30,7 +30,10 @@ export default async function AdminOrdersPage({
   }
 
   if (params.paymentStatus) {
-    where.payment = params.paymentStatus === 'paid'
+    const paymentStatus = params.paymentStatus.toUpperCase()
+    if (['PENDING', 'PAID', 'FAILED', 'REFUNDED'].includes(paymentStatus)) {
+      where.paymentStatus = paymentStatus as PaymentStatus
+    }
   }
 
   if (params.search) {
@@ -84,6 +87,7 @@ export default async function AdminOrdersPage({
           amount: Number(o.amount),
           status: o.status,
           payment: o.payment,
+          paymentStatus: o.paymentStatus,
           paymentMethod: o.paymentMethod,
           createdAt: o.createdAt.toISOString(),
           updatedAt: o.updatedAt.toISOString(),
@@ -91,6 +95,12 @@ export default async function AdminOrdersPage({
           couponCode: o.couponCode,
           discountAmount: o.discountAmount ? Number(o.discountAmount) : null,
           internalNotes: o.internalNotes,
+          courier: o.courier,
+          trackingNumber: o.trackingNumber,
+          shippedAt: o.shippedAt?.toISOString() ?? null,
+          deliveredAt: o.deliveredAt?.toISOString() ?? null,
+          cancelReason: o.cancelReason,
+          refundReason: o.refundReason,
           user: { name: o.user.name, email: o.user.email },
           items: o.items.map((i) => ({
             id: i.id,

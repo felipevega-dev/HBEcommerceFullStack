@@ -6,7 +6,7 @@
  */
 
 /**
- * Formats a number as Argentine Peso currency
+ * Formats a number as Chilean Peso currency
  *
  * @param amount - Amount to format
  * @returns Formatted currency string (e.g., "$2.500")
@@ -19,10 +19,10 @@
  * ```
  */
 export function formatPrice(amount: number): string {
-  // Round to nearest integer (Argentine pesos don't use decimals in practice)
+  // Round to nearest integer (CLP does not use decimals in practice)
   const rounded = Math.round(amount)
 
-  // Format with thousands separator (dot in Argentina)
+  // Format with thousands separator used in Chilean storefront prices
   const formatted = rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
   return `$${formatted}`
@@ -144,7 +144,7 @@ export function formatRelativeTime(date: Date): string {
   }
 
   // For older dates, show formatted date
-  return date.toLocaleDateString('es-AR', {
+  return date.toLocaleDateString('es-CL', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

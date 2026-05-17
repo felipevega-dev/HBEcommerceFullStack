@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
       where: {
         userId,
         status: 'DELIVERED',
+        paymentStatus: 'PAID',
         items: { some: { productId } },
       },
       select: { id: true },

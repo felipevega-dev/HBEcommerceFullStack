@@ -7,7 +7,7 @@ This is the recommended low-cost path for the project right now. Railway remains
 - Supabase has a practical free Postgres tier and a friendly dashboard.
 - It gives us hosted PostgreSQL without managing a VPS.
 - It works well with Prisma when the app runtime uses the transaction pooler.
-- It keeps the app portable because the code still only needs `DATABASE_URL`.
+- It keeps the app portable because runtime still uses `DATABASE_URL`; Prisma migrations use `DIRECT_URL`.
 
 ## Alternatives
 
@@ -21,8 +21,8 @@ This is the recommended low-cost path for the project right now. Railway remains
 2. Go to Project Settings → Database → Connection string.
 3. Copy the transaction pooler connection string for Vercel runtime.
 4. Set it as `DATABASE_URL` in Vercel.
-5. Copy the direct connection string for migrations.
-6. Use the direct connection string only when running `npm run db:migrate:deploy` from a trusted machine or CI migration job.
+5. Copy the direct connection string for migrations and save it as `DIRECT_URL`.
+6. Keep `DATABASE_URL` as the pooler URL in Vercel runtime. Prisma will use `DIRECT_URL` for migrations.
 
 Runtime `DATABASE_URL` example:
 
@@ -33,7 +33,7 @@ DATABASE_URL="postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.sup
 Migration direct URL example:
 
 ```env
-DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres"
+DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres"
 ```
 
 ## Vercel Setup
@@ -47,6 +47,7 @@ DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/pos
 Required Vercel variables:
 
 - `DATABASE_URL`
+- `DIRECT_URL`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `NEXTAUTH_SECRET`
@@ -79,12 +80,13 @@ Before the first production deploy:
 
 ```bash
 cd harrys-boutique-next
-set DATABASE_URL=postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres
+set DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
+set DIRECT_URL=postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres
 npm run db:migrate:deploy
 npm run admin:create
 ```
 
-On macOS/Linux, use `export DATABASE_URL="..."` instead of `set`.
+On macOS/Linux, use `export DATABASE_URL="..."` and `export DIRECT_URL="..."` instead of `set`.
 
 For future releases, run migrations before or immediately after deploy using the direct Supabase URL.
 

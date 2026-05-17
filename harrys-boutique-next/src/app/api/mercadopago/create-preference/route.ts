@@ -5,6 +5,8 @@ import { MercadoPagoConfig, Preference } from 'mercadopago'
 import { prisma } from '@/lib/prisma'
 import { CURRENCY_CODE } from '@/lib/commerce'
 import { roundMoney } from '@/lib/checkout'
+import { releaseExpiredStockReservations } from '@/lib/order-lifecycle'
+import { getSiteUrl } from '@/lib/site'
 
 const preferenceSchema = z.object({
   orderId: z.string().uuid(),
@@ -42,6 +44,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    await releaseExpiredStockReservations().catch((cleanupError) => {
+      console.warn('[MercadoPago Preference] Failed to release expired reservations:', cleanupError)
+    })
+
     const order = await prisma.order.findUnique({
       where: { id: data!.orderId },
       include: { items: true },
@@ -51,10 +57,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Pedido no encontrado' }, { status: 404 })
     }
 
-    if (order.payment) {
+    if (order.payment || order.paymentStatus === 'PAID') {
       return NextResponse.json(
         { success: false, message: 'Este pedido ya fue pagado' },
         { status: 400 },
+      )
+    }
+
+    if (order.stockReleasedAt || order.status === 'CANCELLED') {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            'La reserva de stock de este pedido expiró. Vuelve al carrito para generar un nuevo pedido.',
+        },
+        { status: 409 },
+      )
+    }
+
+    if (order.stockReservationExpiresAt && order.stockReservationExpiresAt <= new Date()) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            'La reserva de stock de este pedido expiró. Vuelve al carrito para generar un nuevo pedido.',
+        },
+        { status: 409 },
       )
     }
 
@@ -67,6 +95,7 @@ export async function POST(req: NextRequest) {
 
     const client = new MercadoPagoConfig({ accessToken })
     const preference = new Preference(client)
+    const siteUrl = getSiteUrl()
 
     const result = await preference.create({
       body: {
@@ -86,10 +115,11 @@ export async function POST(req: NextRequest) {
           email: data!.address.email ?? session!.user.email,
         },
         back_urls: {
-          success: `${process.env.NEXTAUTH_URL}/orders?payment=success`,
-          failure: `${process.env.NEXTAUTH_URL}/checkout?payment=failure`,
-          pending: `${process.env.NEXTAUTH_URL}/orders?payment=pending`,
+          success: `${siteUrl}/orders?payment=success`,
+          failure: `${siteUrl}/checkout?payment=failure`,
+          pending: `${siteUrl}/orders?payment=pending`,
         },
+        notification_url: `${siteUrl}/api/mercadopago/webhook`,
         auto_return: 'approved',
         external_reference: order.id,
       },

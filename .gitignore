@@ -3,6 +3,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+!harrys-boutique-next/.env.production.example
 
 dist/
 coverage/

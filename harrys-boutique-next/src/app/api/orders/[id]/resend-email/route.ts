@@ -66,6 +66,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       })
     } else {
       const total = Number(order.amount)
+      const subtotal = order.items.reduce(
+        (sum, item) => sum + Number(item.price) * item.quantity,
+        0,
+      )
+      const discountAmount = Number(order.discountAmount ?? 0)
+      const shippingFee = Math.max(0, total + discountAmount - subtotal)
+
       await sendEmail({
         to: order.user.email,
         subject: `Confirmación de tu pedido #${id}`,
@@ -79,8 +86,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             size: item.size,
             image: item.image,
           })),
-          subtotal: total,
-          shippingFee: 0,
+          subtotal,
+          shippingFee,
           total,
           address: formatAddress(order.addressSnapshot),
         }),

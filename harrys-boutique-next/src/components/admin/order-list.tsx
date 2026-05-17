@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
-import type { OrderStatus } from '@prisma/client'
+import type { OrderStatus, PaymentStatus } from '@prisma/client'
 import { BrandIcon } from '@/components/ui/brand-icon'
 
 interface OrderItem {
@@ -25,6 +25,7 @@ interface Order {
   amount: number
   status: OrderStatus
   payment: boolean
+  paymentStatus: PaymentStatus
   paymentMethod: string
   createdAt: string
   updatedAt: string
@@ -32,6 +33,12 @@ interface Order {
   couponCode?: string | null
   discountAmount?: number | null
   internalNotes: string
+  courier?: string | null
+  trackingNumber?: string | null
+  shippedAt?: string | null
+  deliveredAt?: string | null
+  cancelReason?: string | null
+  refundReason?: string | null
   items: OrderItem[]
   user: { name: string; email: string }
 }
@@ -52,7 +59,7 @@ interface Props {
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: 'Pendiente',
-  PROCESSING: 'En proceso',
+  PROCESSING: 'Preparando',
   SHIPPED: 'Enviado',
   DELIVERED: 'Entregado',
   CANCELLED: 'Cancelado',
@@ -67,6 +74,20 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
 }
 
 const ALL_STATUSES: OrderStatus[] = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']
+
+const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  PENDING: 'Pendiente',
+  PAID: 'Pagado',
+  FAILED: 'Fallido',
+  REFUNDED: 'Reembolsado',
+}
+
+const PAYMENT_STATUS_COLORS: Record<PaymentStatus, string> = {
+  PENDING: 'bg-yellow-100 text-yellow-800',
+  PAID: 'bg-green-100 text-green-800',
+  FAILED: 'bg-red-100 text-red-800',
+  REFUNDED: 'bg-purple-100 text-purple-800',
+}
 
 function csvCell(value: string | number) {
   return `"${String(value).replace(/"/g, '""')}"`
@@ -87,6 +108,16 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
   const [dateTo, setDateTo] = useState(searchParams.get('dateTo') || '')
   const [notesDrafts, setNotesDrafts] = useState<Record<string, string>>(
     Object.fromEntries(orders.map((order) => [order.id, order.internalNotes || ''])),
+  )
+  const [shippingDrafts, setShippingDrafts] = useState<
+    Record<string, { courier: string; trackingNumber: string }>
+  >(
+    Object.fromEntries(
+      orders.map((order) => [
+        order.id,
+        { courier: order.courier || '', trackingNumber: order.trackingNumber || '' },
+      ]),
+    ),
   )
   const [emailing, setEmailing] = useState<string | null>(null)
   const totalPages = Math.ceil(total / limit)
@@ -135,6 +166,44 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
       router.refresh()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error al guardar notas')
+    } finally {
+      setUpdating(null)
+    }
+  }
+
+  const saveShipping = async (orderId: string) => {
+    setUpdating(orderId)
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(shippingDrafts[orderId] ?? {}),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message ?? 'Error al guardar envío')
+      toast.success('Datos de envío guardados')
+      router.refresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al guardar envío')
+    } finally {
+      setUpdating(null)
+    }
+  }
+
+  const setPaymentStatus = async (orderId: string, paymentStatus: PaymentStatus) => {
+    setUpdating(orderId)
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentStatus }),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.message ?? 'Error al actualizar pago')
+      toast.success('Estado de pago actualizado')
+      router.refresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al actualizar pago')
     } finally {
       setUpdating(null)
     }
@@ -196,7 +265,7 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
       order.user.email,
       order.amount,
       STATUS_LABELS[order.status],
-      order.payment ? 'Pagado' : 'Pendiente',
+      PAYMENT_STATUS_LABELS[order.paymentStatus],
       order.paymentMethod,
       order.couponCode || '',
       order.discountAmount || 0,
@@ -237,7 +306,9 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
   }
 
   const totalRevenue = stats.reduce((sum, stat) => sum + stat.total, 0)
-  const paidOrders = orders.filter((order) => order.payment).length
+  const paidOrders = orders.filter(
+    (order) => order.paymentStatus === 'PAID' || order.payment,
+  ).length
 
   return (
     <div className="space-y-4">
@@ -344,7 +415,9 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
             >
               <option value="">Todos los pagos</option>
               <option value="paid">Pagado</option>
-              <option value="unpaid">Sin pagar</option>
+              <option value="pending">Pendiente</option>
+              <option value="failed">Fallido</option>
+              <option value="refunded">Reembolsado</option>
             </select>
           </div>
           <div className="flex gap-2">
@@ -455,13 +528,9 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                     ))}
                   </select>
                   <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      order.payment
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${PAYMENT_STATUS_COLORS[order.paymentStatus]}`}
                   >
-                    {order.payment ? 'Pagado' : 'Pendiente'}
+                    {PAYMENT_STATUS_LABELS[order.paymentStatus]}
                   </span>
                   <button
                     onClick={() => setExpanded(expanded === order.id ? null : order.id)}
@@ -479,8 +548,22 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                       <p className="mb-2 font-medium">Pago</p>
                       <p className="text-gray-600">Método: {order.paymentMethod}</p>
                       <p className="text-gray-600">
-                        Estado: {order.payment ? 'Pagado' : 'Pendiente'}
+                        Estado: {PAYMENT_STATUS_LABELS[order.paymentStatus]}
                       </p>
+                      <select
+                        value={order.paymentStatus}
+                        disabled={updating === order.id}
+                        onChange={(event) =>
+                          void setPaymentStatus(order.id, event.target.value as PaymentStatus)
+                        }
+                        className="mt-2 w-full rounded-lg border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50"
+                      >
+                        {Object.entries(PAYMENT_STATUS_LABELS).map(([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
                       {order.discountAmount ? (
                         <p className="text-gray-600">
                           Descuento: ${order.discountAmount.toLocaleString('es-CL')}
@@ -509,10 +592,20 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                       <p className="text-gray-600">
                         Última actualización: {new Date(order.updatedAt).toLocaleString('es-CL')}
                       </p>
+                      {order.shippedAt && (
+                        <p className="text-gray-600">
+                          Enviada: {new Date(order.shippedAt).toLocaleString('es-CL')}
+                        </p>
+                      )}
+                      {order.deliveredAt && (
+                        <p className="text-gray-600">
+                          Entregada: {new Date(order.deliveredAt).toLocaleString('es-CL')}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px_240px]">
                     <div className="rounded-lg bg-white p-3 text-sm">
                       <label className="mb-2 block font-medium" htmlFor={`notes-${order.id}`}>
                         Notas internas
@@ -538,6 +631,47 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
                       >
                         Guardar notas
                       </button>
+                    </div>
+                    <div className="rounded-lg bg-white p-3 text-sm">
+                      <p className="mb-2 font-medium">Envío</p>
+                      <div className="space-y-2">
+                        <input
+                          value={shippingDrafts[order.id]?.courier ?? ''}
+                          onChange={(event) =>
+                            setShippingDrafts((current) => ({
+                              ...current,
+                              [order.id]: {
+                                courier: event.target.value,
+                                trackingNumber: current[order.id]?.trackingNumber ?? '',
+                              },
+                            }))
+                          }
+                          className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                          placeholder="Courier"
+                        />
+                        <input
+                          value={shippingDrafts[order.id]?.trackingNumber ?? ''}
+                          onChange={(event) =>
+                            setShippingDrafts((current) => ({
+                              ...current,
+                              [order.id]: {
+                                courier: current[order.id]?.courier ?? '',
+                                trackingNumber: event.target.value,
+                              },
+                            }))
+                          }
+                          className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                          placeholder="Número de seguimiento"
+                        />
+                        <button
+                          type="button"
+                          disabled={updating === order.id}
+                          onClick={() => void saveShipping(order.id)}
+                          className="w-full rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          Guardar envío
+                        </button>
+                      </div>
                     </div>
                     <div className="rounded-lg bg-white p-3 text-sm">
                       <p className="mb-2 font-medium">Emails</p>
