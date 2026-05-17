@@ -3,6 +3,37 @@
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
+## 2026-05-17 - P1 Auditoria De Settings Admin
+
+- Rama usada: `codex/docs-workflow-methodology`.
+- Objetivo de la fase: empezar a usar `AuditLog` en cambios administrativos de
+  configuracion de tienda.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/app/api/settings/route.ts`
+- Cambios realizados:
+  - Se registra `settings.update` cuando un admin cambia valores reales.
+  - Se guardan valores anteriores y nuevos por clave, IP y user-agent.
+  - Se evita registrar valores grandes de contenido como `about_page_content`;
+    solo se marca que cambiaron.
+  - Se mantiene el upsert de settings dentro de una transaccion junto con el
+    log de auditoria.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run lint`.
+  - `npm run test`.
+  - `npm run build`.
+- Resultado:
+  - Validaciones completas en verde.
+  - `npm run test`: 22 archivos y 277 tests pasaron.
+  - `npm run build`: compilacion productiva exitosa.
+- Pendientes:
+  - Extender auditoria a productos, cupones, inventario e Instagram settings en
+    fases separadas.
+- Riesgos detectados:
+  - `AuditLog` aun no cubre productos, cupones, inventario ni settings externos
+    de Instagram; esta fase solo cubre una superficie critica y acotada.
+
 ## 2026-05-17 - P1 Clientes Paginados Server-Side
 
 - Rama usada: `codex/docs-workflow-methodology`.
