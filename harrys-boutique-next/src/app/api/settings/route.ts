@@ -1,22 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAdminAuth } from '@/lib/api-utils'
-
-const DEFAULT_SETTINGS = [
-  { key: 'store_name', value: "Harry's Boutique", description: 'Nombre de la tienda' },
-  { key: 'shipping_fee', value: '10', description: 'Costo de envío base' },
-  { key: 'free_shipping_threshold', value: '50000', description: 'Monto mínimo para envío gratis' },
-  { key: 'currency', value: '$', description: 'Símbolo de moneda' },
-]
+import { getSettingsMap } from '@/lib/commerce-settings'
+import { normalizeSettingsUpdate } from '@/lib/store-settings'
 
 export async function GET() {
   try {
-    const count = await prisma.settings.count()
-    if (count === 0) {
-      await prisma.settings.createMany({ data: DEFAULT_SETTINGS })
-    }
-    const settings = await prisma.settings.findMany()
-    const map = Object.fromEntries(settings.map((s) => [s.key, s.value]))
+    const map = await getSettingsMap()
     return NextResponse.json({ success: true, settings: map })
   } catch (e) {
     return handleApiError(e)
@@ -35,18 +25,23 @@ export async function PUT(req: NextRequest) {
   if (protectionError) return protectionError
 
   try {
-    const updates: Record<string, string> = await req.json()
+    const updates: Record<string, unknown> = await req.json()
+    const { normalized, errors } = normalizeSettingsUpdate(updates)
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json({ success: false, errors }, { status: 400 })
+    }
+
     await Promise.all(
-      Object.entries(updates).map(([key, value]) =>
+      Object.entries(normalized).map(([key, value]) =>
         prisma.settings.upsert({
           where: { key },
-          update: { value: String(value) },
-          create: { key, value: String(value) },
+          update: { value },
+          create: { key, value },
         }),
       ),
     )
-    const settings = await prisma.settings.findMany()
-    const map = Object.fromEntries(settings.map((s) => [s.key, s.value]))
+    const map = await getSettingsMap()
     return NextResponse.json({ success: true, settings: map })
   } catch (e) {
     return handleApiError(e)

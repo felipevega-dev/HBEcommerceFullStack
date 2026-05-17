@@ -3,6 +3,40 @@
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
+## 2026-05-17 - P1 Settings Tipados De Tienda
+
+- Rama usada: `codex/docs-workflow-methodology`.
+- Objetivo de la fase: reemplazar la configuracion key-value libre del admin
+  por definiciones tipadas y validacion server-side para ajustes operativos.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/app/(admin)/admin/settings/page.tsx`
+  - `harrys-boutique-next/src/app/api/settings/route.ts`
+  - `harrys-boutique-next/src/components/admin/settings-client.tsx`
+  - `harrys-boutique-next/src/lib/commerce-settings.ts`
+  - `harrys-boutique-next/src/lib/store-settings.ts`
+- Cambios realizados:
+  - Se agrego catalogo tipado de settings con grupos, defaults, tipos y limites.
+  - Se corrigio el default de `shipping_fee` para usar el valor CLP productivo.
+  - Se agrego validacion server-side para numeros, emails, URLs y booleanos.
+  - Se preservo compatibilidad con `about_page_content`.
+  - Se rehizo el formulario admin en secciones operativas: tienda, envios,
+    contacto e integraciones.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run lint`.
+  - `npm run test`.
+  - `npm run build`.
+- Resultado:
+  - Validaciones completas en verde.
+  - Se corrigio un error inicial de TypeScript en el tipo de `STORE_SETTING_MAP`
+    ajustandolo a `ReadonlyMap<string, StoreSettingDefinition>`.
+- Pendientes:
+  - Commitear la fase.
+- Riesgos detectados:
+  - Esta fase no cambia el modelo de datos; mantiene `Settings` como key-value
+    para evitar una migracion innecesaria en este punto.
+
 ## 2026-05-17 - SEO Tecnico Con Datos Estructurados
 
 - Rama usada: `codex/docs-workflow-methodology`.
