@@ -44,12 +44,20 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
   const searchParams = useSearchParams()
   const totalPages = Math.ceil(total / limit)
   const currentSegment = searchParams.get('segment')
+  const currentSearch = searchParams.get('search') ?? ''
 
   const handleFilter = (segment: string | null) => {
     const params = new URLSearchParams(searchParams.toString())
     if (segment) params.set('segment', segment)
     else params.delete('segment')
+    params.delete('page')
     router.push(`/admin/customers?${params.toString()}`)
+  }
+
+  const getPageHref = (targetPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', String(targetPage))
+    return `/admin/customers?${params.toString()}`
   }
 
   return (
@@ -57,6 +65,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
       <form className="flex gap-2">
         <input
           name="search"
+          defaultValue={currentSearch}
           placeholder="Buscar por nombre o email..."
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
         />
@@ -70,6 +79,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
 
       <div className="flex flex-wrap gap-2">
         <button
+          type="button"
           onClick={() => handleFilter(null)}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
             !currentSegment ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -78,6 +88,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
           Todos ({total})
         </button>
         <button
+          type="button"
           onClick={() => handleFilter('vip')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
             currentSegment === 'vip'
@@ -88,6 +99,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
           VIP
         </button>
         <button
+          type="button"
           onClick={() => handleFilter('frequent')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
             currentSegment === 'frequent'
@@ -98,6 +110,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
           Frecuentes
         </button>
         <button
+          type="button"
           onClick={() => handleFilter('new')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
             currentSegment === 'new'
@@ -108,6 +121,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
           Nuevos
         </button>
         <button
+          type="button"
           onClick={() => handleFilter('at_risk')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
             currentSegment === 'at_risk'
@@ -136,7 +150,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
                 CLV
               </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600 hidden lg:table-cell">
-                Última orden
+                Ultima orden
               </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Rol</th>
             </tr>
@@ -168,7 +182,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
                 <td className="px-4 py-3 text-gray-500 hidden lg:table-cell">
                   {user.lastOrderDate
                     ? new Date(user.lastOrderDate).toLocaleDateString('es-CL')
-                    : '—'}
+                    : '-'}
                 </td>
                 <td className="px-4 py-3">
                   <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
@@ -193,7 +207,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/admin/customers?page=${p}`}
+              href={getPageHref(p)}
               className={`px-3 py-1 rounded-lg text-sm border ${p === page ? 'bg-black text-white border-black' : 'hover:bg-gray-100'}`}
             >
               {p}

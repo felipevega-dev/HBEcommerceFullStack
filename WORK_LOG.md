@@ -3,6 +3,38 @@
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
+## 2026-05-17 - P1 Clientes Paginados Server-Side
+
+- Rama usada: `codex/docs-workflow-methodology`.
+- Objetivo de la fase: mover la segmentacion y paginacion del admin de clientes
+  desde memoria de Node hacia consultas SQL paginadas.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/app/(admin)/admin/customers/page.tsx`
+  - `harrys-boutique-next/src/components/admin/customer-list.tsx`
+- Cambios realizados:
+  - Se reemplazo la carga completa de usuarios y ordenes por CTEs SQL con CLV,
+    cantidad de pedidos, ultima orden, pedidos recientes y segmento.
+  - Se aplican `search`, `segment`, `limit` y `offset` desde la base de datos.
+  - Se preservan `search` y `segment` al paginar.
+  - Se resetea `page` al cambiar filtros de segmento.
+  - Se corrigieron textos con caracteres corruptos en metadata y tabla.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run lint`.
+  - `npm run test`.
+  - `npm run build`.
+- Resultado:
+  - Validaciones completas en verde.
+  - `npm run test`: 22 archivos y 277 tests pasaron.
+  - `npm run build`: compilacion productiva exitosa.
+- Pendientes:
+  - Continuar con el siguiente P1: auditoria de eventos `AuditLog` o filtros
+    avanzados de pedidos.
+- Riesgos detectados:
+  - La consulta usa SQL especifico de PostgreSQL, consistente con Prisma/Postgres
+    y Supabase, pero no portable a SQLite.
+
 ## 2026-05-17 - P1 Settings Tipados De Tienda
 
 - Rama usada: `codex/docs-workflow-methodology`.
