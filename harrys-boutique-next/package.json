@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write .",
+    "format": "prettier --write .",
     "type-check": "tsc --noEmit",
+    "check": "npm run type-check && npm run lint && npm run test",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
@@ -19,6 +21,7 @@
     "instagram:process": "tsx scripts/process-instagram-posts.ts",
     "test": "vitest --run",
     "test:watch": "vitest",
+    "audit": "npm audit --omit=dev",
     "ci": "npm run type-check && npm run lint && npm run test && npm run build",
     "prepare": "husky"
   },

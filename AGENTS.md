@@ -232,7 +232,9 @@ Scripts disponibles:
 - `npm run start`
 - `npm run lint`
 - `npm run lint:fix`
+- `npm run format`
 - `npm run type-check`
+- `npm run check`
 - `npm run db:migrate`
 - `npm run db:migrate:deploy`
 - `npm run db:push`
@@ -242,12 +244,12 @@ Scripts disponibles:
 - `npm run instagram:process`
 - `npm run test`
 - `npm run test:watch`
+- `npm run audit`
 - `npm run ci`
 - `npm run prepare`
 
-Scripts faltantes recomendados:
+Scripts operativos recomendados ya disponibles:
 
 - `audit`: alias para `npm audit --omit=dev`.
-- `format`: alias legible para `prettier --write .` si se quiere separar de
-  `lint:fix`.
+- `format`: alias legible para `prettier --write .`.
 - `check`: alias rapido para `npm run type-check && npm run lint && npm run test`.

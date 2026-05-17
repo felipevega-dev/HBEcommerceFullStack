@@ -3,6 +3,33 @@
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
+## 2026-05-17 - Scripts Operativos De Validacion
+
+- Rama usada: `codex/docs-workflow-methodology`.
+- Objetivo de la fase: agregar scripts de validacion recomendados para hacer
+  mas simple el flujo diario de calidad antes de nuevas fases.
+- Archivos modificados:
+  - `AGENTS.md`
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/package.json`
+- Cambios realizados:
+  - Se agrego `npm run format` como alias explicito de Prettier write.
+  - Se agrego `npm run check` para type-check, lint y tests sin build.
+  - Se agrego `npm run audit` para `npm audit --omit=dev`.
+  - Se actualizo `AGENTS.md` para reflejar los scripts reales.
+- Validaciones ejecutadas:
+  - `npm run check`.
+  - `npm run audit`.
+  - `npx prettier --check ..\AGENTS.md ..\WORK_LOG.md package.json`.
+- Resultado:
+  - Validaciones completas en verde: type-check, lint, 277 tests, audit y
+    formato.
+- Pendientes:
+  - Commitear la fase.
+- Riesgos detectados:
+  - `format` y `lint:fix` hacen lo mismo; se mantiene por claridad operativa,
+    no por necesidad tecnica.
+
 ## 2026-05-17 - Cierre P0 De Produccion, Pagos Y Chile
 
 - Rama usada: `codex/docs-workflow-methodology`.
