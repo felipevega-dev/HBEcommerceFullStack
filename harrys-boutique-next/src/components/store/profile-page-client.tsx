@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
 import { AddressForm } from './address-form'
+import { PetLoyaltyPanel } from '@/components/store/pet-loyalty-panel'
+import { STYLE_QUIZ_RESULT_STORAGE_KEY } from '@/lib/pet-experience'
 
 interface Address {
   id: string
@@ -42,12 +44,55 @@ const emptyAddress = {
   isDefault: false,
 }
 
+interface PetPassport {
+  name: string
+  species: string
+  birthday: string
+  size: string
+  personality: string
+}
+
+const PET_PASSPORT_STORAGE_KEY = 'harrys-pet-passport'
+
+const emptyPetPassport: PetPassport = {
+  name: '',
+  species: 'Perro',
+  birthday: '',
+  size: '',
+  personality: 'Soft Cozy',
+}
+
 export function ProfilePageClient({ user: initialUser }: { user: UserWithAddresses }) {
   const [user, setUser] = useState(initialUser)
   const [isAddingNew, setIsAddingNew] = useState(false)
   const [editingAddress, setEditingAddress] = useState<Address | null>(null)
   const [currentAddress, setCurrentAddress] = useState({ ...emptyAddress })
   const [saving, setSaving] = useState(false)
+  const [petPassport, setPetPassport] = useState<PetPassport>(emptyPetPassport)
+  const [petPassportLoaded, setPetPassportLoaded] = useState(false)
+  const [styleQuizCompleted, setStyleQuizCompleted] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(PET_PASSPORT_STORAGE_KEY)
+      if (stored) {
+        setPetPassport({ ...emptyPetPassport, ...JSON.parse(stored) })
+      }
+    } catch {
+      localStorage.removeItem(PET_PASSPORT_STORAGE_KEY)
+    } finally {
+      setPetPassportLoaded(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    setStyleQuizCompleted(Boolean(localStorage.getItem(STYLE_QUIZ_RESULT_STORAGE_KEY)))
+  }, [])
+
+  useEffect(() => {
+    if (!petPassportLoaded) return
+    localStorage.setItem(PET_PASSPORT_STORAGE_KEY, JSON.stringify(petPassport))
+  }, [petPassport, petPassportLoaded])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -179,10 +224,21 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
     setCurrentAddress((prev) => ({ ...prev, ...updates }))
   }
 
+  const handlePetPassportChange = (updates: Partial<PetPassport>) => {
+    setPetPassport((prev) => ({ ...prev, ...updates }))
+  }
+
   const inputClass =
     'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200'
 
   const showForm = isAddingNew || editingAddress !== null
+  const completedMissionIds = [
+    petPassport.name && petPassport.species && petPassport.size ? 'pet-passport' : null,
+    petPassport.birthday ? 'birthday' : null,
+    styleQuizCompleted ? 'style-quiz' : null,
+    user.profileImage ? 'profile-photo' : null,
+    user.addresses.length > 0 ? 'shipping-ready' : null,
+  ].filter((missionId): missionId is string => Boolean(missionId))
 
   return (
     <div className="max-w-4xl mx-auto py-10 border-t">
@@ -352,6 +408,100 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               </div>
             </form>
           )}
+        </div>
+
+        <div className="rounded-lg border bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-dark)]">
+                Pasaporte Harry&apos;s
+              </p>
+              <h3 className="mt-1 text-xl font-medium">Mi mascota</h3>
+            </div>
+            <Link
+              href="/experiencias#quiz"
+              className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
+            >
+              Quiz
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            <label className="block text-sm font-medium">
+              Nombre
+              <input
+                className={inputClass}
+                value={petPassport.name}
+                onChange={(event) => handlePetPassportChange({ name: event.target.value })}
+                placeholder="Ej: Harry"
+              />
+            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block text-sm font-medium">
+                Especie
+                <select
+                  className={inputClass}
+                  value={petPassport.species}
+                  onChange={(event) => handlePetPassportChange({ species: event.target.value })}
+                >
+                  <option>Perro</option>
+                  <option>Gato</option>
+                  <option>Otra</option>
+                </select>
+              </label>
+              <label className="block text-sm font-medium">
+                Talla
+                <input
+                  className={inputClass}
+                  value={petPassport.size}
+                  onChange={(event) => handlePetPassportChange({ size: event.target.value })}
+                  placeholder="XS, S, M..."
+                />
+              </label>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block text-sm font-medium">
+                Cumpleanos
+                <input
+                  type="date"
+                  className={inputClass}
+                  value={petPassport.birthday}
+                  onChange={(event) => handlePetPassportChange({ birthday: event.target.value })}
+                />
+              </label>
+              <label className="block text-sm font-medium">
+                Personalidad
+                <select
+                  className={inputClass}
+                  value={petPassport.personality}
+                  onChange={(event) => handlePetPassportChange({ personality: event.target.value })}
+                >
+                  <option>Soft Cozy</option>
+                  <option>Street Royal</option>
+                  <option>Mini Royal</option>
+                  <option>Anime Cozy</option>
+                  <option>Explorer Chic</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-xl bg-[var(--color-surface)] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+              Tarjeta compartible
+            </p>
+            <p className="mt-2 text-lg font-semibold">
+              {petPassport.name || 'Tu mascota'} - {petPassport.personality}
+            </p>
+            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+              {petPassport.size ? `Talla ${petPassport.size}` : 'Talla por definir'} -{' '}
+              {petPassport.birthday ? 'birthday box disponible' : 'agrega cumpleanos'}
+            </p>
+          </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <PetLoyaltyPanel completedMissionIds={completedMissionIds} />
         </div>
 
         {/* Recent orders */}

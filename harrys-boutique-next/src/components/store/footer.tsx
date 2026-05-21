@@ -73,6 +73,14 @@ export function Footer() {
                   Más Vendidos
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/experiencias"
+                  className="hover:text-[var(--color-text-primary)] transition-colors"
+                >
+                  Harry&apos;s World
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -8,6 +8,7 @@ import { ProductsShowcase } from '@/components/store/products-showcase'
 import { BestSeller } from '@/components/store/best-seller'
 import { Testimonials } from '@/components/store/testimonials'
 import { OurPolicy } from '@/components/store/our-policy'
+import { PetCultureGateway } from '@/components/store/pet-culture-gateway'
 import { SkeletonCard } from '@/components/ui/skeleton-card'
 import { canUseDatabaseFallback, logDatabaseFallback } from '@/lib/db-fallback'
 
@@ -152,6 +153,8 @@ export default async function HomePage() {
       {/* Main content - Orden: Categorías → Productos (como Almitas) */}
       <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 md:px-12 lg:px-16">
         <div className="space-y-16 md:space-y-20 py-12 md:py-16">
+          <PetCultureGateway />
+
           {/* Categorías Destacadas */}
           <CategoryShowcase categories={categories} />
 

@@ -13,6 +13,7 @@ import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 const navItems = [
   { href: '/', label: 'INICIO' },
   { href: '/collection', label: 'TIENDA' },
+  { href: '/experiencias', label: 'EXPERIENCIAS' },
   { href: '/about', label: 'NOSOTROS' },
   { href: '/contact', label: 'CONTACTO' },
 ]
@@ -95,6 +96,7 @@ export function Navbar() {
     { name: 'Polerones', href: '/collection?subCategory=Polerones', icon: 'shirt' },
     { name: 'Camisetas', href: '/collection?subCategory=Camisetas', icon: 'sparkles' },
     { name: 'Vestidos', href: '/collection?subCategory=Vestidos', icon: 'design' },
+    { name: 'Experiencias', href: '/experiencias', icon: 'sparkles' },
     { name: 'Más vendidos', href: '/collection?bestSeller=true', icon: 'star' },
     { name: 'Novedades', href: '/collection?sort=newest', icon: 'tag' },
   ]

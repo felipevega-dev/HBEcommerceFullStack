@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import type { OrderStatus, PaymentStatus } from '@prisma/client'
+import { OrderStoryTracker } from '@/components/store/order-story-tracker'
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: 'Pendiente',
@@ -48,6 +49,9 @@ export interface OrderWithItems {
   discountAmount?: number | null
   courier?: string | null
   trackingNumber?: string | null
+  paidAt?: string | null
+  shippedAt?: string | null
+  deliveredAt?: string | null
   items: OrderItem[]
 }
 
@@ -134,6 +138,17 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
               {/* Expanded details */}
               {isExpanded && (
                 <div className="mt-4 bg-gray-50 p-6 rounded-lg space-y-6">
+                  <OrderStoryTracker
+                    status={order.status}
+                    paymentStatus={order.paymentStatus}
+                    createdAt={order.createdAt}
+                    courier={order.courier}
+                    trackingNumber={order.trackingNumber}
+                    paidAt={order.paidAt}
+                    shippedAt={order.shippedAt}
+                    deliveredAt={order.deliveredAt}
+                  />
+
                   {/* Products */}
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg">Productos</h3>

@@ -172,6 +172,34 @@ export function ProductInfo({
 
       <p className="text-gray-600 leading-relaxed">{description}</p>
 
+      <div className="grid gap-3 rounded-xl border border-[var(--color-border)] bg-white p-4 shadow-[var(--shadow-sm)] sm:grid-cols-2">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
+            <BrandIcon name="ruler" className="h-4 w-4 text-[var(--color-accent-dark)]" />
+            Fit Lab
+          </div>
+          <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
+            Si dudas entre tallas, mide cuello, pecho y largo. Elige la talla que deje movimiento
+            comodo antes que un calce apretado.
+          </p>
+        </div>
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
+            <BrandIcon name="design" className="h-4 w-4 text-[var(--color-accent-dark)]" />
+            Harry&apos;s Atelier
+          </div>
+          <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
+            Para nombre bordado, matching fit o regalo especial, revisa la experiencia custom.
+          </p>
+          <Link
+            href="/experiencias#atelier"
+            className="mt-3 inline-flex text-xs font-semibold text-[var(--color-accent-dark)] hover:text-[var(--color-primary)]"
+          >
+            Ver opciones custom
+          </Link>
+        </div>
+      </div>
+
       {/* Colors */}
       {product.colors.length > 0 && (
         <div>
@@ -284,6 +312,10 @@ export function ProductInfo({
         <p className="flex items-center gap-2">
           <BrandIcon name="check" className="h-4 w-4" />
           Servicio de asistencia al cliente
+        </p>
+        <p className="flex items-center gap-2">
+          <BrandIcon name="camera" className="h-4 w-4" />
+          Comparte tu look con #HarrysFitCheck
         </p>
       </div>
 

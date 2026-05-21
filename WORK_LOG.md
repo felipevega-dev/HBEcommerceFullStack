@@ -3,6 +3,183 @@
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
+## 2026-05-21 - P1 Preventa Co-Creada, Club Y Comunidad
+
+- Rama usada: `codex/pet-culture-experience`.
+- Objetivo de la fase: sumar mecanismos de recurrencia, comunidad y FOMO dentro
+  de `Harry's World` sin migraciones ni dependencias nuevas.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/lib/pet-experience.ts`
+  - `harrys-boutique-next/src/components/store/pet-experience-page-client.tsx`
+- Cambios realizados:
+  - Se agrego una votacion local de preventa co-creada para conceptos de drops
+    inspirados en anime, gaming y k-pop.
+  - Se agrego una seccion de desafios virales con Mascota del Mes, Matching
+    Domingo y Unboxing Ritual.
+  - Se agrego una seccion de Club Harry's con niveles de membresia, beneficios y
+    CTA hacia el perfil.
+  - Se estructuraron los contenidos nuevos en `pet-experience.ts` para que una
+    futura fase pueda moverlos a admin sin rehacer la UI.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npx prettier --check` sobre los archivos tocados.
+  - Verificacion HTTP local de `/experiencias` y Home.
+  - `npm run test`.
+  - `npm run build`.
+  - `npm run lint`.
+- Resultado:
+  - Type-check y formato focalizado pasaron.
+  - `/experiencias` y Home respondieron HTTP 200.
+  - `npm run test`: 22 archivos y 277 tests pasaron.
+  - `npm run build`: compilacion productiva exitosa.
+  - `npm run lint` sigue fallando por 34 archivos preexistentes fuera de formato
+    que no pertenecen a esta fase.
+- Pendientes:
+  - Persistir votos, desafios y membresia en base de datos si se aprueba la
+    experiencia.
+  - Crear moderacion/admin para UGC antes de aceptar fotos reales de clientes.
+- Riesgos detectados:
+  - La votacion es una simulacion local con `localStorage`; no representa demanda
+    real hasta tener persistencia y control anti-abuso.
+
+## 2026-05-21 - P1 Tracking Post-Compra Con Historia
+
+- Rama usada: `codex/pet-culture-experience`.
+- Objetivo de la fase: elevar la experiencia post-compra con una narrativa de
+  tracking que use los datos existentes de pedidos sin tocar el modelo de base
+  de datos.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/components/store/order-story-tracker.tsx`
+  - `harrys-boutique-next/src/components/store/orders-list.tsx`
+- Cambios realizados:
+  - Se agrego un componente reutilizable de "Tracking con historia" para
+    pedidos.
+  - El detalle de cada pedido ahora muestra una mini aventura: pedido recibido,
+    preparando el look, camino a casa y look entregado.
+  - Se integraron courier, numero de seguimiento, fechas disponibles y alerta de
+    pago pendiente o fallido.
+  - Se agrego un estado respetuoso para pedidos cancelados.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npx prettier --check` sobre los archivos tocados.
+  - `npm run test`.
+  - `npm run build`.
+  - `npm run lint`.
+- Resultado:
+  - Type-check y formato focalizado pasaron.
+  - `npm run test`: 22 archivos y 277 tests pasaron.
+  - `npm run build`: compilacion productiva exitosa.
+  - `npm run lint` sigue fallando por 34 archivos preexistentes fuera de formato
+    que no pertenecen a esta fase.
+- Pendientes:
+  - Conectar estados de tracking mas ricos cuando se agregue integracion real
+    con operador logistico.
+  - Agregar vista publica de tracking por token seguro si se decide compartir el
+    avance fuera del perfil.
+- Riesgos detectados:
+  - La narrativa depende de los estados actuales del pedido; no reemplaza un
+    tracking logistico real.
+
+## 2026-05-21 - P1 HarryCoins Y Misiones
+
+- Rama usada: `codex/pet-culture-experience`.
+- Objetivo de la fase: agregar una capa inicial de gamificacion y loyalty sobre
+  la experiencia pet-fashion sin crear aun un modelo persistente.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/lib/pet-experience.ts`
+  - `harrys-boutique-next/src/components/store/pet-loyalty-panel.tsx`
+  - `harrys-boutique-next/src/components/store/pet-experience-page-client.tsx`
+  - `harrys-boutique-next/src/components/store/profile-page-client.tsx`
+- Cambios realizados:
+  - Se agregaron misiones de comunidad con recompensas en HarryCoins.
+  - Se agregaron niveles `Fan`, `Muse`, `Icon` y `Legend` con progreso visual.
+  - Se creo un panel reutilizable de loyalty para `/experiencias` y perfil.
+  - El quiz de estilo guarda resultado en `localStorage` para que el perfil pueda
+    marcar la mision como completada.
+  - El perfil calcula misiones completadas segun pasaporte, cumpleanos, quiz,
+    foto de perfil y direccion guardada.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npx prettier --check` sobre los archivos tocados.
+  - `npm run test`.
+  - `npm run build`.
+  - `npm run lint`.
+  - Verificacion HTTP local de `/experiencias`.
+- Resultado:
+  - Type-check, formato focalizado, tests y build pasaron.
+  - `npm run test`: 22 archivos y 277 tests pasaron.
+  - `npm run build`: compilacion productiva exitosa.
+  - `/experiencias` respondio HTTP 200.
+  - `npm run lint` sigue fallando por 35 archivos preexistentes fuera de formato
+    que no pertenecen a esta fase.
+- Pendientes:
+  - Persistir HarryCoins y misiones en base de datos cuando se defina la regla de
+    negocio definitiva.
+  - Agregar eventos reales para UGC, compra, reviews y referidos.
+- Riesgos detectados:
+  - Los HarryCoins actuales son una representacion de UX calculada desde estado
+    local y datos existentes; todavia no son saldos transaccionales.
+
+## 2026-05-21 - P0 Experiencia Pet-Fashion Y Comunidad
+
+- Rama usada: `codex/pet-culture-experience`.
+- Objetivo de la fase: aterrizar el roadmap creativo en una primera experiencia
+  publica y verificable sin migraciones grandes.
+- Archivos modificados:
+  - `WORK_LOG.md`
+  - `harrys-boutique-next/src/app/(store)/page.tsx`
+  - `harrys-boutique-next/src/app/(store)/experiencias/page.tsx`
+  - `harrys-boutique-next/src/components/store/pet-culture-gateway.tsx`
+  - `harrys-boutique-next/src/components/store/pet-experience-page-client.tsx`
+  - `harrys-boutique-next/src/components/store/navbar.tsx`
+  - `harrys-boutique-next/src/components/store/footer.tsx`
+  - `harrys-boutique-next/src/components/store/product-info.tsx`
+  - `harrys-boutique-next/src/components/store/profile-page-client.tsx`
+  - `harrys-boutique-next/src/components/store/wishlist-page-client.tsx`
+  - `harrys-boutique-next/src/lib/pet-experience.ts`
+- Cambios realizados:
+  - Se agrego la ruta publica `/experiencias` como "Harry's World" con quiz de
+    estilo, shop by occasion, drops, atelier, UGC, birthday box y pack de
+    adopcion.
+  - Se agrego un bloque de entrada en Home hacia la nueva experiencia.
+  - Se agregaron accesos desde navbar, footer, producto, wishlist y perfil.
+  - Se agrego "Fit Lab" y CTA de Atelier en la ficha de producto.
+  - Se transformo wishlist en una superficie de retorno con ideas de cumpleanos
+    y fit check.
+  - Se agrego un primer "Pasaporte Harry's" local en perfil para capturar
+    mascota, talla, cumpleanos y personalidad sin tocar base de datos.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npx prettier --check` sobre los archivos tocados.
+  - `npm run test`.
+  - `npm run build`.
+  - `npm run lint`.
+  - Verificacion en navegador local de `/experiencias` y Home.
+- Resultado:
+  - Type-check, formato focalizado, tests y build pasaron.
+  - `npm run test`: 22 archivos y 277 tests pasaron.
+  - `npm run build`: compilacion productiva exitosa; `/experiencias` quedo como
+    ruta estatica.
+  - `/experiencias` cargo correctamente, el quiz cambio resultado a
+    `Mini Royal` con progreso 100%, Home mostro el bloque `Harry's World` y no
+    hubo errores de consola en esas vistas.
+  - `npm run lint` sigue fallando por 35 archivos preexistentes fuera de formato
+    que no pertenecen a esta fase.
+- Pendientes:
+  - Convertir pasaporte, puntos, drops y UGC a modelos persistentes cuando se
+    valide el producto.
+  - Crear admin editable para campañas/drops si esta experiencia queda aprobada.
+- Riesgos detectados:
+  - El pasaporte actual persiste en `localStorage`; no sincroniza entre
+    dispositivos hasta una futura migracion.
+  - La experiencia UGC aun es editorial/CTA; no hay carga ni moderacion de fotos
+    de clientes en esta fase.
+  - `npm run dev` no arranco por conflicto de contenedor Docker existente
+    `harrys-postgres`; se verifico con `npx next dev --turbopack -p 3000`.
+
 ## 2026-05-17 - P1 Auditoria De Settings Admin
 
 - Rama usada: `codex/docs-workflow-methodology`.
