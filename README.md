@@ -15,6 +15,7 @@ legacy/                 código histórico, pendiente de retiro definitivo
 cd harrys-boutique-next
 npm install
 cp .env.example .env.local
+# Docker Postgres local: postgres / password
 npx prisma migrate dev
 npm run dev
 ```
@@ -39,6 +40,8 @@ npm run db:studio
 Base: `harrys-boutique-next/.env.example`
 
 Producción: `harrys-boutique-next/.env.production.example`
+
+VM Ubuntu con Docker: `harrys-boutique-next/VM_DEPLOY.md`
 
 ## Estado operativo actual
 
