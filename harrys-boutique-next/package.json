@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/ensure-dev-db.mjs && next dev --turbopack",
+    "dev:app": "next dev --turbopack",
     "dev:db": "node scripts/ensure-dev-db.mjs",
     "dev:db:down": "docker compose down",
     "docker:prod:build": "docker compose -f docker-compose.prod.yml build",

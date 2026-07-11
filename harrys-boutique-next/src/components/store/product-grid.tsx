@@ -80,9 +80,12 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-gray-500 gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 py-24 text-[var(--color-text-muted)]">
         <p>No encontramos productos con estos filtros.</p>
-        <Link href="/collection" className="text-sm underline">
+        <Link
+          href="/collection"
+          className="text-sm font-medium text-[var(--color-text-primary)] underline-offset-4 hover:underline"
+        >
           Limpiar filtros
         </Link>
       </div>
@@ -113,7 +116,7 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
           {currentPage > 1 && (
             <Link
               href={buildPageHref(currentPage - 1)}
-              className="inline-flex h-10 w-10 items-center justify-center border rounded-lg hover:bg-gray-50 text-sm"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] hover:bg-[var(--color-surface)] text-sm"
               aria-label="Pagina anterior"
             >
               <BrandIcon name="chevron-left" className="h-4 w-4" />
@@ -122,11 +125,11 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
           {pagesToRender.map((page, index) => (
             <div key={page} className="flex items-center gap-2">
               {index > 0 && page - pagesToRender[index - 1] > 1 && (
-                <span className="px-1 text-sm text-gray-400">...</span>
+                <span className="px-1 text-sm text-[var(--color-text-muted)]">...</span>
               )}
               <Link
                 href={buildPageHref(page)}
-                className={`px-4 py-2 border rounded-lg text-sm ${page === currentPage ? 'bg-black text-white' : 'hover:bg-gray-50'}`}
+                className={`rounded-[var(--radius-md)] border px-4 py-2 text-sm ${page === currentPage ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white' : 'border-[var(--color-border)] hover:bg-[var(--color-surface)]'}`}
               >
                 {page}
               </Link>
@@ -135,7 +138,7 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
           {currentPage < totalPages && (
             <Link
               href={buildPageHref(currentPage + 1)}
-              className="inline-flex h-10 w-10 items-center justify-center border rounded-lg hover:bg-gray-50 text-sm"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] hover:bg-[var(--color-surface)] text-sm"
               aria-label="Pagina siguiente"
             >
               <BrandIcon name="chevron-right" className="h-4 w-4" />
@@ -152,9 +155,9 @@ export function ProductGridSkeleton() {
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
       {[...Array(12)].map((_, i) => (
         <div key={i} className="animate-pulse">
-          <div className="bg-gray-200 rounded-lg aspect-[3/4] mb-3" />
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-          <div className="h-4 bg-gray-200 rounded w-1/2" />
+          <div className="mb-3 aspect-[3/4] animate-pulse rounded-[var(--radius-lg)] bg-[var(--color-surface-2)]" />
+          <div className="mb-2 h-4 w-3/4 animate-pulse rounded bg-[var(--color-surface-2)]" />
+          <div className="h-4 w-1/2 animate-pulse rounded bg-[var(--color-surface-2)]" />
         </div>
       ))}
     </div>

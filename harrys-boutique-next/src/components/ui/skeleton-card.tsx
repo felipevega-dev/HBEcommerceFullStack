@@ -3,7 +3,7 @@ export function SkeletonCard() {
     <div className="animate-pulse">
       {/* Imagen placeholder — aspecto 3:4 */}
       <div
-        className="w-full bg-[var(--color-surface-2)] rounded-[var(--radius-md)]"
+        className="w-full rounded-[var(--radius-lg)] bg-[var(--color-surface-2)]"
         style={{ aspectRatio: '3 / 4' }}
       />
       {/* Líneas de texto */}

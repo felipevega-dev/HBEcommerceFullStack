@@ -5,8 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
 import { AddressForm } from './address-form'
-import { PetLoyaltyPanel } from '@/components/store/pet-loyalty-panel'
-import { STYLE_QUIZ_RESULT_STORAGE_KEY } from '@/lib/pet-experience'
+import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/ui/page-header'
 
 interface Address {
   id: string
@@ -70,7 +70,6 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
   const [saving, setSaving] = useState(false)
   const [petPassport, setPetPassport] = useState<PetPassport>(emptyPetPassport)
   const [petPassportLoaded, setPetPassportLoaded] = useState(false)
-  const [styleQuizCompleted, setStyleQuizCompleted] = useState(false)
 
   useEffect(() => {
     try {
@@ -83,10 +82,6 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
     } finally {
       setPetPassportLoaded(true)
     }
-  }, [])
-
-  useEffect(() => {
-    setStyleQuizCompleted(Boolean(localStorage.getItem(STYLE_QUIZ_RESULT_STORAGE_KEY)))
   }, [])
 
   useEffect(() => {
@@ -232,19 +227,15 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
     'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200'
 
   const showForm = isAddingNew || editingAddress !== null
-  const completedMissionIds = [
-    petPassport.name && petPassport.species && petPassport.size ? 'pet-passport' : null,
-    petPassport.birthday ? 'birthday' : null,
-    styleQuizCompleted ? 'style-quiz' : null,
-    user.profileImage ? 'profile-photo' : null,
-    user.addresses.length > 0 ? 'shipping-ready' : null,
-  ].filter((missionId): missionId is string => Boolean(missionId))
 
   return (
-    <div className="max-w-4xl mx-auto py-10 border-t">
-      <h1 className="text-3xl font-medium mb-8">Mi Cuenta</h1>
+    <div>
+      <PageHeader
+        title="Mi cuenta"
+        breadcrumbs={[{ label: 'Inicio', href: '/' }, { label: 'Mi cuenta' }]}
+      />
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid gap-8 md:grid-cols-2">
         {/* Personal info + addresses */}
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           {/* Profile image */}
@@ -410,20 +401,12 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
           )}
         </div>
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <div className="mb-5 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-dark)]">
-                Pasaporte Harry&apos;s
-              </p>
-              <h3 className="mt-1 text-xl font-medium">Mi mascota</h3>
-            </div>
-            <Link
-              href="/experiencias#quiz"
-              className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
-            >
-              Quiz
-            </Link>
+        <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+          <div className="mb-5">
+            <h3 className="text-xl font-medium">Mi mascota</h3>
+            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+              Datos opcionales para recomendaciones de talla.
+            </p>
           </div>
 
           <div className="space-y-3">
@@ -485,23 +468,6 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               </label>
             </div>
           </div>
-
-          <div className="mt-5 rounded-xl bg-[var(--color-surface)] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
-              Tarjeta compartible
-            </p>
-            <p className="mt-2 text-lg font-semibold">
-              {petPassport.name || 'Tu mascota'} - {petPassport.personality}
-            </p>
-            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-              {petPassport.size ? `Talla ${petPassport.size}` : 'Talla por definir'} -{' '}
-              {petPassport.birthday ? 'birthday box disponible' : 'agrega cumpleanos'}
-            </p>
-          </div>
-        </div>
-
-        <div className="md:col-span-2">
-          <PetLoyaltyPanel completedMissionIds={completedMissionIds} />
         </div>
 
         {/* Recent orders */}

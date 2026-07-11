@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
+import { Button } from '@/components/ui/button'
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/commerce'
 
 export function CartDrawer() {
@@ -102,12 +103,7 @@ export function CartDrawer() {
                     </p>
                     <p className="text-sm mt-1">Agregá productos para comenzar</p>
                   </div>
-                  <button
-                    onClick={handleExploreCollection}
-                    className="px-6 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors"
-                  >
-                    Explorar colección
-                  </button>
+                  <Button onClick={handleExploreCollection}>Explorar colección</Button>
                 </div>
               ) : (
                 <>
@@ -240,20 +236,12 @@ export function CartDrawer() {
                   <span>Subtotal</span>
                   <span>${total.toLocaleString('es-CL')}</span>
                 </div>
-                <Link
-                  href="/checkout"
-                  onClick={closeDrawer}
-                  className="block w-full py-3 bg-black text-white text-center rounded-lg text-sm hover:bg-gray-800 transition-colors font-medium"
-                >
+                <Button href="/checkout" onClick={closeDrawer} className="w-full">
                   Ir al checkout
-                </Link>
-                <Link
-                  href="/cart"
-                  onClick={closeDrawer}
-                  className="block w-full py-2 border border-[var(--color-border)] text-center rounded-lg text-sm hover:bg-[var(--color-surface)] transition-colors"
-                >
+                </Button>
+                <Button href="/cart" variant="outline" onClick={closeDrawer} className="w-full">
                   Ver carrito
-                </Link>
+                </Button>
               </div>
             )}
           </motion.div>

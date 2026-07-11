@@ -28,21 +28,21 @@ const STORY_STEPS: StoryStep[] = [
   },
   {
     status: 'PROCESSING',
-    title: 'Preparando el look',
-    description: 'Estamos revisando talla, prendas y detalles antes de empacar.',
-    icon: 'shirt',
+    title: 'Preparando pedido',
+    description: 'Estamos preparando tu pedido para el despacho.',
+    icon: 'package',
   },
   {
     status: 'SHIPPED',
-    title: 'Camino a casa',
-    description: 'El paquete ya salio. Prepara la camara para el primer fit check.',
+    title: 'En camino',
+    description: 'Tu pedido ya fue despachado y está en tránsito.',
     icon: 'shipping',
   },
   {
     status: 'DELIVERED',
-    title: 'Look entregado',
-    description: 'Tu mascota ya puede estrenar. Comparte el resultado con #HarrysFitCheck.',
-    icon: 'camera',
+    title: 'Entregado',
+    description: 'Tu pedido fue entregado correctamente.',
+    icon: 'check-circle',
   },
 ]
 

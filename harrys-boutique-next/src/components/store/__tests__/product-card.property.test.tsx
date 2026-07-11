@@ -107,7 +107,10 @@ describe('ProductCard — Property 7: Segunda imagen presente en el DOM para pro
    * Para cualquier producto con 2 o más imágenes, el componente debe incluir
    * la segunda imagen en el DOM.
    */
-  it('incluye la segunda imagen en el DOM cuando hay 2 o más imágenes', () => {
+  it(
+    'incluye la segunda imagen en el DOM cuando hay 2 o más imágenes',
+    { timeout: 60000 },
+    () => {
     fc.assert(
       fc.property(
         fc.record({

@@ -2,13 +2,12 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { serialize } from '@/lib/serialize'
-import { HeroEpic } from '@/components/store/hero-epic'
-import { CategoryShowcase } from '@/components/store/category-showcase'
-import { ProductsShowcase } from '@/components/store/products-showcase'
-import { BestSeller } from '@/components/store/best-seller'
+import { HeroCompact } from '@/components/store/hero-compact'
+import { CategoryPills } from '@/components/store/category-pills'
+import { HomeCatalogSection } from '@/components/store/home-catalog-section'
 import { Testimonials } from '@/components/store/testimonials'
-import { OurPolicy } from '@/components/store/our-policy'
-import { PetCultureGateway } from '@/components/store/pet-culture-gateway'
+import { TrustStrip } from '@/components/ui/trust-strip'
+import { Section } from '@/components/ui/section'
 import { SkeletonCard } from '@/components/ui/skeleton-card'
 import { canUseDatabaseFallback, logDatabaseFallback } from '@/lib/db-fallback'
 
@@ -25,9 +24,6 @@ type HomeHeroSlide = {
 type HomeCategory = {
   id: string
   name: string
-  subcategories: string[]
-  products: { images: string[] }[]
-  _count: { products: number }
 }
 
 type HomeProduct = {
@@ -43,10 +39,11 @@ type HomeProduct = {
 
 export const metadata: Metadata = {
   title: "Harry's Boutique — Ropa y accesorios para mascotas",
-  description: 'Descubre nuestra colección exclusiva de ropa y accesorios para tu mascota.',
+  description:
+    'Compra ropa y accesorios premium para tu mascota. Catálogo curado, envío a todo Chile.',
   openGraph: {
     title: "Harry's Boutique — Ropa y accesorios para mascotas",
-    description: 'Descubre nuestra colección exclusiva de ropa y accesorios para tu mascota.',
+    description: 'Compra ropa y accesorios premium para tu mascota.',
     type: 'website',
   },
 }
@@ -55,124 +52,115 @@ export default async function HomePage() {
   let heroSlidesData: HomeHeroSlide[] = []
   let categoriesData: HomeCategory[] = []
   let productsData: HomeProduct[] = []
+  let bestSellersData: HomeProduct[] = []
+  let testimonialCount = 0
 
   try {
-    ;[heroSlidesData, categoriesData, productsData] = await Promise.all([
-      prisma.heroSlide.findMany({
-        orderBy: { order: 'asc' },
-        include: { product: { select: { id: true, name: true } } },
-      }),
-      prisma.category.findMany({
-        orderBy: { name: 'asc' },
-        select: {
-          id: true,
-          name: true,
-          subcategories: true,
-          products: {
-            where: { active: true },
-            select: { images: true },
-            take: 1,
-            orderBy: { createdAt: 'desc' },
+    ;[heroSlidesData, categoriesData, productsData, bestSellersData, testimonialCount] =
+      await Promise.all([
+        prisma.heroSlide.findMany({
+          orderBy: { order: 'asc' },
+          include: { product: { select: { id: true, name: true } } },
+        }),
+        prisma.category.findMany({
+          orderBy: { name: 'asc' },
+          select: { id: true, name: true },
+        }),
+        prisma.product.findMany({
+          where: { active: true },
+          orderBy: { createdAt: 'desc' },
+          take: 50,
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            price: true,
+            images: true,
+            ratingAverage: true,
+            ratingCount: true,
+            categoryId: true,
           },
-          _count: { select: { products: { where: { active: true } } } },
-        },
-      }),
-      prisma.product.findMany({
-        where: { active: true },
-        orderBy: { createdAt: 'desc' },
-        take: 50,
-        select: {
-          id: true,
-          slug: true,
-          name: true,
-          price: true,
-          images: true,
-          ratingAverage: true,
-          ratingCount: true,
-          categoryId: true,
-        },
-      }),
-    ])
+        }),
+        prisma.product.findMany({
+          where: { bestSeller: true, active: true },
+          orderBy: { ratingAverage: 'desc' },
+          take: 5,
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            price: true,
+            images: true,
+            ratingAverage: true,
+            ratingCount: true,
+            categoryId: true,
+          },
+        }),
+        prisma.testimonial.count({ where: { active: true } }),
+      ])
   } catch (error) {
     if (!canUseDatabaseFallback(error)) throw error
     logDatabaseFallback('HomePage', error)
   }
 
-  const heroSlides = serialize(heroSlidesData).flatMap((s) => {
-    if (!s.product) return []
+  const heroSlides = serialize(heroSlidesData).flatMap((slide) => {
+    if (!slide.product) return []
     return [
       {
-        id: s.id,
-        title: s.title,
-        subtitle: s.subtitle,
-        image: s.image,
-        product: { id: s.product.id, name: s.product.name },
+        id: slide.id,
+        title: slide.title,
+        subtitle: slide.subtitle,
+        image: slide.image,
+        product: { id: slide.product.id, name: slide.product.name },
       },
     ]
   })
 
-  const categories = serialize(categoriesData).map((c) => ({
-    id: c.id,
-    name: c.name,
-    subcategories: c.subcategories ?? [],
-    productImage: c.products?.[0]?.images?.[0] ?? null,
-    productCount: c._count?.products ?? 0,
-  }))
+  const categories = serialize(categoriesData)
+  const mapProduct = (product: HomeProduct) => ({
+    id: product.id,
+    slug: product.slug || '',
+    name: product.name,
+    price: product.price.toNumber(),
+    images: product.images || [],
+    ratingAverage: product.ratingAverage || 0,
+    ratingCount: product.ratingCount || 0,
+    categoryId: product.categoryId || '',
+  })
 
-  const products = productsData.map((p) => ({
-    id: p.id,
-    slug: p.slug || '',
-    name: p.name,
-    price: p.price.toNumber(),
-    images: p.images || [],
-    ratingAverage: p.ratingAverage || 0,
-    ratingCount: p.ratingCount || 0,
-    categoryId: p.categoryId || '',
-  }))
+  const products = productsData.map(mapProduct)
+  const bestSellers = bestSellersData.map(mapProduct)
 
   const skeletonFallback = (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <SkeletonCard key={i} />
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <SkeletonCard key={index} />
       ))}
     </div>
   )
 
   return (
-    <main className="flex flex-col">
-      {/* Hero Section */}
-      <HeroEpic
-        slides={heroSlides}
-        stats={{
-          customers: 5000,
-          products: 500,
-          rating: 4.9,
-        }}
-      />
+    <div className="space-y-10 md:space-y-14">
+      <HeroCompact slides={heroSlides} />
 
-      {/* Main content - Orden: Categorías → Productos (como Almitas) */}
-      <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 md:px-12 lg:px-16">
-        <div className="space-y-16 md:space-y-20 py-12 md:py-16">
-          <PetCultureGateway />
+      <Section spacing="sm" className="space-y-6 !py-0">
+        <CategoryPills categories={categories} />
+        <Suspense fallback={skeletonFallback}>
+          <HomeCatalogSection
+            products={products}
+            categories={categories}
+            bestSellers={bestSellers}
+          />
+        </Suspense>
+      </Section>
 
-          {/* Categorías Destacadas */}
-          <CategoryShowcase categories={categories} />
-
-          {/* Productos con Tabs (como Almitas) */}
-          <ProductsShowcase products={products} categories={categories} />
-
-          {/* Más Vendidos */}
-          <Suspense fallback={skeletonFallback}>
-            <BestSeller />
-          </Suspense>
-
-          {/* Testimonios */}
+      {testimonialCount > 0 && (
+        <Section spacing="sm">
           <Testimonials />
+        </Section>
+      )}
 
-          {/* Políticas */}
-          <OurPolicy />
-        </div>
-      </div>
-    </main>
+      <TrustStrip variant="compact" />
+    </div>
   )
 }

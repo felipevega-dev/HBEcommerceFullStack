@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import Link from 'next/link'
+import { PageHeader } from '@/components/ui/page-header'
 import { serialize } from '@/lib/serialize'
 import { type CollectionParams } from '@/lib/collection-params'
 import { CollectionFilters } from '@/components/store/collection-filters'
@@ -82,29 +82,14 @@ export default async function CollectionPage({
   const serializedCategories = serialize(categories)
 
   return (
-    <div className="pt-6">
-      <nav aria-label="breadcrumb" className="mb-4">
-        <ol className="flex gap-2 text-sm text-[var(--color-text-muted)]">
-          <li>
-            <Link href="/" className="hover:text-[var(--color-text-primary)] transition-colors">
-              Inicio
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page" className="text-[var(--color-text-primary)]">
-            Colecciones
-          </li>
-        </ol>
-      </nav>
+    <div>
+      <PageHeader
+        title="Colección"
+        description="Ropa y accesorios premium para mascotas"
+        breadcrumbs={[{ label: 'Inicio', href: '/' }, { label: 'Colección' }]}
+      />
 
-      <div className="mb-8 border-b border-[var(--color-border)] pb-6">
-        <h1 className="text-3xl font-medium mb-2">Colecciones</h1>
-        <p className="text-[var(--color-text-secondary)]">
-          Descubre nuestra coleccion completa de ropa y accesorios para mascotas
-        </p>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-8">
+      <div className="flex flex-col gap-8 sm:flex-row">
         <CollectionFilters
           categories={serializedCategories}
           colors={uniqueColors}

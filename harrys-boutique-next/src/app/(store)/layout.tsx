@@ -6,9 +6,11 @@ import 'react-toastify/dist/ReactToastify.css'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-grow px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-grow px-4 py-6 sm:px-6 lg:px-8">
+        {children}
+      </main>
       <Footer />
       <CartDrawer />
       <ToastContainer position="bottom-right" autoClose={3000} theme="light" />
