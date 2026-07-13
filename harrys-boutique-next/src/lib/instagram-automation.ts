@@ -57,6 +57,12 @@ export type InstagramSettingsInput = {
 export type ManualInstagramPostInput = {
   title: string
   imageUrl: string
+  instagramUrl?: string | null
+  altText?: string | null
+  homeCaption?: string | null
+  likes?: number | null
+  homeVisible?: boolean
+  homeOrder?: number
   sourceDescription?: string | null
   captionDraft?: string | null
   scheduledFor?: Date | string | null
@@ -218,6 +224,12 @@ export async function createManualInstagramPost(input: ManualInstagramPostInput)
       sourceType: 'MANUAL_UPLOAD',
       imageUrl: input.imageUrl.trim(),
       title: input.title.trim(),
+      instagramUrl: input.instagramUrl?.trim() || null,
+      altText: input.altText?.trim() || input.title.trim(),
+      homeCaption: input.homeCaption?.trim() || null,
+      likes: input.likes ?? null,
+      homeVisible: input.homeVisible ?? false,
+      homeOrder: input.homeOrder ?? 0,
       sourceDescription: input.sourceDescription?.trim() || null,
       captionDraft,
       scheduledFor,

@@ -34,6 +34,7 @@ import {
 } from './steps'
 import { SuccessModal, ErrorModal } from './modals'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { Button } from '@/components/ui/design-system'
 
 interface ProductWizardProps {
   /**
@@ -373,16 +374,16 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
 
       {/* Progress Indicator */}
       <div className="mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <div className="ui-panel p-4">
           <div className="flex items-center justify-between">
             {[1, 2, 3, 4, 5, 6, 7].map((step) => (
               <div key={step} className={`flex items-center ${step < 7 ? 'flex-1' : ''}`}>
                 <div
                   className={`
                     w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-                    ${step < wizard.currentStep ? 'bg-green-500 text-white' : ''}
-                    ${step === wizard.currentStep ? 'bg-black text-white' : ''}
-                    ${step > wizard.currentStep ? 'bg-gray-200 text-gray-500' : ''}
+                    ${step < wizard.currentStep ? 'bg-[var(--color-success)] text-white' : ''}
+                    ${step === wizard.currentStep ? 'bg-[var(--color-accent-dark)] text-white' : ''}
+                    ${step > wizard.currentStep ? 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)]' : ''}
                   `}
                 >
                   {step < wizard.currentStep ? (
@@ -395,7 +396,7 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
                   <div
                     className={`
                       h-0.5 flex-1 mx-2
-                      ${step < wizard.currentStep ? 'bg-green-500' : 'bg-gray-200'}
+                      ${step < wizard.currentStep ? 'bg-[var(--color-success)]' : 'bg-[var(--color-border)]'}
                     `}
                   />
                 )}
@@ -409,21 +410,16 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
       </div>
 
       {/* Step Content */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
-        {renderStep()}
-      </div>
+      <div className="ui-panel mb-6 p-6">{renderStep()}</div>
 
       {/* Navigation */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+      <div className="ui-panel p-4">
         <div className="flex items-center justify-between">
           <div>
             {wizard.currentStep > 1 && (
-              <button
-                onClick={handlePrevious}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
+              <Button onClick={handlePrevious} variant="secondary">
                 Anterior
-              </button>
+              </Button>
             )}
           </div>
 
@@ -431,31 +427,16 @@ export default function ProductWizard({ productId, initialData, categories }: Pr
 
           <div>
             {wizard.currentStep < 7 ? (
-              <button
-                onClick={handleNext}
-                disabled={validation.hasErrors()}
-                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
+              <Button onClick={handleNext} disabled={validation.hasErrors()}>
                 Siguiente
-              </button>
+              </Button>
             ) : (
-              <button
-                onClick={handleSave}
-                disabled={wizard.isSaving}
-                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {wizard.isSaving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <BrandIcon name="save" className="h-4 w-4" />
-                    Guardar Producto
-                  </>
-                )}
-              </button>
+              <Button onClick={handleSave} disabled={wizard.isSaving} loading={wizard.isSaving}>
+                <>
+                  <BrandIcon name="save" className="h-4 w-4" />
+                  {wizard.isSaving ? 'Guardando...' : 'Guardar Producto'}
+                </>
+              </Button>
             )}
           </div>
         </div>

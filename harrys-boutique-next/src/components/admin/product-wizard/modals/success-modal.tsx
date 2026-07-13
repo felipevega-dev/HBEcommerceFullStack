@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { Button } from '@/components/ui/design-system'
 
 interface SuccessModalProps {
   /**
@@ -109,47 +110,46 @@ export function SuccessModal({ isOpen, productId, onCreateAnother, onClose }: Su
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-text-primary)]/50 p-4">
       {/* Modal Container with Animation */}
       <div
-        className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 animate-scale-fade-in"
+        className="ui-panel w-full max-w-md p-6 animate-scale-fade-in"
         role="dialog"
         aria-labelledby="success-modal-title"
         aria-describedby="success-modal-description"
       >
         {/* Success Icon and Title */}
         <div className="text-center mb-4">
-          <div className="mb-3 flex justify-center text-green-600 animate-bounce">
+          <div className="mb-3 flex justify-center text-[var(--color-success)]">
             <BrandIcon name="check-circle" className="h-12 w-12" />
           </div>
-          <h2 id="success-modal-title" className="text-xl font-semibold text-gray-900">
+          <h2
+            id="success-modal-title"
+            className="text-xl font-semibold text-[var(--color-text-primary)]"
+          >
             ¡Producto guardado exitosamente!
           </h2>
         </div>
 
         {/* Success Message */}
-        <p id="success-modal-description" className="text-center text-gray-600 mb-6">
+        <p
+          id="success-modal-description"
+          className="text-center text-[var(--color-text-secondary)] mb-6"
+        >
           Tu producto ya está disponible en la tienda
         </p>
 
         {/* Action Buttons */}
         <div className="space-y-3">
           {/* Primary Action: View Product */}
-          <button
-            onClick={handleViewProduct}
-            className="w-full bg-black text-white py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors font-medium"
-            autoFocus
-          >
+          <Button onClick={handleViewProduct} variant="primary" className="w-full" autoFocus>
             Ver Producto
-          </button>
+          </Button>
 
           {/* Secondary Action: Create Another */}
-          <button
-            onClick={handleCreateAnother}
-            className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-          >
+          <Button onClick={handleCreateAnother} variant="secondary" className="w-full">
             Crear Otro Producto
-          </button>
+          </Button>
         </div>
 
         {/* Auto-close Countdown */}

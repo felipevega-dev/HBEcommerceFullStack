@@ -101,16 +101,21 @@ export function GlobalSearch() {
   if (!isOpen) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20">
-      <div className="absolute inset-0 bg-black/50" onClick={() => setIsOpen(false)} />
-      <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-[var(--color-text-primary)]/50 pt-20">
+      <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
+      <div
+        className="ui-panel relative w-full max-w-2xl overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Búsqueda administrativa"
+      >
         <div className="flex items-center border-b px-4 py-3">
           <BrandIcon name="search" className="h-5 w-5 text-gray-400 mr-3" />
           <input
             ref={inputRef}
             type="text"
             placeholder="Buscar productos, pedidos, clientes..."
-            className="flex-1 text-lg outline-none placeholder:text-gray-400"
+            className="ui-field flex-1 border-0 bg-transparent text-lg outline-none placeholder:text-[var(--color-text-muted)] focus:ring-0"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -124,7 +129,9 @@ export function GlobalSearch() {
             <button
               key={tab}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                activeTab === tab ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'
+                activeTab === tab
+                  ? 'ui-button ui-button-primary'
+                  : 'ui-button ui-button-ghost text-[var(--color-text-secondary)]'
               }`}
               onClick={() => setActiveTab(tab)}
             >

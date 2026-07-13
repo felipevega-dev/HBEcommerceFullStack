@@ -22,7 +22,7 @@ interface Props {
 
 export function CheckoutProgress({ currentStep }: Props) {
   return (
-    <div className="w-full py-6 sm:py-8">
+    <nav aria-label="Progreso de compra" className="w-full py-6 sm:py-8">
       <div className="max-w-3xl mx-auto px-4">
         {/* Desktop version */}
         <div className="hidden sm:flex items-center justify-between relative">
@@ -45,7 +45,11 @@ export function CheckoutProgress({ currentStep }: Props) {
             const isUpcoming = currentStep < step.number
 
             return (
-              <div key={step.number} className="relative flex flex-col items-center z-10">
+              <div
+                key={step.number}
+                aria-current={isCurrent ? 'step' : undefined}
+                className="relative flex flex-col items-center z-10"
+              >
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -123,6 +127,6 @@ export function CheckoutProgress({ currentStep }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   )
 }

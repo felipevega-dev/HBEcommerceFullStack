@@ -480,7 +480,7 @@ export function AdminOrderList({ orders, total, page, limit, stats }: Props) {
           return (
             <div
               key={order.id}
-              className={`overflow-hidden rounded-xl border bg-white transition-all ${
+              className={`ui-card overflow-hidden transition-all ${
                 isSelected ? 'ring-2 ring-black' : ''
               }`}
             >

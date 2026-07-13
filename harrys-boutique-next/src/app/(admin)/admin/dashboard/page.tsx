@@ -130,7 +130,12 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <div className="ui-page-header">
+        <div>
+          <p className="ui-eyebrow">GestiÃ³n de la boutique</p>
+          <h1 className="mt-1 text-3xl">Dashboard</h1>
+        </div>
+      </div>
       <DashboardMetrics metrics={metrics} />
       <div className="rounded-xl border bg-white p-5">
         <h2 className="text-lg font-semibold">Próximas acciones</h2>

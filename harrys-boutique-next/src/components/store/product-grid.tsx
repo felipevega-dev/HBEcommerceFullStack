@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { EmptyState } from '@/components/ui/design-system'
 import { ProductCard } from './product-card'
 
 interface Product {
@@ -80,12 +81,15 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-gray-500 gap-4">
-        <p>No encontramos productos con estos filtros.</p>
-        <Link href="/collection" className="text-sm underline">
-          Limpiar filtros
-        </Link>
-      </div>
+      <EmptyState
+        title="No encontramos productos"
+        description="Prueba con otros filtros para descubrir nuestras prendas y accesorios."
+        action={
+          <Link href="/collection" className="ui-button ui-button-secondary">
+            Limpiar filtros
+          </Link>
+        }
+      />
     )
   }
 
@@ -113,7 +117,7 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
           {currentPage > 1 && (
             <Link
               href={buildPageHref(currentPage - 1)}
-              className="inline-flex h-10 w-10 items-center justify-center border rounded-lg hover:bg-gray-50 text-sm"
+              className="ui-button ui-button-secondary h-10 w-10 px-0 text-sm"
               aria-label="Pagina anterior"
             >
               <BrandIcon name="chevron-left" className="h-4 w-4" />
@@ -126,7 +130,7 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
               )}
               <Link
                 href={buildPageHref(page)}
-                className={`px-4 py-2 border rounded-lg text-sm ${page === currentPage ? 'bg-black text-white' : 'hover:bg-gray-50'}`}
+                className={`ui-button text-sm ${page === currentPage ? 'ui-button-primary' : 'ui-button-secondary'}`}
               >
                 {page}
               </Link>
@@ -135,7 +139,7 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
           {currentPage < totalPages && (
             <Link
               href={buildPageHref(currentPage + 1)}
-              className="inline-flex h-10 w-10 items-center justify-center border rounded-lg hover:bg-gray-50 text-sm"
+              className="ui-button ui-button-secondary h-10 w-10 px-0 text-sm"
               aria-label="Pagina siguiente"
             >
               <BrandIcon name="chevron-right" className="h-4 w-4" />
@@ -152,9 +156,9 @@ export function ProductGridSkeleton() {
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
       {[...Array(12)].map((_, i) => (
         <div key={i} className="animate-pulse">
-          <div className="bg-gray-200 rounded-lg aspect-[3/4] mb-3" />
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-          <div className="h-4 bg-gray-200 rounded w-1/2" />
+          <div className="animate-pulse rounded-[var(--radius-lg)] bg-[var(--color-surface-2)] aspect-[3/4] mb-3" />
+          <div className="animate-pulse h-4 bg-[var(--color-surface-2)] rounded w-3/4 mb-2" />
+          <div className="animate-pulse h-4 bg-[var(--color-surface-2)] rounded w-1/2" />
         </div>
       ))}
     </div>

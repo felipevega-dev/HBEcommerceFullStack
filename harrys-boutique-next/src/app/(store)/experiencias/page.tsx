@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PetExperiencePageClient } from '@/components/store/pet-experience-page-client'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: "Harry's World — Experiencias para mascotas",
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 }
 
 export default function PetExperiencesPage() {
-  return <PetExperiencePageClient />
+  redirect('/collection')
 }

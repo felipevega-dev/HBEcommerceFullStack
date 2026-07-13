@@ -45,11 +45,8 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
             drops o matching outfits.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <a
-              href="/experiencias#quiz"
-              className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
-            >
-              Encontrar estilo
+            <a href="/collection" className="ui-button ui-button-primary">
+              Explorar colecciÃ³n
             </a>
             <a
               href="/collection"
@@ -91,13 +88,13 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <a
-                  href="/experiencias#birthday"
+                  href="/collection?sort=newest"
                   className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
                 >
                   Guardar para cumpleanos
                 </a>
                 <a
-                  href="/experiencias#ugc"
+                  href="/contact"
                   className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
                 >
                   Convertir en fit check

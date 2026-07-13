@@ -120,11 +120,21 @@ model Address {
 model Category {
   id            String   @id @default(uuid())
   name          String   @unique
+  slug          String?  @unique
   subcategories String[]
+  homeImage     String?
+  homeDescription String? @db.Text
+  homeHref      String?
+  active        Boolean  @default(true)
+  homeVisible   Boolean  @default(false)
+  homeOrder     Int      @default(0)
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  products Product[]
+  products          Product[]
+  homeCategoryBlock HomeCategoryBlock?
 
+  @@index([active, homeVisible, homeOrder])
   @@map("categories")
 }
 
@@ -162,6 +172,8 @@ model Product {
   cartItems      CartItem[]
   variants       ProductVariant[]
   instagramPosts InstagramPost[]
+  homeSelections HomeProductSelection[]
+  homeCategoryItems HomeCategoryProduct[]
 
   @@index([slug])
   @@index([categoryId, subCategory])
@@ -170,6 +182,56 @@ model Product {
   @@index([ratingAverage(sort: Desc)])
   @@index([mercadoLibreStatus])
   @@map("products")
+}
+
+model HomeProductSelection {
+  id        String   @id @default(uuid())
+  productId String
+  section   String   @default("FEATURED")
+  visible   Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, section])
+  @@index([section, visible, order])
+  @@map("home_product_selections")
+}
+
+model HomeCategoryBlock {
+  id         String   @id @default(uuid())
+  categoryId String   @unique
+  mode       String   @default("AUTO")
+  maxItems   Int      @default(4)
+  visible    Boolean  @default(true)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category Category               @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  items    HomeCategoryProduct[]
+
+  @@index([visible, order])
+  @@map("home_category_blocks")
+}
+
+model HomeCategoryProduct {
+  id        String   @id @default(uuid())
+  blockId   String
+  productId String
+  visible   Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  block   HomeCategoryBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  product Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([blockId, productId])
+  @@index([blockId, visible, order])
+  @@map("home_category_products")
 }
 
 model ProductVariant {
@@ -482,6 +544,12 @@ model InstagramPost {
   instagramMediaId    String?
   retryCount          Int                 @default(0)
   lastError           String?             @db.Text
+  instagramUrl        String?
+  altText             String?
+  homeCaption         String?             @db.Text
+  likes               Int?
+  homeVisible         Boolean             @default(false)
+  homeOrder           Int                 @default(0)
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 
@@ -491,6 +559,7 @@ model InstagramPost {
   @@index([status, scheduledFor])
   @@index([productId])
   @@index([createdAt(sort: Desc)])
+  @@index([homeVisible, homeOrder])
   @@map("instagram_posts")
 }
 

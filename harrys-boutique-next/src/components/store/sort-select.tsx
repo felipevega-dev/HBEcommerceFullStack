@@ -22,7 +22,7 @@ export function SortSelect({ current }: { current: string }) {
     <select
       value={current}
       onChange={(e) => handleChange(e.target.value)}
-      className="px-4 py-2 border border-[var(--color-border)] rounded-lg text-sm bg-[var(--color-background)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="ui-field min-w-44"
     >
       <option value="latest">Más recientes</option>
       <option value="oldest">Más antiguos</option>

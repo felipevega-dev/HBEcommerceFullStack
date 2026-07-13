@@ -39,8 +39,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const storeStructuredData = getStoreStructuredData()
 
   return (
-    <html lang="es">
-      <body className={`${geist.variable} ${playfairDisplay.variable}`}>
+    <html lang="es" className={`${geist.variable} ${playfairDisplay.variable}`}>
+      <body className="antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: stringifyJsonLd(storeStructuredData) }}

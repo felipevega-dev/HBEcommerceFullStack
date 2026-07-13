@@ -217,7 +217,7 @@ export function ProductInfo({
             Para nombre bordado, matching fit o regalo especial, revisa la experiencia custom.
           </p>
           <Link
-            href="/experiencias#atelier"
+            href="/contact"
             className="mt-3 inline-flex text-xs font-semibold text-[var(--color-accent-dark)] hover:text-[var(--color-primary)]"
           >
             Ver opciones custom
@@ -346,7 +346,7 @@ export function ProductInfo({
                 destination_url: mercadoLibreListing.url,
               })
             }
-            className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-[#ffe600] px-4 py-3 text-sm font-semibold text-[#333] transition-colors hover:bg-[#f5d900] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#333]"
+            className="ui-button ui-button-secondary mt-3 w-full justify-center"
           >
             Comprar en Mercado Libre
           </a>

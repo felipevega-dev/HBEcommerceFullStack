@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import Image from 'next/image'
+import type { HomeContent } from '@/lib/home-content'
 
 type Tone = 'peach' | 'stone' | 'ink' | 'sage' | 'sand' | 'denim'
 
@@ -19,10 +21,14 @@ function Arrow() {
 function Placeholder({
   label,
   tone = 'peach',
+  image,
+  href,
   className = '',
 }: {
   label: string
   tone?: Tone
+  image?: string | null
+  href?: string
   className?: string
 }) {
   const tones: Record<Tone, string> = {
@@ -34,36 +40,40 @@ function Placeholder({
     denim: 'from-[#d8e2e8] via-[#f9faf9] to-[#617d91]',
   }
 
+  if (image) {
+    const imageContent = (
+      <>
+        <Image src={image} alt={label} fill sizes="100vw" className="object-cover" />
+      </>
+    )
+    return href ? (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`relative block overflow-hidden ${className}`}
+        aria-label={label}
+      >
+        {imageContent}
+      </a>
+    ) : (
+      <div className={`relative overflow-hidden ${className}`} role="img" aria-label={label}>
+        {imageContent}
+      </div>
+    )
+  }
+
   return (
     <div
       className={`relative overflow-hidden bg-gradient-to-br ${tones[tone]} ${className}`}
       role="img"
-      aria-label={`Placeholder: ${label}`}
+      aria-label={label}
     >
       <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full border border-white/70" />
       <div className="absolute -bottom-20 left-8 h-44 w-44 rounded-full bg-white/30 blur-2xl" />
-      <div className="absolute bottom-5 left-5 rounded-full border border-white/75 bg-white/55 px-3 py-1.5 text-[9px] font-bold tracking-[0.18em] text-[#514942] backdrop-blur-sm">
-        IMAGEN PENDIENTE
-      </div>
-      <p className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#4f4741]/70">
-        {label}
-      </p>
     </div>
   )
 }
-
-const collections: Array<{ title: string; tone: Tone; query: string }> = [
-  { title: 'Polerones', tone: 'sage', query: 'Polerones' },
-  { title: 'Arneses', tone: 'sand', query: 'Arneses' },
-  { title: 'Chaquetas', tone: 'stone', query: 'Chaquetas' },
-]
-
-const products: Array<{ name: string; tone: Tone }> = [
-  { name: 'Producto destacado 01', tone: 'denim' },
-  { name: 'Producto destacado 02', tone: 'sage' },
-  { name: 'Producto destacado 03', tone: 'peach' },
-  { name: 'Producto destacado 04', tone: 'sand' },
-]
 
 function SectionTitle({
   eyebrow,
@@ -99,7 +109,7 @@ function SectionTitle({
   )
 }
 
-export function HomeEditorialSections() {
+export function HomeEditorialSections({ content }: { content: HomeContent }) {
   return (
     <div className="mx-auto w-full max-w-[1536px] space-y-20 px-4 py-14 sm:px-6 sm:py-20 lg:space-y-28 lg:px-8 lg:py-24">
       <section>
@@ -110,20 +120,26 @@ export function HomeEditorialSections() {
           href="/collection"
         />
         <div className="grid gap-4 md:grid-cols-3 lg:gap-6">
-          {collections.map((collection) => (
+          {content.collections.map((collection) => (
             <Link
-              key={collection.title}
-              href={`/collection?search=${encodeURIComponent(collection.query)}`}
+              key={collection.id}
+              href={collection.href}
               className="group overflow-hidden rounded-[1.5rem] bg-white shadow-[0_10px_30px_rgba(70,48,35,0.06)]"
             >
-              <Placeholder
-                label={`Fotografía colección ${collection.title}`}
-                tone={collection.tone}
-                className="aspect-[1.08] transition-transform duration-500 group-hover:scale-[1.02]"
-              />
+              <div className="relative aspect-[1.08] overflow-hidden">
+                <Placeholder
+                  label={`Fotografía colección ${collection.title}`}
+                  tone="sage"
+                  image={collection.image}
+                  className="h-full transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+              </div>
               <div className="flex items-center justify-between px-5 py-5">
                 <div>
                   <h3 className="text-lg font-semibold text-[#1b1b1b]">{collection.title}</h3>
+                  {collection.description && (
+                    <p className="mt-1 text-xs text-[#756b63]">{collection.description}</p>
+                  )}
                   <p className="mt-1 text-xs text-[#756b63]">Ver colección</p>
                 </div>
                 <Arrow />
@@ -134,11 +150,20 @@ export function HomeEditorialSections() {
       </section>
 
       <section className="grid overflow-hidden rounded-[2rem] bg-[#f8eee7] lg:grid-cols-2">
-        <Placeholder
-          label="Fotografía lifestyle de Harry's Boutique"
-          tone="denim"
-          className="min-h-[360px] lg:min-h-[540px]"
-        />
+        <div className="relative min-h-[360px] overflow-hidden lg:min-h-[540px]">
+          <Placeholder
+            label="Fotografía lifestyle de Harry's Boutique"
+            tone="denim"
+            className="h-full min-h-[360px] lg:min-h-[540px]"
+          />
+          <Image
+            src="/nosotrosfull.png"
+            alt="Familia y mascotas de Harry's Boutique"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
+        </div>
         <div className="relative flex flex-col justify-center px-8 py-14 sm:px-14 lg:px-20">
           <p className="text-[10px] font-bold tracking-[0.2em] text-[#a96808]">NUESTRA HISTORIA</p>
           <h2
@@ -168,18 +193,19 @@ export function HomeEditorialSections() {
           href="/collection"
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-          {products.map((product, index) => (
+          {content.products.map((product) => (
             <article
-              key={product.name}
+              key={product.id}
               className="overflow-hidden rounded-[1.4rem] bg-white shadow-[0_10px_30px_rgba(70,48,35,0.06)]"
             >
               <div className="relative">
                 <Placeholder
                   label={`Fotografía ${product.name}`}
-                  tone={product.tone}
+                  tone="denim"
+                  image={product.image}
                   className="aspect-square"
                 />
-                {index !== 1 && (
+                {product.isNew && (
                   <span className="absolute left-4 top-4 rounded-full bg-white px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-[#a96808]">
                     NUEVO
                   </span>
@@ -188,10 +214,12 @@ export function HomeEditorialSections() {
               <div className="flex items-center justify-between gap-3 px-4 py-4">
                 <div>
                   <h3 className="text-sm font-semibold text-[#29231f]">{product.name}</h3>
-                  <p className="mt-1 text-xs text-[#847970]">Precio disponible al publicar</p>
+                  <p className="mt-1 text-xs text-[#847970]">
+                    ${product.price.toLocaleString('es-CL')}
+                  </p>
                 </div>
                 <Link
-                  href="/collection"
+                  href={product.href}
                   aria-label={`Ver ${product.name}`}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#eee4dd] text-[#1b1b1b] transition-colors hover:border-[#d79a18] hover:text-[#a96808]"
                 >
@@ -202,6 +230,54 @@ export function HomeEditorialSections() {
           ))}
         </div>
       </section>
+
+      {content.categoryBlocks.map((block) => (
+        <section key={block.categoryId}>
+          <SectionTitle
+            eyebrow="COLECCIÓN"
+            title={block.title}
+            link="Ver colección"
+            href={`/collection?category=${encodeURIComponent(block.title)}`}
+          />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {block.products.map((product) => (
+              <article
+                key={product.id}
+                className="overflow-hidden rounded-[1.4rem] bg-white shadow-[0_10px_30px_rgba(70,48,35,0.06)]"
+              >
+                <div className="relative">
+                  <Placeholder
+                    label={`Fotografía ${product.name}`}
+                    tone="sand"
+                    image={product.image}
+                    className="aspect-square"
+                  />
+                  {product.isNew && (
+                    <span className="absolute left-4 top-4 rounded-full bg-white px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-[#a96808]">
+                      NUEVO
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-[#29231f]">{product.name}</h3>
+                    <p className="mt-1 text-xs text-[#847970]">
+                      ${product.price.toLocaleString('es-CL')}
+                    </p>
+                  </div>
+                  <Link
+                    href={product.href}
+                    aria-label={`Ver ${product.name}`}
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#eee4dd] text-[#1b1b1b] transition-colors hover:border-[#d79a18] hover:text-[#a96808]"
+                  >
+                    <Arrow />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
 
       <section className="grid overflow-hidden rounded-[2rem] bg-[#f4e1d7] lg:grid-cols-[0.9fr_1.1fr]">
         <div className="flex flex-col justify-center px-8 py-14 sm:px-14 lg:px-16">
@@ -228,27 +304,40 @@ export function HomeEditorialSections() {
             ))}
           </div>
           <Link
-            href="/experiencias#atelier"
+            href="/contact"
             className="mt-9 inline-flex w-fit items-center gap-2 rounded-full bg-[#2f2823] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#a96808]"
           >
             Personalizar ahora <Arrow />
           </Link>
         </div>
-        <Placeholder
-          label="Close-up de etiqueta bordada Harry's Boutique"
-          tone="peach"
-          className="min-h-[340px] lg:min-h-full"
-        />
+        <div className="relative min-h-[340px] overflow-hidden lg:min-h-full">
+          <Placeholder
+            label="Close-up de etiqueta bordada Harry's Boutique"
+            tone="peach"
+            className="h-full min-h-[340px] lg:min-h-full"
+          />
+          <Image
+            src="/nancyharry.png"
+            alt="Harry's Boutique junto a sus mascotas"
+            fill
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            className="object-cover"
+          />
+        </div>
       </section>
 
-      <section>
-        <SectionTitle eyebrow="COMUNIDAD" title="Síguenos en Instagram" />
+      <section className={content.instagramPosts.length === 0 ? 'hidden' : ''}>
+        {content.instagramPosts.length > 0 && (
+          <SectionTitle eyebrow="COMUNIDAD" title="Síguenos en Instagram" />
+        )}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-4">
-          {Array.from({ length: 6 }, (_, index) => (
+          {content.instagramPosts.map((post, index) => (
             <Placeholder
-              key={index}
+              key={post.id}
               label={`Fotografía Instagram ${index + 1}`}
               tone={(['peach', 'sand', 'denim', 'sage', 'stone', 'ink'] as Tone[])[index]}
+              image={post.imageUrl}
+              href={post.instagramUrl}
               className="aspect-square rounded-[1.25rem]"
             />
           ))}
@@ -263,7 +352,9 @@ export function HomeEditorialSections() {
         </a>
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-[0.62fr_1.38fr] lg:items-center">
+      <section
+        className={`grid gap-8 lg:grid-cols-[0.62fr_1.38fr] lg:items-center ${content.testimonial ? '' : 'hidden'}`}
+      >
         <div>
           <p className="text-[10px] font-bold tracking-[0.2em] text-[#d79a18]">
             COMUNIDAD HARRY&apos;S
@@ -275,7 +366,24 @@ export function HomeEditorialSections() {
             Lo que dicen nuestros clientes
           </h2>
         </div>
-        <div className="rounded-[1.5rem] bg-white px-8 py-9 shadow-[0_12px_35px_rgba(70,48,35,0.07)] sm:px-12">
+        {content.testimonial && (
+          <div className="rounded-[1.5rem] bg-white px-8 py-9 shadow-[0_12px_35px_rgba(70,48,35,0.07)] sm:px-12">
+            <p className="text-sm tracking-[0.25em] text-[#d79a18]">
+              {'★'.repeat(Math.max(0, Math.min(5, content.testimonial.rating)))}
+            </p>
+            <blockquote
+              className="mt-5 max-w-2xl text-2xl leading-relaxed text-[#2b2521]"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              “{content.testimonial.comment}”
+            </blockquote>
+            <p className="mt-5 text-sm text-[#7e746d]">
+              {content.testimonial.name}
+              {content.testimonial.role ? ` · ${content.testimonial.role}` : ''}
+            </p>
+          </div>
+        )}
+        <div className="hidden rounded-[1.5rem] bg-white px-8 py-9 shadow-[0_12px_35px_rgba(70,48,35,0.07)] sm:px-12">
           <p className="text-sm tracking-[0.25em] text-[#d79a18]">★★★★★</p>
           <blockquote
             className="mt-5 max-w-2xl text-2xl leading-relaxed text-[#2b2521]"
@@ -308,8 +416,24 @@ export function HomeEditorialSections() {
             Consultar ubicación <Arrow />
           </Link>
         </div>
-        <Placeholder label="Mapa de ubicación pendiente" tone="stone" className="min-h-[260px]" />
-        <Placeholder label="Fotografía del local pendiente" tone="sand" className="min-h-[260px]" />
+        <div className="relative min-h-[260px] overflow-hidden">
+          <Image
+            src="/nosotros.JPG"
+            alt="Espacio de Harry's Boutique"
+            fill
+            sizes="(max-width: 1024px) 100vw, 30vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="relative min-h-[260px] overflow-hidden">
+          <Image
+            src="/banner.png"
+            alt="Harry's Boutique"
+            fill
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            className="object-cover"
+          />
+        </div>
       </section>
     </div>
   )

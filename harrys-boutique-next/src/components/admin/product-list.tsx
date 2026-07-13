@@ -91,13 +91,14 @@ export function AdminProductList({
   const availableSubcategories = useMemo(() => {
     const source = !categoryFilter
       ? categories.flatMap((category) => category.subcategories)
-      : categories.find((category) => category.name === categoryFilter)?.subcategories ?? []
+      : (categories.find((category) => category.name === categoryFilter)?.subcategories ?? [])
 
     return Array.from(new Set(source))
   }, [categories, categoryFilter])
 
   const bulkSubcategories = useMemo(() => {
-    const source = categories.find((category) => category.id === bulkCategoryId)?.subcategories ?? []
+    const source =
+      categories.find((category) => category.id === bulkCategoryId)?.subcategories ?? []
     return Array.from(new Set(source))
   }, [bulkCategoryId, categories])
 
@@ -600,8 +601,8 @@ export function AdminProductList({
         </div>
       )}
 
-      <div className="hidden overflow-hidden rounded-xl border bg-white md:block">
-        <table className="w-full text-sm">
+      <div className="ui-table-wrap hidden md:block">
+        <table className="ui-table w-full text-sm">
           <thead className="border-b bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left">
@@ -840,7 +841,7 @@ export function AdminProductList({
             ) : (
               <div className="space-y-4">
                 <div className="overflow-auto rounded-lg border">
-                  <table className="w-full min-w-[760px] text-left text-sm">
+                  <table className="ui-table w-full min-w-[760px] text-left text-sm">
                     <thead className="bg-gray-50 text-xs uppercase text-gray-500">
                       <tr>
                         <th className="px-3 py-2">Talla</th>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { Button, Input, Textarea } from '@/components/ui/design-system'
 
 interface FormState {
   nombre: string
@@ -74,8 +75,7 @@ export default function ContactForm() {
     }
   }
 
-  const inputClass =
-    'w-full px-3 py-2.5 text-sm border rounded-lg bg-[var(--color-background)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-colors'
+  const inputClass = 'ui-field w-full'
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
@@ -96,7 +96,7 @@ export default function ContactForm() {
         >
           Nombre
         </label>
-        <input
+        <Input
           id="nombre"
           name="nombre"
           type="text"
@@ -115,7 +115,7 @@ export default function ContactForm() {
         >
           Email
         </label>
-        <input
+        <Input
           id="email"
           name="email"
           type="email"
@@ -134,7 +134,7 @@ export default function ContactForm() {
         >
           Asunto
         </label>
-        <input
+        <Input
           id="asunto"
           name="asunto"
           type="text"
@@ -153,7 +153,7 @@ export default function ContactForm() {
         >
           Mensaje
         </label>
-        <textarea
+        <Textarea
           id="mensaje"
           name="mensaje"
           rows={5}
@@ -167,13 +167,9 @@ export default function ContactForm() {
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 rounded-lg font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition-colors disabled:opacity-60"
-      >
-        {loading ? 'Enviando...' : 'Enviar mensaje'}
-      </button>
+      <Button type="submit" disabled={loading} className="w-full" loading={loading}>
+        Enviar mensaje
+      </Button>
     </form>
   )
 }

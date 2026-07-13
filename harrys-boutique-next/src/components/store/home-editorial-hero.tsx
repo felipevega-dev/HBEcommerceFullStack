@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Navbar } from '@/components/store/navbar'
 
 function PawIcon({ className = '' }: { className?: string }) {
   return (
@@ -113,8 +112,6 @@ export function HomeEditorialHero() {
           sizes="100vw"
           className="object-cover object-center"
         />
-        <Navbar overlay />
-
         <div className="relative flex h-full flex-col justify-center px-7 pb-12 pt-32 sm:px-12 lg:max-w-[64%] lg:px-12 lg:pb-10 lg:pt-28 xl:px-16">
           <h1
             className="mt-6 max-w-3xl text-5xl leading-[0.98] text-[#10192a] sm:text-6xl lg:text-[3.5rem] xl:text-[4.5rem]"

@@ -140,8 +140,7 @@ export function LoginPageClient() {
     }
   }
 
-  const inputBase =
-    'w-full rounded-lg border bg-white px-4 py-3 text-sm outline-none transition-all focus:ring-2'
+  const inputBase = 'ui-field w-full'
 
   return (
     <div className="min-h-[calc(100vh-200px)] px-4 py-10 sm:py-14">
@@ -301,7 +300,7 @@ export function LoginPageClient() {
                       <div
                         key={rule.label}
                         className={`flex items-center gap-1.5 text-xs ${
-                          passed ? 'text-green-700' : 'text-[var(--color-text-muted)]'
+                          passed ? 'text-[var(--color-success)]' : 'text-[var(--color-text-muted)]'
                         }`}
                       >
                         <BrandIcon

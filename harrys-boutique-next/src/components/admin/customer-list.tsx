@@ -24,11 +24,11 @@ interface Props {
 }
 
 const SEGMENT_COLORS: Record<string, string> = {
-  vip: 'bg-purple-100 text-purple-800',
-  frequent: 'bg-blue-100 text-blue-800',
-  regular: 'bg-gray-100 text-gray-800',
-  at_risk: 'bg-red-100 text-red-800',
-  new: 'bg-green-100 text-green-800',
+  vip: 'ui-badge border-[var(--color-gold)] bg-[var(--color-gold-light)] text-[var(--color-gold-dark)]',
+  frequent: 'ui-badge bg-[var(--color-accent-light)] text-[var(--color-accent-dark)]',
+  regular: 'ui-badge',
+  at_risk: 'ui-badge ui-status-warning',
+  new: 'ui-badge ui-status-success',
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
@@ -69,10 +69,7 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
           placeholder="Buscar por nombre o email..."
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
         />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800"
-        >
+        <button type="submit" className="ui-button ui-button-primary">
           Buscar
         </button>
       </form>
@@ -135,9 +132,9 @@ export function AdminCustomerList({ users, total, page, limit }: Props) {
 
       <div className="text-sm text-gray-500">{total} clientes en total</div>
 
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+      <div className="ui-table-wrap">
+        <table className="ui-table w-full text-sm">
+          <thead>
             <tr>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Cliente</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">

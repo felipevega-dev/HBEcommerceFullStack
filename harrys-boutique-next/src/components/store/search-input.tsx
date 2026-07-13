@@ -51,7 +51,7 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
         onChange={(e) => setValue(e.target.value)}
         placeholder="Buscar productos..."
         aria-label="Buscar productos"
-        className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 w-56"
+        className="ui-field w-56 pl-9 pr-4"
       />
     </div>
   )

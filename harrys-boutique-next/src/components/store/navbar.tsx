@@ -13,7 +13,6 @@ import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 const navItems = [
   { href: '/', label: 'INICIO' },
   { href: '/collection', label: 'TIENDA' },
-  { href: '/experiencias', label: 'EXPERIENCIAS' },
   { href: '/about', label: 'NOSOTROS' },
   { href: '/contact', label: 'CONTACTO' },
 ]
@@ -64,6 +63,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const isAdmin = Boolean(session?.user?.role && ADMIN_ROLES.includes(session.user.role))
+  const isOverlay = overlay || pathname === '/'
 
   useEffect(() => {
     setMenuOpen(false)
@@ -75,10 +75,15 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
     if (!menuOpen) return
 
     const originalOverflow = document.body.style.overflow
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
     document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
 
     return () => {
       document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [menuOpen])
 
@@ -96,20 +101,16 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
     { name: 'Polerones', href: '/collection?subCategory=Polerones', icon: 'shirt' },
     { name: 'Camisetas', href: '/collection?subCategory=Camisetas', icon: 'sparkles' },
     { name: 'Vestidos', href: '/collection?subCategory=Vestidos', icon: 'design' },
-    { name: 'Experiencias', href: '/experiencias', icon: 'sparkles' },
     { name: 'Más vendidos', href: '/collection?bestSeller=true', icon: 'star' },
     { name: 'Novedades', href: '/collection?sort=newest', icon: 'tag' },
   ]
-
-  // The home hero owns its transparent navigation, while the rest of the store keeps this layout slot.
-  if (pathname === '/' && !overlay) return null
 
   return (
     <>
       <nav
         aria-label="Navegación principal"
         className={
-          overlay
+          isOverlay
             ? 'absolute inset-x-0 top-0 z-40 border-none bg-transparent shadow-none'
             : 'sticky top-0 z-40 border-b border-[#eadfce]/80 bg-[linear-gradient(90deg,#fffdf8_0%,#fffaf4_46%,#f7ebda_100%)] shadow-none'
         }
@@ -117,7 +118,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
         {/* Top bar - Social links y login */}
         <div
           className={`hidden lg:block ${
-            overlay
+            isOverlay
               ? 'border-b border-[#e6d8c8]/60 bg-transparent'
               : 'border-b border-[#e6d8c8]/60 bg-[linear-gradient(90deg,#fffdf8_0%,#fffaf4_46%,#f7ebda_100%)]'
           }`}
@@ -160,7 +161,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                           <>
                             <Link
                               href="/admin/dashboard"
-                              className="block px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+                              className="block px-4 py-2.5 text-sm text-[var(--color-accent-dark)] hover:bg-[var(--color-accent-light)] transition-colors font-medium"
                             >
                               Panel Admin
                             </Link>
@@ -188,7 +189,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                         <div className="border-t border-[var(--color-border)]" />
                         <button
                           onClick={() => signOut({ callbackUrl: '/' })}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-accent-light)] transition-colors"
                         >
                           Cerrar sesión
                         </button>
@@ -541,14 +542,17 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
         {menuOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-[1000] bg-black/50 lg:hidden"
+              className="fixed inset-0 z-[1000] bg-[var(--color-text-primary)]/50 lg:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMenuOpen(false)}
             />
             <motion.div
-              className="fixed right-0 top-0 z-[1001] flex h-dvh w-[85%] max-w-sm flex-col bg-white shadow-2xl lg:hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menú principal"
+              className="fixed right-0 top-0 z-[1001] flex h-dvh w-[85%] max-w-sm flex-col bg-[var(--color-surface)] shadow-[var(--shadow-hover)] lg:hidden"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -567,7 +571,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 </Link>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="p-2 hover:bg-[var(--color-surface-2)] rounded-full transition-colors"
+                  className="ui-button ui-button-ghost h-10 w-10 rounded-full p-0"
                   aria-label="Cerrar menú"
                 >
                   <BrandIcon name="x" className="h-6 w-6" />
@@ -639,7 +643,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                           <Link
                             href="/admin/dashboard"
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-2 px-6 py-3 text-blue-700 bg-blue-50 border-b border-[var(--color-border)] hover:bg-blue-100 transition-colors font-medium"
+                            className="flex items-center gap-2 px-6 py-3 text-[var(--color-accent-dark)] bg-[var(--color-accent-light)] border-b border-[var(--color-border)] hover:bg-[var(--color-surface)] transition-colors font-medium"
                           >
                             <BrandIcon name="layout-dashboard" className="h-4 w-4" />
                             Panel Admin
@@ -673,7 +677,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                           setMenuOpen(false)
                           signOut({ callbackUrl: '/' })
                         }}
-                        className="w-full text-left px-6 py-3 text-red-600 border-b border-[var(--color-border)] hover:bg-red-50 transition-colors font-medium"
+                        className="w-full text-left px-6 py-3 text-[var(--color-error)] border-b border-[var(--color-border)] hover:bg-[var(--color-accent-light)] transition-colors font-medium"
                       >
                         Cerrar sesión
                       </button>

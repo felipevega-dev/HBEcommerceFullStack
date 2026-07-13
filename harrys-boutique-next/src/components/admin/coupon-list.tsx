@@ -468,9 +468,9 @@ export function AdminCouponList({ coupons: initial }: { coupons: Coupon[] }) {
       )}
 
       {/* Tabla de cupones */}
-      <div className="bg-white rounded-xl border overflow-hidden">
+      <div className="ui-table-wrap">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="ui-table w-full text-sm">
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">Código</th>

@@ -135,7 +135,12 @@ export default async function AdminCustomersPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Clientes</h1>
+      <div className="ui-page-header">
+        <div>
+          <p className="ui-eyebrow">Comunidad</p>
+          <h1 className="mt-1 text-3xl">Clientes</h1>
+        </div>
+      </div>
       <AdminCustomerList users={users} total={total} page={page} limit={limit} />
     </div>
   )

@@ -7,6 +7,13 @@ import { handleApiError, protectMutation, requireAdminAuth, validateBody } from 
 const categorySchema = z.object({
   name: z.string().min(1),
   subcategories: z.array(z.string()).min(1),
+  slug: z.string().min(1).max(120).optional(),
+  homeImage: z.string().url().optional().nullable(),
+  homeDescription: z.string().max(240).optional().nullable(),
+  homeHref: z.string().max(240).optional().nullable(),
+  active: z.boolean().optional().default(true),
+  homeVisible: z.boolean().optional().default(false),
+  homeOrder: z.number().int().min(0).max(9999).optional().default(0),
 })
 
 export async function GET() {

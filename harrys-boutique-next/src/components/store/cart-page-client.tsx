@@ -9,6 +9,7 @@ import {
   type PricingSettings,
 } from '@/lib/checkout'
 import { trackAnalyticsEvent } from '@/lib/analytics'
+import { EmptyState } from '@/components/ui/design-system'
 
 export function CartPageClient({
   pricingSettings = DEFAULT_PRICING_SETTINGS,
@@ -19,32 +20,16 @@ export function CartPageClient({
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 border-t pt-14">
-        <h1 className="text-3xl font-medium text-center">Carro de Compras</h1>
-        <div className="flex flex-col items-center gap-4">
-          <svg
-            className="w-24 h-24 text-gray-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1}
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-            />
-          </svg>
-          <h2 className="text-xl font-medium text-gray-600">Tu Carro está vacío</h2>
-          <p className="text-gray-500 text-center max-w-md">
-            ¡Aprovecha! Tenemos miles de productos en oferta y oportunidades únicas.
-          </p>
-          <Link href="/collection">
-            <button className="bg-black text-white px-8 py-3 mt-4 rounded-lg hover:bg-gray-800 transition-colors">
-              Ver ofertas
-            </button>
-          </Link>
-        </div>
+      <div className="flex min-h-[60vh] items-center justify-center py-14">
+        <EmptyState
+          title="Tu carro está vacío"
+          description="Descubre prendas hechas con cariño y encuentra el próximo favorito de tu mascota."
+          action={
+            <Link href="/collection" className="ui-button ui-button-primary">
+              Explorar colección
+            </Link>
+          }
+        />
       </div>
     )
   }
@@ -87,7 +72,7 @@ export function CartPageClient({
                   </div>
                 )}
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm sm:text-base font-medium group-hover:text-blue-600 transition-colors">
+                  <p className="text-sm sm:text-base font-medium group-hover:text-[var(--color-accent-dark)] transition-colors">
                     {item.name}
                   </p>
                   <div className="flex items-center gap-3 mt-1">
@@ -170,9 +155,7 @@ export function CartPageClient({
 
           <div className="flex flex-col gap-3">
             <Link href="/collection">
-              <button className="w-full px-6 py-3 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
-                Seguir comprando
-              </button>
+              <button className="ui-button ui-button-secondary w-full">Seguir comprando</button>
             </Link>
             <Link
               href="/checkout"
@@ -184,9 +167,7 @@ export function CartPageClient({
                 })
               }
             >
-              <button className="w-full px-6 py-3 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors">
-                Continuar Compra
-              </button>
+              <button className="ui-button ui-button-primary w-full">Continuar Compra</button>
             </Link>
           </div>
         </div>

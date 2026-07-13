@@ -19,6 +19,7 @@
 
 import { useEffect } from 'react'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { Button } from '@/components/ui/design-system'
 
 interface ErrorModalProps {
   /**
@@ -83,27 +84,33 @@ export function ErrorModal({ isOpen, errorMessage, onRetry, onClose }: ErrorModa
   const displayMessage = errorMessage || 'Ocurrió un error al guardar. Por favor intentá de nuevo.'
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-text-primary)]/50 p-4">
       {/* Modal Container */}
       <div
-        className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 animate-fade-in"
+        className="ui-panel w-full max-w-md p-6 animate-fade-in"
         role="dialog"
         aria-labelledby="error-modal-title"
         aria-describedby="error-modal-description"
       >
         {/* Error Icon and Title */}
         <div className="text-center mb-4">
-          <div className="mb-3 flex justify-center text-red-600">
+          <div className="mb-3 flex justify-center text-[var(--color-error)]">
             <BrandIcon name="x-circle" className="h-12 w-12" />
           </div>
-          <h2 id="error-modal-title" className="text-xl font-semibold text-red-600">
+          <h2
+            id="error-modal-title"
+            className="text-xl font-semibold text-[var(--color-error)] text-red-600"
+          >
             No se pudo guardar el producto
           </h2>
         </div>
 
         {/* Error Message */}
         <div className="mb-6">
-          <p id="error-modal-description" className="text-center text-gray-600">
+          <p
+            id="error-modal-description"
+            className="text-center text-[var(--color-text-secondary)]"
+          >
             {displayMessage}
           </p>
         </div>
@@ -111,21 +118,14 @@ export function ErrorModal({ isOpen, errorMessage, onRetry, onClose }: ErrorModa
         {/* Action Buttons */}
         <div className="space-y-3">
           {/* Primary Action: Retry */}
-          <button
-            onClick={onRetry}
-            className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
-            autoFocus
-          >
+          <Button onClick={onRetry} variant="danger" className="w-full bg-red-600" autoFocus>
             Intentar de nuevo
-          </button>
+          </Button>
 
           {/* Secondary Action: Return to Wizard */}
-          <button
-            onClick={onClose}
-            className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-          >
+          <Button onClick={onClose} variant="secondary" className="w-full">
             Volver al wizard
-          </button>
+          </Button>
         </div>
 
         {/* Help Text */}

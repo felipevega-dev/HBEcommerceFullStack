@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <GlobalSearch />
       <div className="flex flex-col md:flex-row">
         <AdminSidebar />
-        <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
+        <main className="ui-container min-w-0 flex-1 py-6 md:py-8">{children}</main>
       </div>
     </div>
   )

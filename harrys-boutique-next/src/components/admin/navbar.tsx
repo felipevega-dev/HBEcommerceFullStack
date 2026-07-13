@@ -12,7 +12,7 @@ interface Props {
 
 export function AdminNavbar({ user }: Props) {
   return (
-    <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-4 py-2 md:px-6">
+    <header className="flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 md:px-6">
       <Link href="/admin/dashboard" className="flex-shrink-0">
         <Image
           src="/harrys_logo.png"
@@ -22,12 +22,12 @@ export function AdminNavbar({ user }: Props) {
           className="object-contain"
         />
       </Link>
-      <div className="flex flex-wrap items-center justify-end gap-3 text-sm text-gray-600">
+      <div className="flex flex-wrap items-center justify-end gap-3 text-sm text-[var(--color-text-secondary)]">
         <Link
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-blue-600 transition-colors hover:text-black"
+          className="flex items-center gap-1.5 text-[var(--color-accent-dark)] transition-colors hover:text-[var(--color-text-primary)]"
         >
           <BrandIcon name="external-link" className="h-4 w-4" />
           Ver tienda
@@ -37,7 +37,7 @@ export function AdminNavbar({ user }: Props) {
         </span>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center gap-1.5 transition-colors hover:text-black"
+          className="flex items-center gap-1.5 transition-colors hover:text-[var(--color-accent-dark)]"
         >
           <BrandIcon name="logout" className="h-4 w-4" />
           Cerrar sesión

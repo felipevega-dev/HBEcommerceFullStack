@@ -67,12 +67,15 @@ export default async function AdminProductsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Productos</h1>
+      <div className="ui-page-header">
+        <div>
+          <p className="ui-eyebrow">CatÃ¡logo</p>
+          <h1 className="mt-1 text-3xl">Productos</h1>
+        </div>
         <div className="flex gap-3">
           <Link
             href="/admin/products/new/bulk"
-            className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm transition-colors hover:bg-gray-50"
+            className="ui-button ui-button-secondary"
             title="Importar productos desde CSV"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,10 +89,7 @@ export default async function AdminProductsPage({
             Importar CSV
           </Link>
 
-          <Link
-            href="/admin/products/wizard/new"
-            className="rounded-lg bg-black px-4 py-2 text-sm text-white transition-colors hover:bg-gray-800"
-          >
+          <Link href="/admin/products/wizard/new" className="ui-button ui-button-primary">
             + Nuevo producto
           </Link>
         </div>

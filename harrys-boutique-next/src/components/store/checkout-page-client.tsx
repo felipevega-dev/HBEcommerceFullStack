@@ -384,8 +384,7 @@ export function CheckoutPageClient({
     }
   }
 
-  const inputClass =
-    'border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 w-full text-sm bg-[var(--color-background)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-colors placeholder:text-[var(--color-text-muted)]'
+  const inputClass = 'ui-field w-full'
 
   const subtotal = getTotal()
   const shippingFee = calculateShippingForSubtotal(subtotal, pricingSettings)

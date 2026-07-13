@@ -49,6 +49,12 @@ export function InstagramManager({ settings, posts, eligibleProducts }: Props) {
     title: '',
     sourceDescription: '',
     captionDraft: '',
+    instagramUrl: '',
+    altText: '',
+    homeCaption: '',
+    likes: '',
+    homeVisible: true,
+    homeOrder: 0,
     imageUrl: '',
     scheduledFor: defaultScheduledForValue(),
   })
@@ -186,6 +192,10 @@ export function InstagramManager({ settings, posts, eligibleProducts }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...manualForm,
+          likes: manualForm.likes ? Number(manualForm.likes) : null,
+          instagramUrl: manualForm.instagramUrl || null,
+          altText: manualForm.altText || manualForm.title,
+          homeCaption: manualForm.homeCaption || null,
           scheduledFor: manualForm.scheduledFor
             ? new Date(manualForm.scheduledFor).toISOString()
             : null,
@@ -199,6 +209,12 @@ export function InstagramManager({ settings, posts, eligibleProducts }: Props) {
           title: '',
           sourceDescription: '',
           captionDraft: '',
+          instagramUrl: '',
+          altText: '',
+          homeCaption: '',
+          likes: '',
+          homeVisible: true,
+          homeOrder: 0,
           imageUrl: '',
           scheduledFor: defaultScheduledForValue(),
         })
@@ -520,6 +536,71 @@ export function InstagramManager({ settings, posts, eligibleProducts }: Props) {
                 className={inputClass}
               />
             </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  URL de la publicaciÃ³n de Instagram
+                </label>
+                <input
+                  type="url"
+                  value={manualForm.instagramUrl}
+                  onChange={(e) =>
+                    setManualForm((prev) => ({ ...prev, instagramUrl: e.target.value }))
+                  }
+                  className={inputClass}
+                  placeholder="https://www.instagram.com/p/..."
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Texto alternativo
+                </label>
+                <input
+                  value={manualForm.altText}
+                  onChange={(e) => setManualForm((prev) => ({ ...prev, altText: e.target.value }))}
+                  className={inputClass}
+                  placeholder="Describe la imagen"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Likes manuales opcionales
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={manualForm.likes}
+                  onChange={(e) => setManualForm((prev) => ({ ...prev, likes: e.target.value }))}
+                  className={inputClass}
+                />
+                <p className="mt-1 text-xs text-gray-500">Valor decorativo, no sincronizado.</p>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Orden en Home
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={manualForm.homeOrder}
+                  onChange={(e) =>
+                    setManualForm((prev) => ({ ...prev, homeOrder: Number(e.target.value) }))
+                  }
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                checked={manualForm.homeVisible}
+                onChange={(e) =>
+                  setManualForm((prev) => ({ ...prev, homeVisible: e.target.checked }))
+                }
+              />
+              Mostrar en Home
+            </label>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>

@@ -3,8 +3,8 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--color-surface)] border-t border-[var(--color-border)] mt-16 py-12 px-4 sm:px-8">
-      <div className="max-w-6xl mx-auto">
+    <footer className="mt-16 border-t border-[var(--color-border)] bg-[var(--color-surface)] py-14 px-4 sm:px-8">
+      <div className="ui-container">
         {/* Columnas principales */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           {/* Columna 1: Logo + descripción + redes sociales */}
@@ -15,7 +15,7 @@ export function Footer() {
               width={1024}
               height={340}
               sizes="(max-width: 640px) 220px, 250px"
-              className="mb-5 h-auto w-[220px] rounded-md object-contain sm:w-[250px]"
+              className="mb-5 h-auto w-[220px] rounded-[var(--radius-lg)] object-contain sm:w-[250px]"
             />
             <p className="text-sm text-[var(--color-text-secondary)] mb-4">
               Ropa y accesorios de moda para tu mejor amigo.
@@ -76,10 +76,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/experiencias"
+                  href="/about"
                   className="hover:text-[var(--color-text-primary)] transition-colors"
                 >
-                  Harry&apos;s World
+                  Nuestra historia
                 </Link>
               </li>
             </ul>
@@ -130,10 +130,7 @@ export function Footer() {
             <p className="text-sm text-[var(--color-text-secondary)] mb-3">
               Suscribite para recibir novedades y ofertas exclusivas
             </p>
-            <Link
-              href="/contact"
-              className="inline-block px-4 py-2 text-sm font-medium bg-[var(--color-primary)] text-white rounded-[var(--radius-md)] hover:bg-[var(--color-primary-hover)] transition-colors"
-            >
+            <Link href="/contact" className="ui-button ui-button-primary">
               Suscribirse
             </Link>
           </div>

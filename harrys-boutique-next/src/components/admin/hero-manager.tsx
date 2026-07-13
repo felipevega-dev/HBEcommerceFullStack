@@ -320,7 +320,7 @@ export function HeroManager({ slides: initial, products }: Props) {
             <button
               type="submit"
               disabled={saving}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl text-sm font-medium hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg"
+              className="ui-button ui-button-primary w-full rounded-[var(--radius-xl)]"
             >
               {saving ? (
                 <span className="flex items-center justify-center gap-2">

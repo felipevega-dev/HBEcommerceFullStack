@@ -250,7 +250,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
           {/* Profile image */}
           <div className="mb-6 flex flex-col items-center">
             <div className="relative">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[var(--color-surface-2)]">
                 {user.profileImage ? (
                   <Image
                     src={user.profileImage}
@@ -265,7 +265,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                   </div>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 bg-black text-white p-2 rounded-full cursor-pointer hover:bg-gray-800 transition-colors">
+              <label className="absolute bottom-0 right-0 bg-[var(--color-primary)] text-white p-2 rounded-full cursor-pointer hover:bg-[var(--color-primary-hover)] transition-colors">
                 <input
                   type="file"
                   className="hidden"
@@ -299,10 +299,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-medium">Información Personal</h3>
             {!showForm && user.addresses.length < 2 && (
-              <button
-                onClick={handleStartAddNew}
-                className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors"
-              >
+              <button onClick={handleStartAddNew} className="ui-button ui-button-primary">
                 Añadir dirección
               </button>
             )}
@@ -348,14 +345,14 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                       <div className="mt-3 flex gap-3">
                         <button
                           onClick={() => handleEditAddress(addr)}
-                          className="text-sm text-blue-600 hover:text-blue-800"
+                          className="text-sm text-[var(--color-accent-dark)] hover:text-[var(--color-text-primary)]"
                         >
                           Editar
                         </button>
                         {!addr.isDefault && (
                           <button
                             onClick={() => handleSetDefault(addr.id)}
-                            className="text-sm text-blue-600 hover:text-blue-800"
+                            className="text-sm text-[var(--color-accent-dark)] hover:text-[var(--color-text-primary)]"
                           >
                             Establecer como predeterminada
                           </button>
@@ -391,7 +388,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 disabled:opacity-50 text-sm"
+                  className="ui-button ui-button-primary flex-1"
                 >
                   {saving ? 'Guardando...' : isAddingNew ? 'Añadir dirección' : 'Guardar cambios'}
                 </button>
@@ -401,7 +398,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                     setIsAddingNew(false)
                     setEditingAddress(null)
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+                  className="ui-button ui-button-secondary"
                 >
                   Cancelar
                 </button>
@@ -419,10 +416,10 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               <h3 className="mt-1 text-xl font-medium">Mi mascota</h3>
             </div>
             <Link
-              href="/experiencias#quiz"
+              href="/collection"
               className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
             >
-              Quiz
+              Ver colecciÃ³n
             </Link>
           </div>
 
@@ -508,13 +505,16 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-medium">Pedidos Recientes</h3>
-            <Link href="/orders" className="text-sm text-blue-600 hover:text-blue-800">
+            <Link
+              href="/orders"
+              className="text-sm text-[var(--color-accent-dark)] hover:text-[var(--color-text-primary)]"
+            >
               Ver todos los pedidos
             </Link>
           </div>
           <p className="text-gray-500 text-sm">
             Visita la sección de{' '}
-            <Link href="/orders" className="text-blue-600 hover:underline">
+            <Link href="/orders" className="text-[var(--color-accent-dark)] hover:underline">
               Mis Pedidos
             </Link>{' '}
             para ver el historial completo.

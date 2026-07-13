@@ -6,6 +6,12 @@ import { createManualInstagramPost } from '@/lib/instagram-automation'
 const manualPostSchema = z.object({
   title: z.string().min(1),
   imageUrl: z.string().url(),
+  instagramUrl: z.string().url().optional().nullable(),
+  altText: z.string().max(160).optional().nullable(),
+  homeCaption: z.string().max(500).optional().nullable(),
+  likes: z.number().int().min(0).optional().nullable(),
+  homeVisible: z.boolean().optional(),
+  homeOrder: z.number().int().min(0).max(9999).optional(),
   sourceDescription: z.string().optional().nullable(),
   captionDraft: z.string().optional().nullable(),
   scheduledFor: z.string().datetime().optional().nullable(),
