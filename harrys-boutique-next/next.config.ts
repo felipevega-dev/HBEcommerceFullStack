@@ -12,7 +12,7 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://ui-avatars.com https://res.cloudinary.com",
+  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://ui-avatars.com https://res.cloudinary.com https://images.unsplash.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   scriptSrc,
@@ -59,6 +59,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
       { protocol: 'https', hostname: 'ui-avatars.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
   experimental: {

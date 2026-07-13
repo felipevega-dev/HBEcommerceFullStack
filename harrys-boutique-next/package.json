@@ -16,6 +16,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
+    "db:seed": "node --env-file-if-exists=.env.local scripts/seed-supabase.mjs",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "admin:create": "tsx scripts/create-admin.ts",
@@ -26,6 +27,9 @@
     "audit": "npm audit --omit=dev",
     "ci": "npm run type-check && npm run lint && npm run test && npm run build",
     "prepare": "husky"
+  },
+  "prisma": {
+    "seed": "node --env-file-if-exists=.env.local scripts/seed-supabase.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

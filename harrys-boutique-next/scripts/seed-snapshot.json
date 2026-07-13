@@ -1,0 +1,652 @@
+{
+    "users": [
+        {
+            "id": "14193261-813b-5428-97a6-61d83b0dd32e",
+            "name": "Nicol",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "nicol@gmail.com",
+            "password": "$2b$10$0uanh5l6Wx5NESEi.0mFx.pwBOrwjZ4Y35cQxmdBwnsYCfnuvEKMi",
+            "createdAt": "2024-11-29T10:41:37.609",
+            "updatedAt": "2024-11-29T13:33:55.571",
+            "profileImage": "https://res.cloudinary.com/djz8qahor/image/upload/v1732887235/profile-images/weudxjadqgumlxayqmre.png"
+        },
+        {
+            "id": "904fb73b-b3cb-50bf-ae67-fcf70778a717",
+            "name": "kakaroto",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "kerate@gmail.com",
+            "password": "$2b$10$/XBAlKm/9leA5gw5H7f5JedAoisdRRkiMskPS2BNPrCDTtew4JwoO",
+            "createdAt": "2024-11-29T11:44:19.782",
+            "updatedAt": "2024-11-29T11:44:19.782",
+            "profileImage": "https://ui-avatars.com/api/?name=User&background=random"
+        },
+        {
+            "id": "f8eacc77-dfc1-5564-9fe1-78c8b569fb43",
+            "name": "Carlos",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "carlos@gmail.com",
+            "password": "$2b$10$Y92fDdgKSWUVcR60F8b/j.2xEqTTRmY2zEk34bnjt5AzftGDMjNgS",
+            "createdAt": "2024-11-29T11:47:29.161",
+            "updatedAt": "2024-11-29T11:47:29.161",
+            "profileImage": "https://ui-avatars.com/api/?name=User&background=random"
+        },
+        {
+            "id": "61e6ef92-8b70-56c9-ad62-105001d955ee",
+            "name": "Marcopolo",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "marcopolo@gmail.com",
+            "password": "$2b$10$wiIqoqvKq1tY8rPP3YJLwesnaBk/1Q.Ee3xvS.Ia9GzzbGrc1gDYu",
+            "createdAt": "2025-02-20T21:37:09.772",
+            "updatedAt": "2025-02-20T21:37:19.478",
+            "profileImage": "https://res.cloudinary.com/djz8qahor/image/upload/v1740087439/profile-images/sarqdozyoy94hs298abs.png"
+        },
+        {
+            "id": "91c809e8-fa5d-5696-a5fd-33d94908f476",
+            "name": "Felipe",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "felipe.vega@gearlabs.cl",
+            "password": "$2b$10$uLo2jJTkANF1IfuQb3nP.ea2k/u/q0PeVKX/62/GcAmak8AJtvcba",
+            "createdAt": "2025-04-23T07:02:30.165",
+            "updatedAt": "2025-04-23T07:03:16.294",
+            "profileImage": "https://ui-avatars.com/api/?name=User&background=random"
+        },
+        {
+            "id": "149835ab-10a8-5ec6-ad6c-0016368f42b6",
+            "name": "carlanga",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "manuel@gmail.com",
+            "password": "$2b$10$D.L9PG9MHbQkR1KL0/LiYurqduZMTLE0S3fCzcm2BiXemnYeeOxAK",
+            "createdAt": "2025-05-01T01:33:46.347",
+            "updatedAt": "2025-05-01T01:36:28.796",
+            "profileImage": "https://res.cloudinary.com/djz8qahor/image/upload/v1746063387/profile-images/kyrzgtdogshl5odafth6.jpg"
+        },
+        {
+            "id": "9bf7da0a-f0d8-5636-81a1-a1c0e823bb13",
+            "name": "Felipe",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "felipevega@outlook.cl",
+            "password": "$2b$10$kRNSwLZ9hcw8dBsOOgP5Keb6OtgoOjlY61Z7BoslP3NukYbxI.M6u",
+            "createdAt": "2025-05-02T04:41:05.851",
+            "updatedAt": "2025-05-02T04:41:05.851",
+            "profileImage": "https://ui-avatars.com/api/?name=User&background=random"
+        },
+        {
+            "id": "92c2bdc0-84fb-5bca-bfea-d39ad7652988",
+            "name": "11",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "1@gmail.com",
+            "password": "$2b$10$gbnSr0.26xWUZu7aOk7ceusRQqR6vS1xxjFzc/LmAG7R8v0t4UXdW",
+            "createdAt": "2025-07-16T14:48:03.521",
+            "updatedAt": "2025-07-16T14:48:31.164",
+            "profileImage": "https://ui-avatars.com/api/?name=User&background=random"
+        },
+        {
+            "id": "50e5b49d-5a22-5b03-9750-4b5a0c0d0273",
+            "name": "Felipe",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "felipevega.dev@gmail.com",
+            "password": "$2b$10$7RH3VqInYvCPFjZDbpiPxefs/.oUI8fwRQk4.fqvuArCBSSHZurOS",
+            "createdAt": "2026-04-13T07:38:42.067",
+            "updatedAt": "2026-04-13T07:39:40.162",
+            "profileImage": "https://res.cloudinary.com/djz8qahor/image/upload/v1776065907/profile-images/fvsiaavkzjvlxronltmf.png"
+        },
+        {
+            "id": "6724938a-8c4d-5574-b519-164b69ade2ef",
+            "name": "asdasd",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "vegad@gmail.com",
+            "password": "$2b$10$YKVXBoW3sufRWFybWMIai.q6uW5Z3G1fUSE8cZYKREEQeb92k4oCu",
+            "createdAt": "2026-04-13T19:50:17.202",
+            "updatedAt": "2026-04-13T19:50:17.202",
+            "profileImage": null
+        },
+        {
+            "id": "514747b7-212b-5f6c-beb0-3a819c7c02e3",
+            "name": "Marcelo",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "felipe@gmail.com",
+            "password": "$2b$10$F9avmYXhMmhVAVPecd2oFeOXUT5C7eUsHtjjRPOmqJ5xYmt/9Elru",
+            "createdAt": "2026-04-13T19:50:17.207",
+            "updatedAt": "2024-11-29T21:56:07.2",
+            "profileImage": "https://res.cloudinary.com/djz8qahor/image/upload/v1732917358/profile-images/gztzf0bbshdrif2o9tn6.jpg"
+        },
+        {
+            "id": "3b0150a1-6320-5198-8f9b-15d19b06bd2c",
+            "name": "vegadev",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "vegadev@gmail.com",
+            "password": "$2b$10$1ahVeyAPOXEv2e9XqKz4A.aOzYogotD1d.8rgMp4pu3uvXYNk9btO",
+            "createdAt": "2026-04-13T19:50:17.232",
+            "updatedAt": "2026-04-13T19:50:17.232",
+            "profileImage": null
+        },
+        {
+            "id": "30436e5a-ba9d-5ee4-ae99-b1ead2afe873",
+            "name": "cDDD",
+            "role": "USER",
+            "tags": [
+            ],
+            "email": "fe@gmail.com",
+            "password": "$2b$10$ioxlHanABztzi8opGLdRY.rvRzz.pR9MKvnatXWLST6.kvPt01./W",
+            "createdAt": "2026-04-13T19:50:17.235",
+            "updatedAt": "2026-04-13T19:50:17.235",
+            "profileImage": null
+        },
+        {
+            "id": "5541486b-dbaf-493f-8c92-7d0939dad735",
+            "name": "Admin",
+            "role": "OWNER",
+            "tags": [
+            ],
+            "email": "admin@harrys.com",
+            "password": "$2b$10$t0cNV6s9QKYdItqtf9BDRud/y/8Wr8i8qhN6V2SjvxaYL5iaWbAVq",
+            "createdAt": "2026-04-13T20:33:28.105",
+            "updatedAt": "2026-04-13T20:33:28.105",
+            "profileImage": null
+        },
+        {
+            "id": "c7973de4-adc3-4ed9-8608-71ff19aa931a",
+            "name": "Admin Harrys",
+            "role": "OWNER",
+            "tags": [
+            ],
+            "email": "admin@harrysboutique.cl",
+            "password": "$2b$12$XbkaS53a6j52CpaTh5Er4e4TlEuNF2iz4Gz2ND42o.jTyyjeaxE1G",
+            "createdAt": "2026-04-28T17:23:11.776",
+            "updatedAt": "2026-04-28T17:23:11.776",
+            "profileImage": null
+        }
+    ],
+    "source": "local-docker",
+    "products": [
+        {
+            "id": "83262b7c-c368-53b1-9508-d3753c056f45",
+            "sku": null,
+            "name": "Camisa Guayabera",
+            "slug": "camisa-guayabera",
+            "price": 5990.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Negro",
+                "Blanco"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732741894/jr5bygz1ixmtqispukuq.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-25T17:07:44.412",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": true,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Camisa blanca con negro de tela fresca",
+            "ratingCount": 2,
+            "subCategory": "Camisetas",
+            "originalPrice": null,
+            "ratingAverage": 3,
+            "seoDescription": null
+        },
+        {
+            "id": "95c1f936-8ef8-57c0-af24-bac577cb50dd",
+            "sku": null,
+            "name": "Polerón Barbie Purpura",
+            "slug": "poleron-barbie-purpura",
+            "price": 10990.00,
+            "sizes": [
+                "XS",
+                "S",
+                "L",
+                "XL",
+                "M"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Rosa",
+                "Morado"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732555383/jieylrdfas1yhhdico0a.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-25T17:23:00.716",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": true,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Polerón de tela polar, con bordado barbie.",
+            "ratingCount": 2,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 5,
+            "seoDescription": null
+        },
+        {
+            "id": "c89c65fe-750a-5dcc-9fe3-faa7279a8530",
+            "sku": null,
+            "name": "Polerón Charmander",
+            "slug": "poleron-charmander",
+            "price": 8990.00,
+            "sizes": [
+                "L",
+                "M"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Rojo"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889592/vyx1ob43uoz5gwcwgk0u.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-25T17:42:25.262",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Pokemon charmander de tipo fuego",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "9af23686-0c95-5f15-bac1-012038c9d3b9",
+            "sku": null,
+            "name": "Polerón Akatsuki",
+            "slug": "poleron-akatsuki",
+            "price": 9990.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Negro",
+                "Rojo"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732888984/xocwrpayulgwlxwznffk.png",
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732888985/fgv6d2mvig1b4bjhb3bx.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:03:05.571",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": true,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Viste a tu mascota con el icónico estilo de los Akatsuki con este espectacular polerón negro. Fabricado en suave y cálido polar, es perfecto para mantener a tu peludo amigo cómodo y abrigado en días fríos. Incluye una capucha para un look completo y un bordado detallado de la emblemática nube roja, símbolo característico del grupo.\r\n\r\nIdeal para fans de Naruto y sus fieles compañeros. ¡Haz que tu mascota luzca increíble mientras rinde homenaje a esta legendaria organización! 🌩️🐾",
+            "ratingCount": 1,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 5,
+            "seoDescription": null
+        },
+        {
+            "id": "3547e8b2-50f2-541f-b3e9-955aa3ef5309",
+            "sku": null,
+            "name": "Polerón Bulbasaur",
+            "slug": "poleron-bulbasaur",
+            "price": 8990.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Verde"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889335/obiidoqzkkesuylbgj83.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:08:56.069",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": true,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Polerón inspirado en Bulbasaur para tu mascota, hecho de suave polar verde con detalles que imitan su adorable diseño. Incluye capucha y estampados únicos para un look Pokémon auténtico. ¡Perfecto para mantener a tu peludo cómodo y con estilo! 🌱✨",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "9e26fa27-014b-538c-8f77-2f5f63ad2cec",
+            "sku": null,
+            "name": "Polerón Squirtle",
+            "slug": "poleron-squirtle",
+            "price": 8990.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Azul"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889402/wgw38j5xkorlizblfz1f.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:10:03.282",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Polerón para mascotas inspirado en Squirtle, de suave polar azul con capucha y detalles que recrean su caparazón. Cómodo, cálido y perfecto para los fans de Pokémon. ¡Tu amigo lucirá como el más tierno del equipo! 🌊🐢",
+            "ratingCount": 1,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 5,
+            "seoDescription": null
+        },
+        {
+            "id": "d93c1532-0008-534f-9542-3153859782a2",
+            "sku": null,
+            "name": "Polerón Hunter X Hunter",
+            "slug": "poleron-hunter-x-hunter",
+            "price": 9990.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Negro",
+                "Blanco"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889462/svvkjnrguooejelujkgt.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:11:03.185",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Polerón para mascotas inspirado en Hunter x Hunter, de suave polar negro con detalles que evocan el estilo de los personajes. Incluye capucha para mayor comodidad y un diseño único que hará que tu peludo luzca como un auténtico cazador. ¡Perfecto para los fans del anime! 🎯🐾",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "a3dd4a30-9011-56a3-9541-122ff786c599",
+            "sku": null,
+            "name": "Polerón Naruto Uzumaki",
+            "slug": "poleron-naruto-uzumaki",
+            "price": 11990.00,
+            "sizes": [
+                "S",
+                "M",
+                "XL",
+                "L",
+                "XS"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Naranja"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889545/fqg9frg7odvm4bbpw2vz.png",
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889545/sgp2thvi1mbt3svifm06.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:12:25.403",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": true,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Polerón para mascotas inspirado en Naruto Uzumaki, hecho de suave polar naranja con detalles negros y capucha. Diseñado para mantener a tu compañero cálido mientras luce el icónico estilo del ninja más valiente de Konoha. ¡Ideal para fans del anime! 🍥🐾",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "783a808b-4ebc-5946-900a-f385257dd44f",
+            "sku": null,
+            "name": "Enterizo de Rayas",
+            "slug": "enterizo-de-rayas",
+            "price": 10990.00,
+            "sizes": [
+                "S",
+                "M",
+                "L",
+                "XL",
+                "XS"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Rojo"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889725/essgdzqefmptqa8zcsis.png",
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889725/htdq2laum8vvi3bjmou7.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:15:26.284",
+            "updatedAt": "2026-04-16T05:27:37.086",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Enterizo para mascotas de rayas, confeccionado en tela suave y cómoda. Diseño completo que cubre el cuerpo, ideal para mantener a tu peludo abrigado con estilo. Perfecto para cualquier ocasión casual o especial. 🐾❤️",
+            "ratingCount": 0,
+            "subCategory": "Enterizos",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "56e0e677-43bf-5b2b-945a-27c261fe65ff",
+            "sku": null,
+            "name": "Pijama Azul",
+            "slug": "pijama-azul",
+            "price": 6990.00,
+            "sizes": [
+                "M",
+                "S",
+                "XS"
+            ],
+            "stock": 20,
+            "active": true,
+            "colors": [
+                "Azul",
+                "Blanco"
+            ],
+            "images": [
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889964/hp3kfnpjdw23off8qgsd.png",
+                "https://res.cloudinary.com/djz8qahor/image/upload/v1732889964/h8e8j6i6jl3mkgibxvku.png"
+            ],
+            "seoTitle": null,
+            "createdAt": "2024-11-29T14:19:24.292",
+            "updatedAt": "2026-04-18T16:14:39.117",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Pijama azul para mascotas, hecho de tela suave y cálida para máxima comodidad. Diseño ligero y ajustado, ideal para mantener a tu amigo peludo abrigado durante las noches frías. ¡Perfecto para un descanso lleno de estilo! 💤💙🐾",
+            "ratingCount": 2,
+            "subCategory": "Enterizos",
+            "originalPrice": null,
+            "ratingAverage": 4,
+            "seoDescription": null
+        },
+        {
+            "id": "cd22e67d-ac82-479d-ad28-fbb3c780c883",
+            "sku": null,
+            "name": "Waselpof",
+            "slug": "waselpof",
+            "price": 5000.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 0,
+            "active": true,
+            "colors": [
+                "Amarillo"
+            ],
+            "images": [
+                "https://pb8oq0tssv0frka9.public.blob.vercel-storage.com/products/1777690504171-WhatsApp_Image_2026-04-26_at_6.28.20_PM-ZCV61UPNILGO0HyCecTxmnvwOaNgG5.jpeg"
+            ],
+            "seoTitle": null,
+            "createdAt": "2026-05-02T02:55:06.187",
+            "updatedAt": "2026-05-02T02:55:06.187",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Producto nuevo",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "a446d41c-df08-4d1c-9645-56df057c8429",
+            "sku": null,
+            "name": "Griffindor",
+            "slug": "griffindor",
+            "price": 5000.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 0,
+            "active": true,
+            "colors": [
+                "Rojo"
+            ],
+            "images": [
+                "https://pb8oq0tssv0frka9.public.blob.vercel-storage.com/products/1777690504172-WhatsApp_Image_2026-04-26_at_6.28.21_PM__1_-tEB786Yz71MEqnx2CdQQ91Ojja3X1w.jpeg"
+            ],
+            "seoTitle": null,
+            "createdAt": "2026-05-02T02:55:06.192",
+            "updatedAt": "2026-05-02T02:55:06.192",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Producto nuevo",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        },
+        {
+            "id": "eeab7716-6cc5-41bd-93d4-19352c6358c9",
+            "sku": null,
+            "name": "Slitherin",
+            "slug": "slitherin",
+            "price": 5000.00,
+            "sizes": [
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL"
+            ],
+            "stock": 0,
+            "active": true,
+            "colors": [
+                "Verde"
+            ],
+            "images": [
+                "https://pb8oq0tssv0frka9.public.blob.vercel-storage.com/products/1777690504172-WhatsApp_Image_2026-04-26_at_6.28.21_PM__2_-0gv1EMKFqBq2Jjw5glrPjFPl6G8Nie.jpeg"
+            ],
+            "seoTitle": null,
+            "createdAt": "2026-05-02T02:55:06.196",
+            "updatedAt": "2026-05-02T02:55:06.196",
+            "bestSeller": false,
+            "categoryId": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "description": "Producto nuevo",
+            "ratingCount": 0,
+            "subCategory": "Polerones",
+            "originalPrice": null,
+            "ratingAverage": 0,
+            "seoDescription": null
+        }
+    ],
+    "categories": [
+        {
+            "id": "86b62482-0f1d-5c36-b1e2-afc226792ae8",
+            "name": "Accesorios",
+            "createdAt": "2024-11-29T15:01:04.761",
+            "subcategories": [
+                "Collares",
+                "Pulseras"
+            ]
+        },
+        {
+            "id": "5e7d9ec0-fa19-5d47-ae09-7e5456a7a241",
+            "name": "Arneses",
+            "createdAt": "2024-11-29T15:01:04.914",
+            "subcategories": [
+                "Pequeños",
+                "Medianos",
+                "Grandes"
+            ]
+        },
+        {
+            "id": "69235c7a-8404-50e6-b83a-4b1de9990146",
+            "name": "Prendas",
+            "createdAt": "2026-04-13T07:30:42.815",
+            "subcategories": [
+                "Polerones",
+                "Vestidos",
+                "Camisetas"
+            ]
+        }
+    ],
+    "exportedAt": "2026-07-13T05:32:25.275Z"
+}

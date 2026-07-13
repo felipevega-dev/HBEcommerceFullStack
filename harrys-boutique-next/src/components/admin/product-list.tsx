@@ -89,12 +89,16 @@ export function AdminProductList({
   const bestSellerFilter = searchParams.get('bestSeller') || ''
 
   const availableSubcategories = useMemo(() => {
-    if (!categoryFilter) return categories.flatMap((category) => category.subcategories)
-    return categories.find((category) => category.name === categoryFilter)?.subcategories ?? []
+    const source = !categoryFilter
+      ? categories.flatMap((category) => category.subcategories)
+      : categories.find((category) => category.name === categoryFilter)?.subcategories ?? []
+
+    return Array.from(new Set(source))
   }, [categories, categoryFilter])
 
   const bulkSubcategories = useMemo(() => {
-    return categories.find((category) => category.id === bulkCategoryId)?.subcategories ?? []
+    const source = categories.find((category) => category.id === bulkCategoryId)?.subcategories ?? []
+    return Array.from(new Set(source))
   }, [bulkCategoryId, categories])
 
   const buildListHref = (nextPage?: number) => {
