@@ -412,3 +412,87 @@ en `harrys-boutique-next/`.
   - La rama fue creada desde `main` con muchos cambios previos sin commitear de
     la fase de produccion/pagos. El commit de esta fase debe incluir solo
     documentacion para no mezclar alcances.
+
+## 2026-07-13 - Seed Reproducible Contra Supabase
+
+- Rama usada: `codex/seed-supabase-bootstrap`.
+- Objetivo de la fase: dejar un seed reproducible para poblar Supabase con
+  admin, categorias y productos base.
+- Archivos modificados:
+  - `harrys-boutique-next/package.json`
+  - `harrys-boutique-next/scripts/seed-supabase.mjs`
+  - `WORK_LOG.md`
+- Cambios realizados:
+  - Se agrego el script `db:seed` para ejecutar el seed desde `npm`.
+  - Se configuro `prisma.seed` para compatibilidad con `prisma db seed`.
+  - Se creo un seed idempotente contra Supabase que hace upsert de admin,
+    categorias y productos base.
+  - Se resetean las variantes de los productos semilla en cada corrida para
+    mantener el estado reproducible.
+- Validaciones ejecutadas:
+  - `npm run db:seed`
+- Resultado:
+  - Seed funcional y repetible contra Supabase.
+  - La base queda con admin `admin@harrys-boutique.com`, categorias `Perros`
+    y `Gatos`, y tres productos iniciales.
+- Pendientes:
+  - Definir si se quieren mas productos semilla o solo usar este seed como base
+    minima.
+- Riesgos detectados:
+  - El seed usa una contraseña por defecto si `ADMIN_PASSWORD` no se define.
+    Conviene sobrescribirla en entornos compartidos o de produccion.
+## 2026-07-13 - Seed Real Desde Docker Local
+
+- Rama usada: `codex/seed-supabase-bootstrap`.
+- Objetivo de la fase: reemplazar el bootstrap minimo por un sync real del
+  catalogo local contra Supabase.
+- Archivos modificados:
+  - `harrys-boutique-next/scripts/seed-supabase.mjs`
+  - `WORK_LOG.md`
+- Cambios realizados:
+  - El seed ahora lee desde el Postgres local del Docker activo por defecto.
+  - Se copian `categories`, `users` y `products` con sus IDs originales.
+  - Se preservan passwords hashed, roles, imagenes, tallas, colores y slugs del
+    catalogo real.
+  - Se mantiene el admin funcional `admin@harrys-boutique.com` para login
+    inmediato.
+  - Se elimino la salida de password en consola.
+- Validaciones ejecutadas:
+  - `npm run db:seed`
+- Resultado:
+  - Supabase quedo sincronizado con 3 categorias, 15 usuarios y 13 productos
+    del Docker local.
+  - El seed es repetible mientras exista la fuente local o se defina
+    `SOURCE_DATABASE_URL`.
+- Pendientes:
+  - Extender el import a tablas de contenido extra si se quiere clonar el
+    entorno completo.
+- Riesgos detectados:
+  - Si el Docker local no esta disponible, el seed necesita
+    `SOURCE_DATABASE_URL` para apuntar a otra fuente valida.
+
+## 2026-07-13 - Seed Desacoplado Del Docker
+
+- Rama usada: `codex/seed-supabase-bootstrap`.
+- Objetivo de la fase: dejar de depender del Docker local como fuente de seed
+  y usar un snapshot versionado en el repo.
+- Archivos modificados:
+  - `harrys-boutique-next/scripts/seed-snapshot.json`
+  - `harrys-boutique-next/scripts/seed-supabase.mjs`
+  - `WORK_LOG.md`
+- Cambios realizados:
+  - Se congelo el catalogo local en `scripts/seed-snapshot.json`.
+  - El seed ahora lee ese snapshot por defecto y ya no requiere Docker para
+    poblar Supabase.
+  - Se mantuvo el admin funcional para acceso inmediato al panel.
+- Validaciones ejecutadas:
+  - `npm run db:seed`
+- Resultado:
+  - Supabase puede repoblarse sin levantar Docker.
+  - El snapshot contiene 3 categorias, 15 usuarios y 13 productos reales del
+    entorno local original.
+- Pendientes:
+  - Si el catalogo cambia, refrescar el snapshot con una exportacion nueva.
+- Riesgos detectados:
+  - El snapshot refleja el estado capturado hoy; si se quiere verdad historica
+    de otras tablas no copiadas, hace falta exportarlas aparte.
