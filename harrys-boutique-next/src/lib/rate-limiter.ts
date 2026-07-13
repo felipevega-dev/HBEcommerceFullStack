@@ -7,16 +7,10 @@ interface RateLimitEntry {
 }
 
 const store = new Map<string, RateLimitEntry>()
+let warnedAboutUpstashFallback = false
 
 let upstashRatelimit: Ratelimit | null | undefined
 let upstashRedis: Redis | null | undefined
-
-export class RateLimitUnavailableError extends Error {
-  constructor() {
-    super('Distributed rate limiting is not available')
-    this.name = 'RateLimitUnavailableError'
-  }
-}
 
 function getUpstashRatelimit() {
   if (upstashRatelimit !== undefined) {
@@ -99,8 +93,9 @@ export async function getRateLimitState(key: string, maxRequests: number, window
   const ratelimit = getUpstashRatelimit()
 
   if (!ratelimit || !upstashRedis) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new RateLimitUnavailableError()
+    if (process.env.NODE_ENV === 'production' && !warnedAboutUpstashFallback) {
+      warnedAboutUpstashFallback = true
+      console.warn('[Rate limit] Upstash unavailable, using local fallback limiter')
     }
 
     return getLocalRateLimitState(key, maxRequests, windowMs)

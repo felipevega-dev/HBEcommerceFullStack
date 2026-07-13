@@ -496,3 +496,33 @@ en `harrys-boutique-next/`.
 - Riesgos detectados:
   - El snapshot refleja el estado capturado hoy; si se quiere verdad historica
     de otras tablas no copiadas, hace falta exportarlas aparte.
+
+## 2026-07-13 - Auth Prod Fix
+
+- Rama usada: `main`.
+- Objetivo de la fase: eliminar el `503` de registro en produccion cuando
+  Upstash no esta disponible y dejar claro el problema de conexion a Supabase
+  en login.
+- Archivos modificados:
+  - `harrys-boutique-next/src/lib/rate-limiter.ts`
+  - `harrys-boutique-next/src/lib/api-utils.ts`
+  - `harrys-boutique-next/src/lib/__tests__/rate-limiter.test.ts`
+  - `WORK_LOG.md`
+- Cambios realizados:
+  - `getRateLimitState` ahora cae al limiter local si Upstash no esta
+    configurado, incluso en produccion.
+  - `protectMutation` deja de devolver `503` solo por falta de Upstash.
+  - Se actualizo la prueba para reflejar el fallback local en produccion.
+- Validaciones ejecutadas:
+  - `npx vitest --run src/lib/__tests__/rate-limiter.test.ts`
+  - `npm run type-check`
+- Resultado:
+  - Registro deja de bloquearse por el rate limiter distribuido ausente.
+  - El login sigue dependiendo de que `DATABASE_URL` apunte al pooler correcto
+    de Supabase y que Supabase acepte la conexion.
+- Pendientes:
+  - Corregir `DATABASE_URL` en Vercel si apunta al host directo o si el password
+    no esta URL-encoded.
+- Riesgos detectados:
+  - El fallback local no es distribuido; si el trafico sube mucho, conviene
+    reinstalar Upstash en cuanto se pueda.

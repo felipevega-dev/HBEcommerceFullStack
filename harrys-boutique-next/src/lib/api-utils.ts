@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { z } from 'zod'
 import type { Role } from '@prisma/client'
 import { getSiteUrl } from '@/lib/site'
-import { getClientIp, getRateLimitState, RateLimitUnavailableError } from '@/lib/rate-limiter'
+import { getClientIp, getRateLimitState } from '@/lib/rate-limiter'
 
 const ADMIN_ROLES: Role[] = ['OWNER', 'ADMIN', 'MODERATOR']
 
@@ -82,20 +82,7 @@ export async function enforceRateLimit(
   options: { keyPrefix: string; maxRequests: number; windowMs: number; keySuffix?: string },
 ) {
   const key = `${options.keyPrefix}:${options.keySuffix ?? getClientIp(req)}`
-  let result: Awaited<ReturnType<typeof getRateLimitState>>
-  try {
-    result = await getRateLimitState(key, options.maxRequests, options.windowMs)
-  } catch (error) {
-    if (error instanceof RateLimitUnavailableError || process.env.NODE_ENV === 'production') {
-      console.error('[Rate limit] Distributed limiter unavailable', error)
-      return NextResponse.json(
-        { success: false, message: 'Servicio temporalmente no disponible. Intenta nuevamente.' },
-        { status: 503 },
-      )
-    }
-
-    throw error
-  }
+  const result = await getRateLimitState(key, options.maxRequests, options.windowMs)
 
   if (result.allowed) return null
 

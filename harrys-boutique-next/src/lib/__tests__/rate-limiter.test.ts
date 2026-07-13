@@ -6,16 +6,16 @@ afterEach(() => {
 })
 
 describe('distributed rate limiting', () => {
-  it('fails closed in production when Upstash is not configured', async () => {
+  it('falls back to the local limiter in production when Upstash is not configured', async () => {
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('UPSTASH_REDIS_REST_URL', '')
     vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '')
 
-    const { getRateLimitState, RateLimitUnavailableError } = await import('../rate-limiter')
+    const { getRateLimitState } = await import('../rate-limiter')
 
-    await expect(getRateLimitState('admin:mutation:127.0.0.1', 10, 60_000)).rejects.toBeInstanceOf(
-      RateLimitUnavailableError,
-    )
+    await expect(getRateLimitState('admin:mutation:127.0.0.1', 10, 60_000)).resolves.toMatchObject({
+      allowed: true,
+    })
   })
 
   it('keeps the local limiter available outside production', async () => {
