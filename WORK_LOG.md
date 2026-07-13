@@ -1,5 +1,146 @@
 # WORK_LOG.md
 
+## 2026-07-13 - Home content data layer and Admin connection
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo: conectar el contenido comercial del Home con datos reales sin
+  modificar su composición visual.
+- Archivos principales:
+  - `prisma/schema.prisma`
+  - `prisma/migrations/20260713130000_add_home_content_management/migration.sql`
+  - `src/lib/home-content.ts`
+  - `src/components/store/home-editorial-sections.tsx`
+  - `src/app/(store)/page.tsx`
+  - `src/app/(admin)/admin/home/page.tsx`
+  - `src/components/admin/home-content-manager.tsx`
+  - `src/app/api/admin/home-content/route.ts`
+  - `src/lib/instagram-automation.ts`
+  - `src/app/api/instagram/posts/manual/route.ts`
+- Cambios realizados:
+  - Categorías del Home usan `Category` con metadatos de imagen, destino,
+    visibilidad y orden.
+  - Productos destacados usan `HomeProductSelection`, filtrando activos y con
+    stock; existe fallback a best sellers reales.
+  - Instagram usa `InstagramPost` extendido con URL pública, alt, caption,
+    likes manuales, visibilidad y orden.
+  - Testimonios usan `Testimonial` existente, solo activos y APPROVED.
+  - Se añadió `/admin/home` y un endpoint protegido para administrar estos datos.
+  - Las imágenes estáticas protegidas de Nuestra Historia y Harry's Atelier se
+    mantienen en código, sin configuración Admin.
+- Migración:
+  - Aplicada con `npm run db:migrate:deploy` sobre la base configurada.
+  - No elimina datos; inicializa las categorías existentes visibles en Home.
+- Validaciones:
+  - `npm run type-check`.
+  - `npm run test` — 24 archivos, 284 tests.
+  - `npm run build` — incluye `/admin/home` y `/api/admin/home-content`.
+- Pendientes:
+  - Completar UI específica para bloques de productos por categoría y creación
+    directa de nuevas categorías desde `/admin/home`.
+  - Resolver `prisma generate` normal bloqueado por `EPERM` del motor Windows;
+    `--no-engine` generó correctamente el cliente tipado.
+
+## 2026-07-13 - SimplificaciÃ³n del recorrido comercial
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo: retirar Experiencias del producto principal y reforzar las pÃ¡ginas
+  necesarias de marca y soporte.
+- Cambios realizados:
+  - Se eliminÃ³ Experiencias del Navbar, del menÃº de categorÃ­as y del Footer.
+  - La ruta `/experiencias` conserva compatibilidad y redirige a `/collection`.
+  - Se eliminaron los componentes exclusivos de esa pÃ¡gina que quedaron sin
+    uso.
+  - Las llamadas a personalizaciÃ³n ahora llevan a Contacto; accesos de perfil y
+    favoritos llevan a ColecciÃ³n, Contacto o Novedades.
+  - Contacto adopta `ui-container`, `ui-card`, `Input`, `Textarea` y `Button`.
+  - Nosotros adopta contenedores, cards y botones del Design System para una
+    composiciÃ³n mÃ¡s cercana al lenguaje de Home.
+- Validaciones:
+  - `npm run type-check`.
+  - `npm run test` â€” 24 archivos, 284 tests.
+  - `npm run build`.
+  - `git diff --check`.
+- Resultado: el recorrido pÃºblico queda mÃ¡s enfocado en compra, confianza,
+  historia y contacto, sin romper enlaces antiguos.
+- Pendientes: siguiente pasada sobre catÃ¡logo/producto, carrito/checkout y
+  pruebas visuales responsive de Contacto y Nosotros.
+
+## 2026-07-13 - Navbar indicator transition fix
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo: corregir el salto del indicador discontinuo al navegar de Home a
+  Tienda.
+- Archivos modificados:
+  - `harrys-boutique-next/src/components/store/navbar.tsx`
+  - `harrys-boutique-next/src/components/store/home-editorial-hero.tsx`
+- Causa: Home montaba una instancia independiente de `Navbar` dentro del hero,
+  mientras el resto de rutas montaba otra desde el layout. `layoutId` no podÃ­a
+  interpolar entre instancias distintas.
+- SoluciÃ³n:
+  - Se eliminÃ³ el Navbar duplicado del hero.
+  - El layout mantiene una Ãºnica instancia persistente.
+  - El Navbar calcula su modo overlay con la ruta actual y conserva el mismo
+    indicador Framer Motion para que pueda deslizarse entre enlaces.
+- Validaciones:
+  - `npm run type-check`.
+  - `git diff --check`.
+  - Build y tests de la fase anterior permanecen correctos.
+- Pendiente: repetir la prueba visual de navegaciÃ³n cuando el navegador local
+  vuelva a exponer la pestaÃ±a interactiva.
+
+## 2026-07-13 - Admin wizard modal and control migration
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo: continuar la migraciÃ³n de superficies Admin que todavÃ­a usaban
+  overlays, botones y paneles independientes.
+- Archivos modificados:
+  - `harrys-boutique-next/src/components/admin/product-wizard/index.tsx`
+  - `harrys-boutique-next/src/components/admin/product-wizard/modals/error-modal.tsx`
+  - `harrys-boutique-next/src/components/admin/product-wizard/modals/success-modal.tsx`
+  - `harrys-boutique-next/src/components/admin/global-search.tsx`
+- Cambios realizados:
+  - El wizard usa paneles, botones, estados y progreso con tokens de marca.
+  - Los modales de error y éxito sustituyen superficies y botones aislados por
+    primitives compatibles, manteniendo las clases legacy solo como alias para
+    tests y la capa de compatibilidad visual.
+  - La búsqueda global usa overlay cÃ¡lido, panel de marca y semÃ¡ntica de dialog.
+- Validaciones:
+  - `npm run type-check`.
+  - `npm run test` â€” 24 archivos, 284 tests.
+  - `git diff --check`.
+- Resultado: la fase queda estable sin cambios en lÃ³gica de negocio,
+  persistencia ni permisos.
+- Pendientes: migrar los pasos internos del wizard y los restantes managers de
+  contenido Admin; hacer la revisiÃ³n visual autenticada por viewport.
+
+## 2026-07-13 - Full viewport fix and legacy controls normalization
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo: corregir el ancho incompleto visible en Home y continuar la
+  normalizaciÃ³n de controles globales y navegaciÃ³n mÃ³vil.
+- Archivos modificados:
+  - `harrys-boutique-next/src/app/(store)/layout.tsx`
+  - `harrys-boutique-next/src/app/globals.css`
+  - `harrys-boutique-next/src/components/store/navbar.tsx`
+  - `harrys-boutique-next/src/components/ui/design-system.tsx`
+- Cambios realizados:
+  - Se restaurÃ³ el contrato de padding del layout de tienda para que los
+    mÃ¡rgenes negativos editoriales de Home alcancen todo el viewport.
+  - Se normalizaron inputs, selects y textareas con tokens de marca, alturas,
+    radios y focus visible.
+  - El menÃº mÃ³vil ahora tiene semÃ¡ntica de dialog, cierre con Escape y overlay
+    cÃ¡lido; tambiÃ©n restaura el scroll del documento al cerrar.
+- Validaciones:
+  - Navegador local: viewport de 1235px; `main` y hero ocupan 1220px hasta el
+    borde visible, sin bandas laterales.
+  - `npm run type-check`, `npm run test`, `npm run build` y `git diff --check`.
+- Resultado: Home a ancho completo y build de producciÃ³n correcto.
+- Pendientes: migrar modales del wizard Admin y formularios legacy; completar
+  revisiÃ³n responsive autenticada; resolver Prettier y auditar dependencias en
+  una fase separada.
+- Riesgos: la validaciÃ³n visual autenticada requiere sesiones y datos
+  representativos; no se alterÃ³ lÃ³gica de negocio ni persistencia.
+
 Registro de avance del trabajo en este repositorio. La aplicacion activa esta
 en `harrys-boutique-next/`.
 
@@ -441,6 +582,7 @@ en `harrys-boutique-next/`.
 - Riesgos detectados:
   - El seed usa una contraseña por defecto si `ADMIN_PASSWORD` no se define.
     Conviene sobrescribirla en entornos compartidos o de produccion.
+
 ## 2026-07-13 - Seed Real Desde Docker Local
 
 - Rama usada: `codex/seed-supabase-bootstrap`.
@@ -526,3 +668,275 @@ en `harrys-boutique-next/`.
 - Riesgos detectados:
   - El fallback local no es distribuido; si el trafico sube mucho, conviene
     reinstalar Upstash en cuanto se pueda.
+
+## 2026-07-13 - Design System Visual Audit Phase 1
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo de la fase: establecer fundaciones visuales comunes y eliminar la
+  segunda paleta fría que aparecía en tienda, cuenta y Admin.
+- Archivos modificados:
+  - `harrys-boutique-next/src/app/globals.css`
+  - `harrys-boutique-next/src/app/layout.tsx`
+  - `harrys-boutique-next/src/app/(store)/layout.tsx`
+  - `harrys-boutique-next/src/app/(admin)/layout.tsx`
+  - `harrys-boutique-next/src/components/ui/design-system.tsx`
+  - Componentes de navegación, catálogo, carrito, cuenta y clientes Admin.
+- Cambios realizados:
+  - Se añadieron tokens de controles, focus, contenedores y dimensiones.
+  - Se añadieron primitives de Button, Input, Select, Card, Badge y EmptyState.
+  - Se unificó la tipografía global en el elemento `html`.
+  - Se normalizaron layouts de tienda y Admin con contenedor compartido.
+  - Se añadió una capa de compatibilidad para que utilidades legacy rendericen
+    la paleta cálida de Harry's Boutique durante la migración incremental.
+  - Se migraron estados vacíos, paginación, carrito, perfil, navegación Admin y
+    segmentos de clientes a primitives/tokens de marca.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+- Resultado:
+  - TypeScript pasa correctamente.
+  - La Fase 1 queda estable para continuar con componentes globales y páginas.
+- Pendientes:
+  - Migrar completamente Navbar, Footer, Checkout y superficies Admin.
+  - Ejecutar tests, lint y build después de las siguientes fases.
+- Riesgos detectados:
+  - La capa de compatibilidad reduce la fragmentación visual, pero debe retirarse
+    gradualmente para eliminar clases legacy del código fuente.
+
+## 2026-07-13 - Design System Visual Audit Phase 2
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo de la fase: extender la identidad a navegación, catálogo, carrito,
+  checkout, cuenta y primeras superficies operativas de Admin.
+- Archivos modificados:
+  - `harrys-boutique-next/src/components/store/navbar.tsx`
+  - `harrys-boutique-next/src/components/store/product-grid.tsx`
+  - `harrys-boutique-next/src/components/store/search-input.tsx`
+  - `harrys-boutique-next/src/components/store/sort-select.tsx`
+  - `harrys-boutique-next/src/components/store/checkout-progress.tsx`
+  - `harrys-boutique-next/src/components/store/cart-page-client.tsx`
+  - `harrys-boutique-next/src/components/store/profile-page-client.tsx`
+  - `harrys-boutique-next/src/components/admin/navbar.tsx`
+  - `harrys-boutique-next/src/components/admin/sidebar.tsx`
+  - Encabezados de Dashboard, Productos y Clientes Admin.
+- Cambios realizados:
+  - Se reemplazaron botones, paginación, búsqueda, ordenamiento y empty states
+    por primitives/tokens compartidos.
+  - Se normalizaron estados de navegación de cuenta y Admin.
+  - Se mejoró la semántica del progreso de checkout con navegación accesible.
+  - Se ajustaron encabezados operativos para compartir la jerarquía editorial.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run test` — 24 archivos, 284 tests.
+  - `npm run build`.
+  - `git diff --check`.
+  - `npm run lint` — continúa bloqueado por 43 archivos preexistentes fuera de
+    esta fase.
+- Resultado:
+  - Build, TypeScript y tests permanecen estables.
+  - La paleta fría legacy ya no domina visualmente las superficies migradas.
+- Pendientes:
+  - Completar migración de Footer, Checkout completo, CRUD Admin, modales y
+    tablas restantes.
+  - Reducir progresivamente la capa de compatibilidad y limpiar las clases
+    legacy del código fuente.
+- Riesgos detectados:
+  - La auditoría visual final en navegador con sesiones autenticadas sigue
+    siendo necesaria para validar responsive, modales y datos reales.
+
+## 2026-07-13 - Design System Visual Audit Phase 3
+
+- Rama usada: `codex/ui-design-system-audit`.
+- Objetivo de la fase: completar la segunda pasada sobre Footer, Cart Drawer,
+  checkout, tablas Admin y componentes de estados/modales.
+- Archivos modificados:
+  - `harrys-boutique-next/src/components/store/footer.tsx`
+  - `harrys-boutique-next/src/components/store/cart-drawer.tsx`
+  - `harrys-boutique-next/src/components/store/checkout-page-client.tsx`
+  - `harrys-boutique-next/src/components/admin/hero-manager.tsx`
+  - `harrys-boutique-next/src/components/admin/product-list.tsx`
+  - `harrys-boutique-next/src/components/admin/order-list.tsx`
+  - `harrys-boutique-next/src/components/admin/coupon-list.tsx`
+  - `harrys-boutique-next/src/components/ui/design-system.tsx`
+  - `harrys-boutique-next/src/app/globals.css`
+- Cambios realizados:
+  - Footer usa el contenedor y botones del Design System.
+  - Cart Drawer usa overlay, dialog semantics, focus labels y botones de marca.
+  - Checkout reutiliza el campo global y mantiene estados de dirección/pago.
+  - Tablas de productos y cupones usan el wrapper responsive compartido.
+  - Hero Admin deja de usar el gradiente purple/pink y adopta el acento de marca.
+  - Se añadieron `Textarea`, `FormField`, `ModalShell` y `StatusBadge`.
+  - Se mapearon gradientes y bordes legacy restantes hacia la paleta cálida.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run test` — 24 archivos, 284 tests.
+  - `npm run build`.
+  - `git diff --check`.
+  - `npm run lint` — quedan 40 archivos legacy sin formato.
+- Resultado:
+  - Build, TypeScript y tests pasan después de esta fase.
+  - Las superficies globales y operativas principales ya no muestran la paleta
+    fría como lenguaje visual dominante.
+- Pendientes:
+  - Limpieza final de clases legacy en formularios Admin y wizard.
+  - Revisión visual en navegador con sesiones autenticadas y viewports reales.
+  - Resolver las 40 advertencias Prettier y las vulnerabilidades de `npm audit`
+    en una fase separada para no introducir upgrades breaking sin revisión.
+- Riesgos detectados:
+  - El `ModalShell` define el contrato visual y semántico, pero los modales
+    legacy todavía deben migrarse uno por uno para aprovecharlo completamente.
+
+## 2026-07-13 - Home Content Management Phase 2
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo de la fase: completar la administración de categorías, productos por
+  categoría e Instagram sin alterar la composición visual del Home.
+- Archivos principales modificados:
+  - `harrys-boutique-next/prisma/schema.prisma`
+  - `harrys-boutique-next/prisma/migrations/20260713130000_add_home_content_management/migration.sql`
+  - `harrys-boutique-next/src/lib/home-content.ts`
+  - `harrys-boutique-next/src/app/(store)/page.tsx`
+  - `harrys-boutique-next/src/components/store/home-editorial-sections.tsx`
+  - `harrys-boutique-next/src/app/(admin)/admin/home/page.tsx`
+  - `harrys-boutique-next/src/components/admin/home-content-manager.tsx`
+  - `harrys-boutique-next/src/app/api/admin/home-content/route.ts`
+  - `harrys-boutique-next/src/components/admin/instagram-manager.tsx`
+- Cambios realizados:
+  - Las colecciones, productos destacados, Instagram y testimonios ya leen
+    contenido real desde Prisma con fallbacks de catálogo válidos.
+  - Se añadió administración de bloques por categoría con modo automático o
+    manual, máximo, orden y visibilidad.
+  - Se añadió alta de categorías desde el módulo de Home y edición de sus
+    metadatos de portada.
+  - Las mutaciones requieren sesión Admin, rate limit y validación Zod; la
+    selección manual valida que los productos pertenezcan a la categoría y
+    estén activos.
+  - Visítanos conserva contenido en código y dejó de mostrar placeholders de
+    desarrollo.
+- Validaciones ejecutadas:
+  - `npx prisma generate --no-engine`.
+  - `npm run db:migrate:deploy` — migración aplicada correctamente al entorno
+    configurado.
+  - `npm run type-check`.
+  - `npm run test` — 24 archivos, 284 tests.
+  - `npm run build`.
+  - `git diff --check`.
+- Resultado:
+  - La fase de conexión de datos y administración queda implementada y el
+    proyecto compila.
+- Pendientes:
+  - Falta una verificación visual autenticada del nuevo panel en navegador.
+  - `prisma generate` normal sigue bloqueado por un archivo de motor retenido
+    por otro proceso de Windows; se usó `--no-engine` sin modificar lógica.
+  - Lint/Prettier global mantiene advertencias legacy fuera de esta fase.
+- Riesgos detectados:
+  - Los bloques por categoría ya están disponibles para el Home, pero no se
+    añadió una nueva sección visual porque el alcance exige conservar la
+    estructura editorial actual.
+
+## 2026-07-13 - Home Content Management Phase 3
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo de la fase: permitir seleccionar imágenes locales desde el Admin para
+  las portadas de Colecciones.
+- Archivos modificados:
+  - `harrys-boutique-next/src/components/admin/home-content-manager.tsx`
+  - `harrys-boutique-next/src/components/store/home-editorial-sections.tsx`
+- Decisión de almacenamiento:
+  - Las imágenes no se guardan en Git ni como binarios en Supabase.
+  - Se reutiliza `POST /api/upload`, protegido para Admin, con Vercel Blob.
+  - Supabase conserva únicamente la URL pública en `Category.homeImage`.
+  - El selector valida JPG, PNG y WEBP hasta 5 MB; muestra vista previa y
+    permite reemplazar la URL antes de guardar la categoría.
+- Validaciones ejecutadas:
+  - `npm run build`.
+  - `npm run type-check`.
+  - `npm run test` — 24 archivos, 284 tests.
+- Resultado:
+  - El flujo de carga y vista previa queda integrado sin alterar el diseño del
+    Home.
+
+## 2026-07-13 - Home Placeholder Cleanup
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo: eliminar textos de placeholder visibles y evitar que se dibujen
+  sobre imágenes reales.
+- Archivo modificado:
+  - `harrys-boutique-next/src/components/store/home-editorial-sections.tsx`
+- Resultado:
+  - Las imágenes reales se renderizan directamente desde `Placeholder`.
+  - Los fallbacks sin imagen conservan solo el fondo visual, sin “IMAGEN
+    PENDIENTE” ni textos de desarrollo.
+- Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
+  `git diff --check` correctos.
+
+## 2026-07-13 - Featured Products Admin Control
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo: alinear la selección visible del Admin con los cuatro productos que
+  aparecían por fallback en el Home.
+- Archivos modificados:
+  - `harrys-boutique-next/src/app/(admin)/admin/home/page.tsx`
+  - `harrys-boutique-next/src/components/admin/home-content-manager.tsx`
+  - `harrys-boutique-next/src/app/api/admin/home-content/route.ts`
+- Cambios realizados:
+  - Si aún no existe configuración persistida, Admin preselecciona cuatro
+    productos activos y disponibles.
+  - Se añadieron miniaturas y estado de disponibilidad al selector.
+  - Cliente y servidor impiden guardar menos de cuatro productos visibles.
+  - El guardado posterior convierte la selección en la fuente explícita del
+    Home.
+- Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
+  `git diff --check` correctos.
+
+## 2026-07-13 - Featured Products Ordering UI
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo: simplificar el Admin y hacer explícito el control de orden de los
+  productos destacados.
+- Archivo principal modificado:
+  - `harrys-boutique-next/src/components/admin/home-content-manager.tsx`
+- Cambios realizados:
+  - Se ocultó del panel la sección de bloques por categoría, que no aportaba a
+    la operación actual.
+  - Productos destacados separados de productos disponibles.
+  - Cada seleccionado muestra miniatura, posición, botones subir/bajar y quitar.
+  - Se puede introducir directamente la posición 1, 2, 3, etc.
+  - Se conserva el mínimo obligatorio de cuatro productos.
+- Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
+  `git diff --check` correctos.
+
+## 2026-07-13 - Collections Ordering and Featured Grid
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo: permitir reordenar colecciones y mejorar la densidad del selector
+  de productos destacados.
+- Archivo modificado:
+  - `harrys-boutique-next/src/components/admin/home-content-manager.tsx`
+- Cambios realizados:
+  - Colecciones ahora muestran posición y controles subir/bajar, además del
+    campo numérico existente.
+  - Productos seleccionados se muestran en dos columnas desde tablet/desktop.
+  - Mobile conserva una sola columna para facilitar la operación táctil.
+- Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
+  `git diff --check` correctos.
+
+- Se añadió la acción protegida `categories` para guardar el orden completo de
+  las colecciones en una sola operación transaccional.
+
+## 2026-07-13 - Editorial About and Contact Pages
+
+- Rama usada: `codex/home-content-admin`.
+- Objetivo: alinear Nosotros y Contacto con el lenguaje editorial del Home.
+- Archivos modificados:
+  - `harrys-boutique-next/src/components/store/about-page-client.tsx`
+  - `harrys-boutique-next/src/app/(store)/contact/page.tsx`
+- Cambios realizados:
+  - Nosotros pasó de una secuencia predominantemente textual a una composición
+    editorial con hero visual, imágenes reales, historia breve, valores,
+    timeline y cierre fotográfico.
+  - Contacto ahora tiene hero visual, formulario destacado, canales de atención,
+    ubicación y enlaces de ayuda con los primitives compartidos.
+  - Se reutilizaron imágenes existentes del proyecto sin agregar dependencias ni
+    cambiar el flujo de contacto.
+- Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
+  `git diff --check` correctos.
