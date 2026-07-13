@@ -11,12 +11,21 @@ import {
 } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
 import { buildProductWhere, buildProductOrderBy } from '@/lib/collection-params'
+import { getMercadoLibreValidationError, MERCADO_LIBRE_LISTING_STATUSES } from '@/lib/mercado-libre'
 
 const createProductSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   seoTitle: z.string().trim().max(70).nullable().optional(),
   seoDescription: z.string().trim().max(160).nullable().optional(),
+  mercadoLibreUrl: z.string().url().nullable().optional(),
+  mercadoLibreItemId: z
+    .string()
+    .trim()
+    .regex(/^MLC\d+$/i)
+    .nullable()
+    .optional(),
+  mercadoLibreStatus: z.enum(MERCADO_LIBRE_LISTING_STATUSES).optional(),
   price: z.number().positive(),
   originalPrice: z.number().positive().optional(),
   images: z.array(z.string().url()).min(1).max(4),
@@ -87,6 +96,11 @@ export async function POST(req: NextRequest) {
   if (validationError) {
     console.error('Validation error:', validationError)
     return validationError
+  }
+
+  const mercadoLibreError = getMercadoLibreValidationError(data!)
+  if (mercadoLibreError) {
+    return NextResponse.json({ success: false, message: mercadoLibreError }, { status: 400 })
   }
 
   try {

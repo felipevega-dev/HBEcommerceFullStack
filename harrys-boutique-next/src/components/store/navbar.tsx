@@ -27,7 +27,7 @@ const socialLinks = [
         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
       </svg>
     ),
-    href: 'https://instagram.com/harrysboutique',
+    href: 'https://www.instagram.com/harrysboutique.cl/',
     label: 'Instagram',
   },
   {
@@ -50,7 +50,7 @@ const socialLinks = [
   },
 ]
 
-export function Navbar() {
+export function Navbar({ overlay = false }: { overlay?: boolean }) {
   const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
@@ -101,14 +101,27 @@ export function Navbar() {
     { name: 'Novedades', href: '/collection?sort=newest', icon: 'tag' },
   ]
 
+  // The home hero owns its transparent navigation, while the rest of the store keeps this layout slot.
+  if (pathname === '/' && !overlay) return null
+
   return (
     <>
       <nav
         aria-label="Navegación principal"
-        className="sticky top-0 z-40 bg-[var(--color-background)]/95 backdrop-blur-md border-b border-[var(--color-border)] shadow-sm"
+        className={
+          overlay
+            ? 'absolute inset-x-0 top-0 z-40 border-none bg-transparent shadow-none'
+            : 'sticky top-0 z-40 border-b border-[#eadfce]/80 bg-[linear-gradient(90deg,#fffdf8_0%,#fffaf4_46%,#f7ebda_100%)] shadow-none'
+        }
       >
         {/* Top bar - Social links y login */}
-        <div className="hidden lg:block border-b border-[var(--color-border)]/50 bg-[var(--color-surface)]/30">
+        <div
+          className={`hidden lg:block ${
+            overlay
+              ? 'border-b border-[#e6d8c8]/60 bg-transparent'
+              : 'border-b border-[#e6d8c8]/60 bg-[linear-gradient(90deg,#fffdf8_0%,#fffaf4_46%,#f7ebda_100%)]'
+          }`}
+        >
           <div className="px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
             <div className="flex justify-between items-center py-2 text-xs">
               {/* Social links */}
@@ -196,15 +209,15 @@ export function Navbar() {
         </div>
 
         {/* Main navbar */}
-        <div className="px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-          <div className="flex justify-between items-center py-3 lg:py-4 gap-4">
-            {/* Categories button + Logo */}
-            <div className="flex items-center gap-4">
+        <div className="px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="relative flex items-center justify-between gap-4 py-3 lg:py-4">
+            {/* Logo */}
+            <div className="flex items-center gap-3 lg:order-1 lg:gap-5">
               {/* Categories dropdown - Desktop */}
-              <div className="hidden lg:block relative">
+              <div className="hidden">
                 <button
                   onClick={() => setCategoriesOpen(!categoriesOpen)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[var(--color-accent)] text-white rounded-lg hover:bg-[var(--color-accent-dark)] transition-all font-medium text-sm shadow-sm hover:shadow-md"
+                  className="flex items-center gap-1.5 py-2 text-sm font-medium text-[#4f423b] transition-colors hover:text-[#b98278]"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -214,7 +227,7 @@ export function Navbar() {
                       d="M4 6h16M4 12h16M4 18h16"
                     />
                   </svg>
-                  VER CATEGORÍAS
+                  CATEGORÍAS
                   <svg
                     className={`w-4 h-4 transition-transform ${categoriesOpen ? 'rotate-180' : ''}`}
                     fill="none"
@@ -243,7 +256,7 @@ export function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-2 w-64 bg-white rounded-lg shadow-xl border border-[var(--color-border)] overflow-hidden z-40"
+                        className="absolute left-0 top-full z-40 mt-3 w-60 overflow-hidden rounded-xl border border-[#eaded6] bg-[#fffdfa] shadow-[0_18px_45px_rgba(59,41,31,0.14)]"
                       >
                         {categories.map((category) => (
                           <Link
@@ -275,21 +288,28 @@ export function Navbar() {
               </div>
 
               {/* Logo */}
-              <Link href="/" className="flex-shrink-0">
+              <Link
+                href="/"
+                className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 lg:static lg:order-1 lg:translate-x-0 lg:translate-y-0"
+              >
                 <Image
-                  src="/harrys_logo.png"
+                  src="/logotrans.png"
                   alt="Harry's Boutique"
-                  width={100}
-                  height={100}
-                  className="object-contain w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28"
+                  width={320}
+                  height={107}
+                  sizes="(max-width: 1023px) 144px, 320px"
+                  className="h-11 w-auto object-contain sm:h-12 lg:h-[100px] xl:h-[108px]"
                   priority
                 />
               </Link>
             </div>
 
             {/* Search bar - Desktop */}
-            <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-4">
-              <div className="relative w-full">
+            <form
+              onSubmit={handleSearch}
+              className="hidden max-w-[260px] flex-1 md:flex lg:order-3 xl:max-w-[300px]"
+            >
+              <div className="relative w-full rounded-[1.1rem] border border-[#bd8d4a] bg-[#fffaf1]/80 p-1 shadow-[inset_0_0_0_2px_rgba(255,253,248,0.8),0_7px_18px_rgba(100,66,28,0.1)]">
                 <input
                   type="text"
                   value={searchQuery}
@@ -297,11 +317,11 @@ export function Navbar() {
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   placeholder="Buscar productos..."
-                  className="w-full px-4 py-2.5 pr-12 rounded-lg border-2 border-[var(--color-border)] focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all outline-none text-sm"
+                  className="w-full rounded-[0.85rem] border border-dashed border-[#d7b26c] bg-transparent px-4 py-2.5 pr-12 text-sm outline-none transition-all placeholder:text-[#947a69] focus:border-[#a96808]"
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[var(--color-accent)] text-white rounded-md hover:bg-[var(--color-accent-dark)] transition-colors"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full border border-[#8e5418] bg-[#9f6118] p-2 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] transition-colors hover:bg-[#7d4510]"
                   aria-label="Buscar"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -317,29 +337,59 @@ export function Navbar() {
             </form>
 
             {/* Desktop nav links */}
-            <ul className="hidden lg:flex gap-6 xl:gap-8 text-sm font-medium text-[var(--color-text-secondary)]">
+            <ul className="order-2 hidden items-center gap-4 text-[13px] font-medium text-[#4f423b] lg:flex xl:gap-7">
               {navItems.map((item) => (
-                <li key={item.href} className="relative">
+                <li
+                  key={item.href}
+                  className="relative"
+                  onMouseEnter={() => item.href === '/collection' && setCategoriesOpen(true)}
+                  onMouseLeave={() => item.href === '/collection' && setCategoriesOpen(false)}
+                >
                   <Link
                     href={item.href}
-                    className={`flex flex-col items-center gap-1 transition-colors duration-200 hover:text-[var(--color-primary)] ${
-                      pathname === item.href ? 'text-[var(--color-primary)]' : ''
+                    className={`flex flex-col items-center gap-1 transition-colors duration-200 hover:text-[#b98278] ${
+                      pathname === item.href ? 'text-[#1b1b1b]' : ''
                     }`}
                   >
                     {item.label}
                     {pathname === item.href && (
                       <motion.span
                         layoutId="navbar-indicator"
-                        className="absolute -bottom-2 left-0 right-0 h-0.5 bg-[var(--color-accent)]"
+                        className="absolute -bottom-3 left-0 right-0 h-[2px] bg-[repeating-linear-gradient(to_right,#c28a27_0_7px,transparent_7px_12px)]"
                       />
                     )}
                   </Link>
+                  {item.href === '/collection' && (
+                    <AnimatePresence>
+                      {categoriesOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.16 }}
+                          className="absolute left-1/2 top-full z-50 mt-4 w-60 -translate-x-1/2 overflow-hidden rounded-xl border border-[#eaded6] bg-[#fffdfa] shadow-[0_18px_45px_rgba(59,41,31,0.14)]"
+                        >
+                          {categories.map((category) => (
+                            <Link
+                              key={category.name}
+                              href={category.href}
+                              onClick={() => setCategoriesOpen(false)}
+                              className="flex items-center gap-3 border-b border-[#eadfce] px-4 py-3 text-sm font-medium text-[#4f423b] transition-colors hover:bg-[#f4ebdd] last:border-b-0"
+                            >
+                              <BrandIcon name={category.icon} className="h-5 w-5 text-[#b77b17]" />
+                              {category.name}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
                 </li>
               ))}
             </ul>
 
             {/* Actions */}
-            <div className="flex gap-2 sm:gap-3 items-center">
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:order-4">
               {/* Search icon - Mobile */}
               <button
                 onClick={() => setMobileSearchOpen((open) => !open)}
@@ -411,7 +461,7 @@ export function Navbar() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={1.5}
-                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                        d="M5 9h14l-1 11H6L5 9zM8 9V6a4 4 0 018 0v3"
                       />
                     </svg>
                     {cartCount > 0 && (
@@ -508,11 +558,11 @@ export function Navbar() {
               <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
                 <Link href="/" onClick={() => setMenuOpen(false)}>
                   <Image
-                    src="/harrys_logo.png"
+                    src="/logotrans.png"
                     alt="Harry's Boutique"
-                    width={80}
-                    height={80}
-                    className="object-contain"
+                    width={160}
+                    height={68}
+                    className="h-12 w-auto object-contain"
                   />
                 </Link>
                 <button

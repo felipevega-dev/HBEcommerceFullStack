@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 export function SearchInput({ defaultValue }: { defaultValue?: string }) {
   const [value, setValue] = useState(defaultValue ?? '')
@@ -19,6 +20,9 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
       }
       params.set('page', '1')
       router.replace(`${pathname}?${params.toString()}`)
+      if (value.trim()) {
+        trackAnalyticsEvent('search_catalog', { search_term: value.trim() })
+      }
     }, 300)
     return () => clearTimeout(timer)
   }, [value]) // eslint-disable-line react-hooks/exhaustive-deps

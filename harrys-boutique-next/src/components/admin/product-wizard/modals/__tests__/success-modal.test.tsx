@@ -10,7 +10,7 @@
  * - Celebration animation
  */
 
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { SuccessModal } from '../success-modal'
 import { useRouter } from 'next/navigation'
@@ -34,7 +34,8 @@ describe('SuccessModal', () => {
   })
 
   afterEach(() => {
-    vi.runOnlyPendingTimers()
+    cleanup()
+    vi.clearAllTimers()
     vi.useRealTimers()
   })
 
@@ -136,7 +137,9 @@ describe('SuccessModal', () => {
     )
 
     // Advance 5 seconds
-    vi.advanceTimersByTime(5000)
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
 
     // Close modal
     rerender(<SuccessModal isOpen={false} productId="123" onCreateAnother={mockOnCreateAnother} />)

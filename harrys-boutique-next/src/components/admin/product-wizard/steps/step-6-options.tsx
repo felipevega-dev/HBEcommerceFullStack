@@ -22,7 +22,14 @@ interface Step6OptionsProps {
  * - Contextual help tooltips
  */
 export function Step6Options({ productData, updateField, errors = {} }: Step6OptionsProps) {
-  const { stock = 0, bestSeller = false, active = true } = productData
+  const {
+    stock = 0,
+    bestSeller = false,
+    active = true,
+    mercadoLibreUrl = '',
+    mercadoLibreItemId = '',
+    mercadoLibreStatus = 'INACTIVE',
+  } = productData
 
   return (
     <div className="space-y-6">
@@ -35,6 +42,65 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
         <p className="mt-1 text-sm text-gray-500">
           Configurá las opciones adicionales del producto
         </p>
+      </div>
+
+      <div>
+        <label
+          htmlFor="product-mercado-libre-url"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Publicacion de Mercado Libre
+        </label>
+        <input
+          type="url"
+          id="product-mercado-libre-url"
+          value={mercadoLibreUrl}
+          onChange={(e) => updateField('mercadoLibreUrl', e.target.value)}
+          placeholder="https://www.mercadolibre.cl/..."
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors"
+          aria-describedby="mercado-libre-url-helper"
+        />
+        <p id="mercado-libre-url-helper" className="mt-1 text-sm text-gray-500">
+          Solo una publicación ACTIVE con URL e item ID válidos se muestra como compra principal.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor="product-mercado-libre-item-id"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Item ID de Mercado Libre
+          </label>
+          <input
+            id="product-mercado-libre-item-id"
+            value={mercadoLibreItemId}
+            onChange={(e) => updateField('mercadoLibreItemId', e.target.value.toUpperCase())}
+            placeholder="MLC4144018020"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="product-mercado-libre-status"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Estado de publicación
+          </label>
+          <select
+            id="product-mercado-libre-status"
+            value={mercadoLibreStatus}
+            onChange={(e) =>
+              updateField('mercadoLibreStatus', e.target.value as ProductData['mercadoLibreStatus'])
+            }
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors"
+          >
+            <option value="INACTIVE">Inactiva</option>
+            <option value="PAUSED">Pausada</option>
+            <option value="ACTIVE">Activa</option>
+          </select>
+        </div>
       </div>
 
       {/* Stock Input */}

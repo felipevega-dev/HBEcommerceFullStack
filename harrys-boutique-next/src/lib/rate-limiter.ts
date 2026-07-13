@@ -11,6 +11,13 @@ const store = new Map<string, RateLimitEntry>()
 let upstashRatelimit: Ratelimit | null | undefined
 let upstashRedis: Redis | null | undefined
 
+export class RateLimitUnavailableError extends Error {
+  constructor() {
+    super('Distributed rate limiting is not available')
+    this.name = 'RateLimitUnavailableError'
+  }
+}
+
 function getUpstashRatelimit() {
   if (upstashRatelimit !== undefined) {
     return upstashRatelimit
@@ -92,6 +99,10 @@ export async function getRateLimitState(key: string, maxRequests: number, window
   const ratelimit = getUpstashRatelimit()
 
   if (!ratelimit || !upstashRedis) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new RateLimitUnavailableError()
+    }
+
     return getLocalRateLimitState(key, maxRequests, windowMs)
   }
 

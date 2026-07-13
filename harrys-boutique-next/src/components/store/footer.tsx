@@ -10,11 +10,12 @@ export function Footer() {
           {/* Columna 1: Logo + descripción + redes sociales */}
           <div>
             <Image
-              src="/logo.png"
+              src="/lunafooter2.jpg"
               alt="Harry's Boutique"
-              width={120}
-              height={40}
-              className="mb-3"
+              width={1024}
+              height={340}
+              sizes="(max-width: 640px) 220px, 250px"
+              className="mb-5 h-auto w-[220px] rounded-md object-contain sm:w-[250px]"
             />
             <p className="text-sm text-[var(--color-text-secondary)] mb-4">
               Ropa y accesorios de moda para tu mejor amigo.

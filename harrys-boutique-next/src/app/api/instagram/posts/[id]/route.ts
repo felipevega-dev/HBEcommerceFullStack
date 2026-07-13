@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { updateInstagramPostDraft } from '@/lib/instagram-automation'
 
 const updatePostSchema = z.object({
@@ -15,6 +15,13 @@ const updatePostSchema = z.object({
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdminAuth()
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:instagram:update',
+    maxRequests: 30,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
 
   const { data, error: validationError } = await validateBody(req, updatePostSchema)
   if (validationError) return validationError

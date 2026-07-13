@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { handleApiError, requireAdminAuth, validateBody } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { createManualInstagramPost } from '@/lib/instagram-automation'
 
 const manualPostSchema = z.object({
@@ -14,6 +14,13 @@ const manualPostSchema = z.object({
 export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:instagram:manual',
+    maxRequests: 20,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
 
   const { data, error: validationError } = await validateBody(req, manualPostSchema)
   if (validationError) return validationError

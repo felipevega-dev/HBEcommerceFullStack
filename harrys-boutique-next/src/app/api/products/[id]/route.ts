@@ -4,12 +4,21 @@ import { prisma } from '@/lib/prisma'
 import { revalidateCatalogCache } from '@/lib/cache'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
+import { getMercadoLibreValidationError, MERCADO_LIBRE_LISTING_STATUSES } from '@/lib/mercado-libre'
 
 const updateProductSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
   seoTitle: z.string().trim().max(70).nullable().optional(),
   seoDescription: z.string().trim().max(160).nullable().optional(),
+  mercadoLibreUrl: z.string().url().nullable().optional(),
+  mercadoLibreItemId: z
+    .string()
+    .trim()
+    .regex(/^MLC\d+$/i)
+    .nullable()
+    .optional(),
+  mercadoLibreStatus: z.enum(MERCADO_LIBRE_LISTING_STATUSES).optional(),
   price: z.number().positive().optional(),
   originalPrice: z.number().positive().nullable().optional(),
   images: z.array(z.string()).min(1).max(4).optional(),
@@ -59,6 +68,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const { id } = await params
+    const current = await prisma.product.findUnique({
+      where: { id },
+      select: { mercadoLibreUrl: true, mercadoLibreItemId: true, mercadoLibreStatus: true },
+    })
+    if (!current) {
+      return NextResponse.json(
+        { success: false, message: 'Producto no encontrado' },
+        { status: 404 },
+      )
+    }
+    const mercadoLibreError = getMercadoLibreValidationError({ ...current, ...data! })
+    if (mercadoLibreError) {
+      return NextResponse.json({ success: false, message: mercadoLibreError }, { status: 400 })
+    }
+
     // If name changed, regenerate slug
     let slug: string | undefined
     if (data!.name) {

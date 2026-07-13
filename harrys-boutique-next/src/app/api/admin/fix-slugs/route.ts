@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { handleApiError, requireAdminAuth } from '@/lib/api-utils'
+import { handleApiError, protectMutation, requireAdminAuth } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
 
 /**
@@ -8,9 +8,16 @@ import { generateSlug } from '@/lib/utils'
  * Regenerates slugs for all products that have empty, blank, or malformed slugs.
  * A valid slug must match /^[a-z0-9]+(-[a-z0-9]+)*$/ — lowercase, no spaces, no leading/trailing hyphens.
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   const { error } = await requireAdminAuth()
   if (error) return error
+
+  const protectionError = await protectMutation(req, {
+    keyPrefix: 'admin:fix-slugs',
+    maxRequests: 5,
+    windowMs: 10 * 60 * 1000,
+  })
+  if (protectionError) return protectionError
 
   try {
     const products = await prisma.product.findMany({

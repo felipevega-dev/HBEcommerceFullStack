@@ -159,7 +159,7 @@ export function SuccessModal({ isOpen, productId, onCreateAnother, onClose }: Su
       </div>
 
       {/* CSS Animation Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes scale-fade-in {
           from {
             opacity: 0;

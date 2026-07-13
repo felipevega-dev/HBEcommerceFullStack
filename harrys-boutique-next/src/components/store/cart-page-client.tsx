@@ -8,6 +8,7 @@ import {
   calculateShippingForSubtotal,
   type PricingSettings,
 } from '@/lib/checkout'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 export function CartPageClient({
   pricingSettings = DEFAULT_PRICING_SETTINGS,
@@ -173,7 +174,16 @@ export function CartPageClient({
                 Seguir comprando
               </button>
             </Link>
-            <Link href="/checkout">
+            <Link
+              href="/checkout"
+              onClick={() =>
+                trackAnalyticsEvent('start_direct_checkout', {
+                  cta_location: 'cart',
+                  item_count: items.length,
+                  value: total,
+                })
+              }
+            >
               <button className="w-full px-6 py-3 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors">
                 Continuar Compra
               </button>

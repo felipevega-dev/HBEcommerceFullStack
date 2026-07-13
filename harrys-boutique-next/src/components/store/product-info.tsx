@@ -1,22 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { useCartStore } from '@/store/cart-store'
 import { toast } from 'react-toastify'
 import { colorToHex } from '@/lib/utils'
 import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { trackAnalyticsEvent } from '@/lib/analytics'
+import { resolveMercadoLibreListing, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
 
 interface Product {
   id: string
+  slug?: string
   name: string
   price: number
   originalPrice?: number | null
   description: string
+  mercadoLibreUrl?: string | null
+  mercadoLibreItemId?: string | null
+  mercadoLibreStatus?: MercadoLibreListingStatus
   sizes: unknown
   colors: string[]
   images: string[]
@@ -42,6 +47,7 @@ export function ProductInfo({
   const [quantity, setQuantity] = useState(1)
   const [showModal, setShowModal] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
+  const mercadoLibreListing = resolveMercadoLibreListing(product)
 
   const sizes = Array.isArray(product.sizes) ? (product.sizes as string[]) : []
   const activeVariants = product.variants?.filter((variant) => variant.active) ?? []
@@ -56,6 +62,25 @@ export function ProductInfo({
   const description = stripEmoji(product.description)
     .replace(/\s{2,}/g, ' ')
     .trim()
+
+  useEffect(() => {
+    const item = { item_id: product.id, item_name: product.name }
+    trackAnalyticsEvent('view_item', item)
+
+    if (mercadoLibreListing) return
+    trackAnalyticsEvent(
+      product.mercadoLibreUrl || product.mercadoLibreItemId
+        ? 'invalid_mercadolibre_link'
+        : 'product_without_mercadolibre_listing',
+      item,
+    )
+  }, [
+    mercadoLibreListing,
+    product.id,
+    product.mercadoLibreItemId,
+    product.mercadoLibreUrl,
+    product.name,
+  ])
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
@@ -215,7 +240,14 @@ export function ProductInfo({
               return (
                 <button
                   key={color}
-                  onClick={() => setSelectedColor(color)}
+                  onClick={() => {
+                    setSelectedColor(color)
+                    trackAnalyticsEvent('select_item_variant', {
+                      item_id: product.id,
+                      item_name: product.name,
+                      color,
+                    })
+                  }}
                   disabled={!colorHasStock}
                   title={color}
                   className={`w-8 h-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${selectedColor === color ? 'border-[var(--color-accent)] scale-110' : 'border-gray-200 hover:border-gray-400'}`}
@@ -245,7 +277,15 @@ export function ProductInfo({
               return (
                 <button
                   key={size}
-                  onClick={() => setSelectedSize(size)}
+                  onClick={() => {
+                    setSelectedSize(size)
+                    trackAnalyticsEvent('select_item_variant', {
+                      item_id: product.id,
+                      item_name: product.name,
+                      size,
+                      color: selectedColor,
+                    })
+                  }}
                   disabled={!sizeHasStock}
                   className={`px-4 py-2 rounded-lg border text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${selectedSize === size ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : 'border-gray-200 hover:border-gray-300'}`}
                 >
@@ -280,6 +320,39 @@ export function ProductInfo({
         </div>
       </div>
 
+      {/* Mercado Libre is primary only for products explicitly mapped to an active listing. */}
+      {mercadoLibreListing && (
+        <div className="rounded-xl border border-[#ffe1a6] bg-[#fff8e8] p-4">
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+            Compra protegida en Mercado Libre
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
+            Paga y coordina el envio dentro de Mercado Libre para contar con sus protecciones y
+            seguimiento.
+          </p>
+          <a
+            href={mercadoLibreListing.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() =>
+              trackAnalyticsEvent('click_mercadolibre', {
+                item_id: product.id,
+                item_name: product.name,
+                item_slug: product.slug,
+                mercado_libre_item_id: mercadoLibreListing.itemId,
+                cta_location: 'product_page',
+                size: selectedSize || undefined,
+                color: selectedColor || undefined,
+                destination_url: mercadoLibreListing.url,
+              })
+            }
+            className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-[#ffe600] px-4 py-3 text-sm font-semibold text-[#333] transition-colors hover:bg-[#f5d900] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#333]"
+          >
+            Comprar en Mercado Libre
+          </a>
+        </div>
+      )}
+
       {/* Add to cart */}
       {selectedStock === 0 ? (
         <button
@@ -293,9 +366,13 @@ export function ProductInfo({
           onClick={handleAddToCart}
           variant="primary"
           size="lg"
-          className="w-full !bg-black !text-white hover:!bg-gray-800"
+          className={
+            mercadoLibreListing
+              ? 'w-full !border !border-[var(--color-border-strong)] !bg-transparent !text-[var(--color-text-primary)] hover:!bg-[var(--color-surface)]'
+              : 'w-full !bg-black !text-white hover:!bg-gray-800'
+          }
         >
-          Añadir al carrito
+          {mercadoLibreListing ? "Comprar directo en Harry's" : 'Añadir al carrito'}
         </ButtonWithFeedback>
       )}
 

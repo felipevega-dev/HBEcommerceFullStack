@@ -24,6 +24,12 @@ export interface ProductData {
   seoTitle?: string
   /** SEO meta description override shown in search results (optional) */
   seoDescription?: string
+  /** Canonical Mercado Libre listing used as the primary purchase channel (optional) */
+  mercadoLibreUrl?: string
+  /** Mercado Libre item ID paired with the publication URL */
+  mercadoLibreItemId?: string
+  /** Whether the listing is eligible to receive storefront traffic */
+  mercadoLibreStatus?: 'ACTIVE' | 'PAUSED' | 'INACTIVE'
 
   // Step 3: Pricing
   /** Selling price (must be > 0) */

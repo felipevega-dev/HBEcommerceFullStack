@@ -4,10 +4,10 @@ Target: una VM con Ubuntu 22.04/24.04, Docker Engine y Docker Compose plugin.
 
 ## Que incluye el stack
 
-| Servicio | Archivo | Rol |
-|----------|---------|-----|
-| PostgreSQL 16 | `docker-compose.prod.yml` | Base de datos persistente |
-| Next.js standalone | `Dockerfile` | App en `:3000`, migraciones al arrancar |
+| Servicio           | Archivo                   | Rol                                     |
+| ------------------ | ------------------------- | --------------------------------------- |
+| PostgreSQL 16      | `docker-compose.prod.yml` | Base de datos persistente               |
+| Next.js standalone | `Dockerfile`              | App en `:3000`, migraciones al arrancar |
 
 Dev local sigue usando `docker-compose.yml` (solo Postgres) + `npm run dev` en el host.
 

@@ -135,7 +135,7 @@ export function ErrorModal({ isOpen, errorMessage, onRetry, onClose }: ErrorModa
       </div>
 
       {/* CSS Animation Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from {
             opacity: 0;

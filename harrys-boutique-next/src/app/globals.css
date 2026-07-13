@@ -1,30 +1,40 @@
 @import 'tailwindcss';
 
 :root {
+  --color-bg: #fbf7ef;
+  --color-surface-warm: #f4ebdd;
+  --color-text: #2f2823;
+  --color-text-soft: #6f625a;
+  --color-muted: #a9968b;
+  --color-gold-dark: #a96808;
+  --color-gold-soft: #f3d58a;
+  --color-stitch: #3a2d26;
+  --color-accent-soft: #f1ddd8;
+
   /* Paleta principal */
-  --color-primary: #1a1a1a;
-  --color-primary-hover: #333333;
+  --color-primary: var(--color-text);
+  --color-primary-hover: var(--color-stitch);
 
   /* Acento — rosa palo elegante */
-  --color-accent: #c9a0a0;
-  --color-accent-light: #f0e0e0;
-  --color-accent-dark: #a07070;
+  --color-accent: #b98278;
+  --color-accent-light: var(--color-accent-soft);
+  --color-accent-dark: #936259;
 
   /* Dorado suave */
-  --color-gold: #c8a96e;
-  --color-gold-light: #f5e6c8;
+  --color-gold: #d79a18;
+  --color-gold-light: var(--color-gold-soft);
 
   /* Neutros cálidos */
-  --color-background: #fdfaf7;
-  --color-surface: #f7f2ed;
-  --color-surface-2: #efe8e0;
-  --color-border: #e8ddd5;
-  --color-border-strong: #d4c4b8;
+  --color-background: var(--color-bg);
+  --color-surface: #fffdf8;
+  --color-surface-2: var(--color-surface-warm);
+  --color-border: #e6d8c8;
+  --color-border-strong: #cfbda9;
 
   /* Texto */
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #6b5c52;
-  --color-text-muted: #9e8e84;
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-soft);
+  --color-text-muted: var(--color-muted);
 
   /* Semánticos */
   --color-success: #4a7c59;

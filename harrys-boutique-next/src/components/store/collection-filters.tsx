@@ -5,7 +5,9 @@ import { useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { FilterChip } from '@/components/ui/filter-chip'
 import type { CollectionParams } from '@/lib/collection-params'
+import type { CollectionFacet } from '@/lib/collection-data'
 import { colorToHex } from '@/lib/utils'
+import { trackAnalyticsEvent } from '@/lib/analytics'
 
 interface Category {
   id: string
@@ -15,8 +17,8 @@ interface Category {
 
 interface Props {
   categories: Category[]
-  colors: string[]
-  sizes: string[]
+  colors: Array<string | CollectionFacet>
+  sizes: Array<string | CollectionFacet>
   currentParams: CollectionParams
 }
 
@@ -72,8 +74,8 @@ function FilterContent({
   setShowSizes,
 }: {
   categories: Category[]
-  colors: string[]
-  sizes: string[]
+  colors: Array<string | CollectionFacet>
+  sizes: Array<string | CollectionFacet>
   selectedCategories: string[]
   selectedSubcategories: string[]
   selectedColors: string[]
@@ -134,35 +136,51 @@ function FilterContent({
       </AccordionSection>
 
       <AccordionSection title="Colores" open={showColors} onToggle={() => setShowColors((v) => !v)}>
-        {colors.map((color) => (
-          <label key={color} className="flex items-center gap-2 py-1 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-[var(--color-border)] accent-[var(--color-accent)]"
-              checked={selectedColors.includes(color)}
-              onChange={() => updateMultiFilter('colors', color, selectedColors)}
-            />
-            <span
-              className="w-4 h-4 rounded-full inline-block border border-[var(--color-border)]"
-              style={{ backgroundColor: colorToHex(color) }}
-            />
-            <span className="text-sm">{color}</span>
-          </label>
-        ))}
+        {colors.map((item) => {
+          const facet = typeof item === 'string' ? { value: item, count: undefined } : item
+          return (
+            <label key={facet.value} className="flex items-center gap-2 py-1 cursor-pointer">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded border-[var(--color-border)] accent-[var(--color-accent)]"
+                checked={selectedColors.includes(facet.value)}
+                onChange={() => updateMultiFilter('colors', facet.value, selectedColors)}
+              />
+              <span
+                className="w-4 h-4 rounded-full inline-block border border-[var(--color-border)]"
+                style={{ backgroundColor: colorToHex(facet.value) }}
+              />
+              <span className="text-sm">{facet.value}</span>
+              {facet.count !== undefined && (
+                <span className="ml-auto text-xs text-[var(--color-text-muted)]">
+                  {facet.count}
+                </span>
+              )}
+            </label>
+          )
+        })}
       </AccordionSection>
 
       <AccordionSection title="Tallas" open={showSizes} onToggle={() => setShowSizes((v) => !v)}>
-        {sizes.map((size) => (
-          <label key={size} className="flex items-center gap-2 py-1 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-[var(--color-border)] accent-[var(--color-accent)]"
-              checked={selectedSizes.includes(size)}
-              onChange={() => updateMultiFilter('sizes', size, selectedSizes)}
-            />
-            <span className="text-sm">{size}</span>
-          </label>
-        ))}
+        {sizes.map((item) => {
+          const facet = typeof item === 'string' ? { value: item, count: undefined } : item
+          return (
+            <label key={facet.value} className="flex items-center gap-2 py-1 cursor-pointer">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded border-[var(--color-border)] accent-[var(--color-accent)]"
+                checked={selectedSizes.includes(facet.value)}
+                onChange={() => updateMultiFilter('sizes', facet.value, selectedSizes)}
+              />
+              <span className="text-sm">{facet.value}</span>
+              {facet.count !== undefined && (
+                <span className="ml-auto text-xs text-[var(--color-text-muted)]">
+                  {facet.count}
+                </span>
+              )}
+            </label>
+          )
+        })}
       </AccordionSection>
     </div>
   )
@@ -200,6 +218,11 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
       }
       params.delete('page')
       router.push(`${pathname}?${params.toString()}`)
+      trackAnalyticsEvent('use_catalog_filter', {
+        filter_type: key,
+        filter_value: value,
+        filter_enabled: !current.includes(value),
+      })
     },
     [router, pathname, searchParams],
   )

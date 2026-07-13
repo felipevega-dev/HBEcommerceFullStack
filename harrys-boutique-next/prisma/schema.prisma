@@ -49,6 +49,12 @@ enum InstagramPostStatus {
   SKIPPED
 }
 
+enum MercadoLibreListingStatus {
+  ACTIVE
+  PAUSED
+  INACTIVE
+}
+
 // ─── User & Auth ──────────────────────────────────────────────────────────────
 
 model User {
@@ -130,6 +136,9 @@ model Product {
   description    String
   seoTitle       String?
   seoDescription String?
+  mercadoLibreUrl String?
+  mercadoLibreItemId String? @unique
+  mercadoLibreStatus MercadoLibreListingStatus @default(INACTIVE)
   price          Decimal  @db.Decimal(10, 2)
   originalPrice  Decimal? @db.Decimal(10, 2)
   images         String[]
@@ -159,6 +168,7 @@ model Product {
   @@index([bestSeller])
   @@index([createdAt(sort: Desc)])
   @@index([ratingAverage(sort: Desc)])
+  @@index([mercadoLibreStatus])
   @@map("products")
 }
 
