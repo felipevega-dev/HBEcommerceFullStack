@@ -110,7 +110,15 @@ export function HomeEditorialHero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center"
+          className="hidden object-cover object-center lg:block"
+        />
+        <Image
+          src="/bannermobile.png"
+          alt="Perro usando una prenda de Harry's Boutique"
+          fill
+          priority
+          sizes="100vw"
+          className="block object-cover object-center lg:hidden"
         />
         <div className="relative flex h-full flex-col justify-center px-7 pb-12 pt-32 sm:px-12 lg:max-w-[64%] lg:px-12 lg:pb-10 lg:pt-28 xl:px-16">
           <h1

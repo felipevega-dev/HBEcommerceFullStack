@@ -279,53 +279,6 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
         </section>
       ))}
 
-      <section className="grid overflow-hidden rounded-[2rem] bg-[#f4e1d7] lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="flex flex-col justify-center px-8 py-14 sm:px-14 lg:px-16">
-          <p className="text-[10px] font-bold tracking-[0.2em] text-[#a96808]">
-            HARRY&apos;S ATELIER
-          </p>
-          <h2
-            className="mt-5 text-5xl leading-[0.95] text-[#1b1b1b] sm:text-6xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Personalización que lo hace <span className="italic text-[#c98612]">único</span>
-          </h2>
-          <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3">
-            {['Nombre bordado', 'Colores exclusivos', 'Hecho a mano'].map((benefit) => (
-              <span
-                key={benefit}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[#594c44]"
-              >
-                <span className="grid h-6 w-6 place-items-center rounded-full border border-[#d7b26c] text-[#a96808]">
-                  +
-                </span>
-                {benefit}
-              </span>
-            ))}
-          </div>
-          <Link
-            href="/contact"
-            className="mt-9 inline-flex w-fit items-center gap-2 rounded-full bg-[#2f2823] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#a96808]"
-          >
-            Personalizar ahora <Arrow />
-          </Link>
-        </div>
-        <div className="relative min-h-[340px] overflow-hidden lg:min-h-full">
-          <Placeholder
-            label="Close-up de etiqueta bordada Harry's Boutique"
-            tone="peach"
-            className="h-full min-h-[340px] lg:min-h-full"
-          />
-          <Image
-            src="/nancyharry.png"
-            alt="Harry's Boutique junto a sus mascotas"
-            fill
-            sizes="(max-width: 1024px) 100vw, 45vw"
-            className="object-cover"
-          />
-        </div>
-      </section>
-
       <section className={content.instagramPosts.length === 0 ? 'hidden' : ''}>
         {content.instagramPosts.length > 0 && (
           <SectionTitle eyebrow="COMUNIDAD" title="Síguenos en Instagram" />

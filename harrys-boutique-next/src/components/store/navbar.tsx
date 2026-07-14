@@ -59,7 +59,6 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
   const openDrawer = useCartStore((s) => s.openDrawer)
   const [menuOpen, setMenuOpen] = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const isAdmin = Boolean(session?.user?.role && ADMIN_ROLES.includes(session.user.role))
@@ -68,7 +67,6 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
   useEffect(() => {
     setMenuOpen(false)
     setCategoriesOpen(false)
-    setMobileSearchOpen(false)
   }, [pathname])
 
   useEffect(() => {
@@ -289,10 +287,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               </div>
 
               {/* Logo */}
-              <Link
-                href="/"
-                className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 lg:static lg:order-1 lg:translate-x-0 lg:translate-y-0"
-              >
+              <Link href="/" className="relative z-10 lg:order-1">
                 <Image
                   src="/logotrans.png"
                   alt="Harry's Boutique"
@@ -308,7 +303,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
             {/* Search bar - Desktop */}
             <form
               onSubmit={handleSearch}
-              className="hidden max-w-[260px] flex-1 md:flex lg:order-3 xl:max-w-[300px]"
+              className="hidden max-w-[260px] flex-1 lg:flex lg:order-3 xl:max-w-[300px]"
             >
               <div className="relative w-full rounded-[1.1rem] border border-[#bd8d4a] bg-[#fffaf1]/80 p-1 shadow-[inset_0_0_0_2px_rgba(255,253,248,0.8),0_7px_18px_rgba(100,66,28,0.1)]">
                 <input
@@ -391,20 +386,6 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:order-4">
-              {/* Search icon - Mobile */}
-              <button
-                onClick={() => setMobileSearchOpen((open) => !open)}
-                className="md:hidden p-2 hover:bg-[var(--color-surface)] rounded-full transition-colors"
-                aria-label={mobileSearchOpen ? 'Cerrar busqueda' : 'Buscar'}
-                aria-expanded={mobileSearchOpen}
-              >
-                <BrandIcon
-                  name={mobileSearchOpen ? 'x' : 'search'}
-                  className="h-5 w-5"
-                  strokeWidth={1.5}
-                />
-              </button>
-
               {/* Wishlist */}
               <Link
                 href="/wishlist"
@@ -425,7 +406,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               {session?.user ? (
                 <Link
                   href="/profile"
-                  className="lg:hidden p-2 hover:bg-[var(--color-surface)] rounded-full transition-colors"
+                  className="hidden lg:hidden p-2 hover:bg-[var(--color-surface)] rounded-full transition-colors"
                   aria-label="Mi cuenta"
                 >
                   <div className="w-6 h-6 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center text-xs font-semibold">
@@ -435,7 +416,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               ) : (
                 <Link
                   href="/login"
-                  className="lg:hidden p-2 hover:bg-[var(--color-surface)] rounded-full transition-colors"
+                  className="hidden lg:hidden p-2 hover:bg-[var(--color-surface)] rounded-full transition-colors"
                   aria-label="Iniciar sesión"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -504,37 +485,6 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
             </div>
           </div>
         </div>
-
-        <AnimatePresence>
-          {mobileSearchOpen && (
-            <motion.form
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onSubmit={handleSearch}
-              className="overflow-hidden border-t border-[var(--color-border)] bg-[var(--color-background)] px-4 py-3 md:hidden"
-            >
-              <div className="relative">
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar productos..."
-                  autoFocus
-                  className="w-full rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-[var(--color-accent)] p-2 text-white transition-colors hover:bg-[var(--color-accent-dark)]"
-                  aria-label="Buscar"
-                >
-                  <BrandIcon name="search" className="h-4 w-4" />
-                </button>
-              </div>
-            </motion.form>
-          )}
-        </AnimatePresence>
       </nav>
 
       {/* Mobile menu — animated with framer-motion */}
@@ -580,6 +530,30 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
 
               {/* Content */}
               <div className="flex-1 overflow-y-auto">
+                {/* Search */}
+                <form
+                  onSubmit={handleSearch}
+                  className="border-b border-[var(--color-border)] bg-[var(--color-background)] p-4"
+                >
+                  <div className="relative">
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Buscar productos..."
+                      className="w-full rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                      aria-label="Buscar productos"
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-[var(--color-accent)] p-2 text-white transition-colors hover:bg-[var(--color-accent-dark)]"
+                      aria-label="Buscar"
+                    >
+                      <BrandIcon name="search" className="h-4 w-4" />
+                    </button>
+                  </div>
+                </form>
+
                 {/* Categories section */}
                 <div className="p-4 bg-[var(--color-accent-light)] border-b border-[var(--color-border)]">
                   <h3 className="text-xs font-bold text-[var(--color-accent-dark)] uppercase mb-3">
