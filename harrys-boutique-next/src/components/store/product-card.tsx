@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
   const purchaseChannel = resolveProductPurchaseChannel(product)
 
   return (
-    <article className="group space-y-3">
+    <article className="group space-y-3 rounded-[1.35rem] border border-transparent p-2 transition-all duration-300 hover:border-[#eadfce] hover:bg-white/70 hover:shadow-[0_14px_34px_rgba(70,48,35,0.06)]">
       <div className="space-y-2">
         <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-hover)]">
           {product.bestSeller && (

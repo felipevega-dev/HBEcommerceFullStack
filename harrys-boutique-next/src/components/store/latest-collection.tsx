@@ -62,7 +62,7 @@ export async function LatestCollection() {
       )}
 
       <div className="text-center">
-        <Link href="/collection">
+        <Link href="/tienda">
           <button className="px-8 py-3 border border-gray-800 hover:bg-gray-800 hover:text-white transition-colors rounded-md">
             Ver Toda la Colección
           </button>

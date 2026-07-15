@@ -34,10 +34,10 @@ function AccordionSection({
   children: React.ReactNode
 }) {
   return (
-    <div className="border border-[var(--color-border)] rounded-lg overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-[#eadfce] bg-white/75">
       <button
         onClick={onToggle}
-        className="w-full px-5 py-3 flex justify-between items-center bg-[var(--color-surface)]"
+        className="flex w-full items-center justify-between bg-[#fffaf4] px-5 py-3 text-[#4f423b] transition-colors hover:bg-[#f6ecdf]"
       >
         <span className="font-medium">{title}</span>
         <svg
@@ -296,7 +296,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
     <>
       {/* Mobile: "Filtros" button */}
       <button
-        className="sm:hidden flex items-center gap-2 px-4 py-2 border border-[var(--color-border)] rounded-lg text-sm font-medium mb-4"
+        className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[#d9c4ad] bg-white/80 px-4 py-3 text-sm font-semibold text-[#4f423b] shadow-[0_8px_20px_rgba(70,48,35,0.05)] sm:hidden"
         onClick={() => setDrawerOpen(true)}
         aria-label="Abrir filtros"
       >
@@ -333,7 +333,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
             />
             {/* Drawer */}
             <motion.div
-              className="fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-[var(--color-background)] z-50 sm:hidden overflow-y-auto"
+              className="fixed left-0 top-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto bg-[#fbf7ef] sm:hidden"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -406,10 +406,13 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <aside className="hidden sm:block w-64 flex-shrink-0">
-        <div className="sticky top-24 space-y-4">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-xl font-medium">Filtros</h2>
+      <aside className="hidden w-64 flex-shrink-0 sm:block">
+        <div className="sticky top-24 space-y-4 rounded-[1.35rem] border border-[#eadfce] bg-white/70 p-4 shadow-[0_10px_28px_rgba(70,48,35,0.05)]">
+          <div className="mb-2 flex items-end justify-between">
+            <div>
+              <p className="text-[9px] font-bold tracking-[0.2em] text-[#a96808]">TU SELECCIÓN</p>
+              <h2 className="mt-1 text-xl font-medium">Filtros</h2>
+            </div>
             {hasFilters && (
               <button
                 onClick={clearAll}

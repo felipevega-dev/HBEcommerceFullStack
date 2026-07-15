@@ -150,7 +150,7 @@ export function HomeEditorialHero() {
 
           <div className="mt-6 flex flex-col items-start gap-3 sm:gap-4 lg:mt-8 lg:flex-row lg:flex-wrap">
             <Link
-              href="/collection"
+              href="/tienda"
               className="rounded-[0.7rem] border border-[#76410e] bg-[linear-gradient(135deg,#d49824_0%,#a96512_100%)] p-1 text-[#fffdf8] shadow-[inset_0_0_0_2px_rgba(91,50,12,0.35),0_12px_24px_rgba(111,64,16,0.24)] transition-transform hover:-translate-y-0.5 hover:brightness-95 max-lg:w-[180px]"
             >
               <span
@@ -162,7 +162,7 @@ export function HomeEditorialHero() {
               </span>
             </Link>
             <Link
-              href="/collection?sort=newest"
+              href="/tienda?sort=newest"
               className="rounded-[0.7rem] border border-[#d7b26c] bg-[#fffdf8]/90 p-1 text-[#3a2d26] shadow-[inset_0_0_0_2px_rgba(255,253,248,0.9),0_8px_20px_rgba(77,55,39,0.08)] backdrop-blur-sm transition-colors hover:bg-white max-lg:w-[200px]"
             >
               <span

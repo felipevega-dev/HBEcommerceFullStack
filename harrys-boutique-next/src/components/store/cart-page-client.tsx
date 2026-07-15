@@ -25,7 +25,7 @@ export function CartPageClient({
           title="Tu carro está vacío"
           description="Descubre prendas hechas con cariño y encuentra el próximo favorito de tu mascota."
           action={
-            <Link href="/collection" className="ui-button ui-button-primary">
+            <Link href="/tienda" className="ui-button ui-button-primary">
               Explorar colección
             </Link>
           }
@@ -154,7 +154,7 @@ export function CartPageClient({
           </div>
 
           <div className="flex flex-col gap-3">
-            <Link href="/collection">
+            <Link href="/tienda">
               <button className="ui-button ui-button-secondary w-full">Seguir comprando</button>
             </Link>
             <Link

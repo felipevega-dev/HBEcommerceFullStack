@@ -155,7 +155,7 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
         {categories.map((cat) => (
           <Link
             key={cat.id}
-            href={`/collection?category=${encodeURIComponent(cat.name)}`}
+            href={`/tienda?category=${encodeURIComponent(cat.name)}`}
             className="group relative h-40 rounded-xl bg-[var(--color-surface)] overflow-hidden flex flex-col items-center justify-center p-4 transition-colors after:absolute after:inset-0 after:bg-[var(--color-accent)]/10 after:opacity-0 group-hover:after:opacity-100 after:transition-opacity"
           >
             <CategoryIcon name={cat.name} />

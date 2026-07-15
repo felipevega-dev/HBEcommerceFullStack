@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BrandIcon } from '@/components/ui/brand-icon'
@@ -89,7 +90,7 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
         title="No encontramos productos"
         description="Prueba con otros filtros para descubrir nuestras prendas y accesorios."
         action={
-          <Link href="/collection" className="ui-button ui-button-secondary">
+          <Link href="/tienda" className="ui-button ui-button-secondary">
             Limpiar filtros
           </Link>
         }
@@ -100,18 +101,65 @@ export function ProductGrid({ products, currentPage, totalPages }: Props) {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => {
+        {products.map((product, index) => {
           const price = typeof product.price === 'number' ? product.price : product.price.toNumber()
           return (
-            <ProductCard
-              key={product.id}
-              product={{
-                ...product,
-                price,
-                wishlisted: wishlistSet.has(product.id),
-                showWishlist: true,
-              }}
-            />
+            <Fragment key={product.id}>
+              <ProductCard
+                product={{
+                  ...product,
+                  price,
+                  wishlisted: wishlistSet.has(product.id),
+                  showWishlist: true,
+                }}
+              />
+              {index === 3 && (
+                <aside className="relative col-span-2 grid min-h-64 overflow-hidden rounded-[1.75rem] border border-[#e4d2c2] bg-[#f3e5dc] shadow-[0_16px_38px_rgba(70,48,35,0.07)] sm:col-span-3 sm:grid-cols-[0.85fr_1.15fr] lg:col-span-4">
+                  <div className="relative min-h-52 overflow-hidden sm:min-h-72">
+                    <Image
+                      src="/nosotrosfull.png"
+                      alt="El oficio handmade de Harry's Boutique"
+                      fill
+                      sizes="(max-width: 640px) 100vw, 35vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#f3e5dc]/25" />
+                  </div>
+                  <div className="relative flex flex-col justify-center px-7 py-9 sm:px-10 lg:px-14">
+                    <div className="pointer-events-none absolute inset-3 rounded-[1.15rem] border border-dashed border-[#d6b98d]" />
+                    <div className="relative">
+                      <p className="text-[10px] font-bold tracking-[0.22em] text-[#a96808]">
+                        HECHO A MANO EN CHILE
+                      </p>
+                      <h2
+                        className="mt-3 text-4xl leading-none text-[#1b1b1b] sm:text-5xl"
+                        style={{ fontFamily: 'var(--font-display)' }}
+                      >
+                        Cada detalle tiene una historia.
+                      </h2>
+                      <p className="mt-4 max-w-xl text-sm leading-6 text-[#635a54]">
+                        Bordados, combinaciones y terminaciones creadas en series pequeñas para que
+                        cada prenda conserve el carácter de nuestro atelier.
+                      </p>
+                      <div className="mt-6 flex flex-wrap gap-3">
+                        <Link
+                          href="/about"
+                          className="inline-flex items-center gap-2 rounded-full bg-[#2f2823] px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-[#a96808]"
+                        >
+                          Conoce nuestra historia <span aria-hidden="true">→</span>
+                        </Link>
+                        <Link
+                          href="/contact"
+                          className="inline-flex items-center rounded-full border border-[#cdb89e] bg-white/60 px-5 py-3 text-xs font-semibold text-[#4f423b] transition-colors hover:bg-white"
+                        >
+                          Consultar un diseño
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              )}
+            </Fragment>
           )
         })}
       </div>

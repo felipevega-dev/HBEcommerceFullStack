@@ -33,7 +33,7 @@ export function CartDrawer() {
 
   const handleExploreCollection = () => {
     closeDrawer()
-    router.push('/collection')
+    router.push('/tienda')
   }
 
   const shippingProgress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100)

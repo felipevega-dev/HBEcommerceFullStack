@@ -95,7 +95,7 @@ export function ProductsShowcase({
       {/* View all button */}
       <div className="text-center pt-4">
         <Link
-          href="/collection"
+          href="/tienda"
           className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-text-primary)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-text-primary)] hover:text-white"
         >
           Ver todos los productos

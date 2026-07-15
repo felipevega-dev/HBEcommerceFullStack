@@ -396,7 +396,7 @@ export function CheckoutPageClient({
       <div className="py-20 text-center space-y-4">
         <p className="text-[var(--color-text-secondary)] text-lg">Tu carrito está vacío.</p>
         <Link
-          href="/collection"
+          href="/tienda"
           className="inline-block px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors"
         >
           Ver colección

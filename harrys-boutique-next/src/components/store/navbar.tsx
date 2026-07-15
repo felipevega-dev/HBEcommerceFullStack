@@ -12,7 +12,7 @@ import { BrandIcon, type BrandIconName } from '@/components/ui/brand-icon'
 
 const navItems = [
   { href: '/', label: 'INICIO' },
-  { href: '/collection', label: 'TIENDA' },
+  { href: '/tienda', label: 'TIENDA' },
   { href: '/about', label: 'NOSOTROS' },
   { href: '/contact', label: 'CONTACTO' },
 ]
@@ -88,19 +88,19 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/collection?search=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/tienda?search=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
       setSearchFocused(false)
     }
   }
 
   const categories: Array<{ name: string; href: string; icon: BrandIconName }> = [
-    { name: 'Prendas', href: '/collection?category=Prendas', icon: 'shirt' },
-    { name: 'Polerones', href: '/collection?subCategory=Polerones', icon: 'shirt' },
-    { name: 'Camisetas', href: '/collection?subCategory=Camisetas', icon: 'sparkles' },
-    { name: 'Vestidos', href: '/collection?subCategory=Vestidos', icon: 'design' },
-    { name: 'Más vendidos', href: '/collection?bestSeller=true', icon: 'star' },
-    { name: 'Novedades', href: '/collection?sort=newest', icon: 'tag' },
+    { name: 'Prendas', href: '/tienda?category=Prendas', icon: 'shirt' },
+    { name: 'Polerones', href: '/tienda?subCategory=Polerones', icon: 'shirt' },
+    { name: 'Camisetas', href: '/tienda?subCategory=Camisetas', icon: 'sparkles' },
+    { name: 'Vestidos', href: '/tienda?subCategory=Vestidos', icon: 'design' },
+    { name: 'Más vendidos', href: '/tienda?bestSeller=true', icon: 'star' },
+    { name: 'Novedades', href: '/tienda?sort=newest', icon: 'tag' },
   ]
 
   return (
@@ -274,7 +274,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                           </Link>
                         ))}
                         <Link
-                          href="/collection"
+                          href="/tienda"
                           onClick={() => setCategoriesOpen(false)}
                           className="block px-4 py-3 text-center text-sm font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent-light)] transition-colors"
                         >
@@ -338,8 +338,8 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 <li
                   key={item.href}
                   className="relative"
-                  onMouseEnter={() => item.href === '/collection' && setCategoriesOpen(true)}
-                  onMouseLeave={() => item.href === '/collection' && setCategoriesOpen(false)}
+                  onMouseEnter={() => item.href === '/tienda' && setCategoriesOpen(true)}
+                  onMouseLeave={() => item.href === '/tienda' && setCategoriesOpen(false)}
                 >
                   <Link
                     href={item.href}
@@ -355,7 +355,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                       />
                     )}
                   </Link>
-                  {item.href === '/collection' && (
+                  {item.href === '/tienda' && (
                     <AnimatePresence>
                       {categoriesOpen && (
                         <motion.div

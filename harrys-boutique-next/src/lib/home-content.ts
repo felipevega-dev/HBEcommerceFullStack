@@ -217,7 +217,10 @@ export async function getHomeContent(): Promise<HomeContent> {
       id: category.id,
       title: category.name,
       description: category.homeDescription,
-      href: category.homeHref || `/collection?category=${encodeURIComponent(category.name)}`,
+      href: (category.homeHref || `/tienda?category=${encodeURIComponent(category.name)}`).replace(
+        /^\/collection(?=\?|$)/,
+        '/tienda',
+      ),
       image: category.homeImage || productImage(category.products[0]?.images ?? []),
     })),
     products: fallbackProducts,

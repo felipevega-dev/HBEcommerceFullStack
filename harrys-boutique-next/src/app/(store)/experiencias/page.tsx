@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 }
 
 export default function PetExperiencesPage() {
-  redirect('/collection')
+  redirect('/tienda')
 }

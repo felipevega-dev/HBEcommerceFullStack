@@ -125,7 +125,7 @@ export function ProductInfo({
               <li>/</li>
               <li>
                 <Link
-                  href="/collection"
+                  href="/tienda"
                   className="hover:text-[var(--color-text-primary)] transition-colors"
                 >
                   {categoryName}

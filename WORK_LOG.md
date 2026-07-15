@@ -1,5 +1,27 @@
 # WORK_LOG.md
 
+## 2026-07-15 - Experiencia editorial para la tienda
+
+- Rama usada: `codex/collection-editorial-experience`.
+- Objetivo: dar al catálogo la personalidad artesanal del Home y reemplazar la URL anglosajona por `/tienda`.
+- Cambios realizados:
+  - `/tienda` pasa a ser la ruta canónica con metadata y sitemap propios.
+  - `/collection` redirige permanentemente a `/tienda`, conservando query strings.
+  - Hero compacto con categorías visuales dinámicas, señales handmade y compra segura.
+  - Filtros, búsqueda y orden presentados como mesa de selección del atelier.
+  - Bloque editorial “Hecho a mano en Chile” integrado después de los primeros productos.
+  - Guía final de talla, personalidad y compra protegida para apoyar conversión y SEO.
+  - Enlaces internos, emails y navegación actualizados a la nueva ruta.
+- Validaciones:
+  - `npm run type-check`.
+  - `npm run test` — 26 archivos, 299 tests.
+  - `npm run build` — compilación de producción correcta y rutas `/tienda` y `/collection` registradas.
+  - `git diff --check` y Prettier focalizado en los archivos nuevos.
+  - Revisión responsive en navegador a 1440 px y 390 px, sin desborde horizontal.
+  - Verificación HTTP: Home, tienda y Auth responden 200; `/collection` responde 308 y conserva filtros.
+  - `npm run lint` global continúa bloqueado por 89 archivos preexistentes fuera de formato; no se aplicó un formateo masivo ajeno a esta fase.
+- Riesgos: los enlaces externos antiguos continúan funcionando mediante 308; no se elimina la ruta histórica.
+
 ## 2026-07-15 - Catálogo premium con compra en Mercado Libre
 
 - Rama usada: `codex/mercadolibre-catalog-flow`.
@@ -72,7 +94,7 @@
   necesarias de marca y soporte.
 - Cambios realizados:
   - Se eliminÃ³ Experiencias del Navbar, del menÃº de categorÃ­as y del Footer.
-  - La ruta `/experiencias` conserva compatibilidad y redirige a `/collection`.
+  - La ruta `/experiencias` conserva compatibilidad y redirige a `/tienda`.
   - Se eliminaron los componentes exclusivos de esa pÃ¡gina que quedaron sin
     uso.
   - Las llamadas a personalizaciÃ³n ahora llevan a Contacto; accesos de perfil y

@@ -52,7 +52,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
               <li>
                 <Link
-                  href="/collection"
+                  href="/tienda"
                   className="hover:text-[var(--color-text-primary)] transition-colors"
                 >
                   Colecciones
@@ -60,7 +60,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/collection?sort=newest"
+                  href="/tienda?sort=newest"
                   className="hover:text-[var(--color-text-primary)] transition-colors"
                 >
                   Novedades
@@ -68,7 +68,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/collection?bestSeller=true"
+                  href="/tienda?bestSeller=true"
                   className="hover:text-[var(--color-text-primary)] transition-colors"
                 >
                   Más Vendidos

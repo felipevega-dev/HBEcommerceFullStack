@@ -115,7 +115,7 @@ export function CategoryGrid3D({ categories }: { categories: Category[] }) {
             className="mt-8 text-center"
           >
             <Link
-              href="/collection"
+              href="/tienda"
               className="inline-flex items-center gap-2 text-[var(--color-accent)] hover:text-[var(--color-accent-dark)] font-medium transition-colors"
             >
               Ver todas las categorías
@@ -177,7 +177,7 @@ function CategoryCard({
         perspective: '1000px',
       }}
     >
-      <Link href={`/collection?category=${category.id}`}>
+      <Link href={`/tienda?category=${category.id}`}>
         <motion.div
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}

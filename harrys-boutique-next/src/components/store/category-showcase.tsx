@@ -43,8 +43,8 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
         {displayCategories.slice(0, 3).map((category, index) => {
           const hasProducts = (category.productCount ?? 0) > 0
           const href = hasProducts
-            ? `/collection?category=${encodeURIComponent(category.name)}`
-            : '/collection'
+            ? `/tienda?category=${encodeURIComponent(category.name)}`
+            : '/tienda'
 
           return (
             <motion.div
@@ -112,7 +112,7 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
           className="mt-5 text-center sm:mt-8"
         >
           <Link
-            href="/collection"
+            href="/tienda"
             className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-dark)] sm:text-base"
           >
             Ver todas las categorías

@@ -117,7 +117,7 @@ export function HeroEpic({
                   </Link>
 
                   <Link
-                    href="/collection"
+                    href="/tienda"
                     className="rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-white/35 hover:bg-white/20 sm:text-base"
                   >
                     Ver colección
@@ -226,7 +226,7 @@ function DefaultHero() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
-            href="/collection"
+            href="/tienda"
             className="rounded-lg bg-[var(--color-primary)] px-6 py-3 text-base font-semibold text-white transition-all hover:bg-[var(--color-primary-hover)] hover:shadow-xl"
           >
             Ver colección

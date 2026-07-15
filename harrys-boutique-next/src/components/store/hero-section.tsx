@@ -93,7 +93,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
             transition={{ delay: 1, duration: 0.6 }}
           >
             <Link
-              href="/collection"
+              href="/tienda"
               className="inline-block bg-[var(--color-primary)] text-white px-10 py-4 rounded-xl hover:bg-[var(--color-primary-hover)] transition-all hover:scale-105 hover:shadow-xl text-sm font-medium"
             >
               Ver colección
@@ -243,7 +243,7 @@ export function HeroSection({ slides }: { slides: Slide[] }) {
               </svg>
             </Link>
             <Link
-              href="/collection"
+              href="/tienda"
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:bg-white/20 transition-all border border-white/20 text-sm sm:text-base font-medium"
             >
               Ver más

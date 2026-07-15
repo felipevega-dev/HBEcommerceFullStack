@@ -29,7 +29,7 @@ export default function NotFound() {
             Ir al inicio
           </Link>
           <Link
-            href="/collection"
+            href="/tienda"
             className="px-6 py-2.5 border border-[var(--color-border)] rounded-lg text-sm font-medium hover:bg-[var(--color-surface)] transition-colors"
           >
             Ver colección

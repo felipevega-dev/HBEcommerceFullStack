@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     {
-      url: `${BASE_URL}/collection`,
+      url: `${BASE_URL}/tienda`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
@@ -62,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
 
     const categoryUrls: MetadataRoute.Sitemap = categories.map((category) => ({
-      url: `${BASE_URL}/collection?category=${encodeURIComponent(category.name)}`,
+      url: `${BASE_URL}/tienda?category=${encodeURIComponent(category.name)}`,
       lastModified: category.createdAt,
       changeFrequency: 'weekly',
       priority: 0.7,

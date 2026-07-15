@@ -145,3 +145,10 @@ npm run db:migrate:deploy
 ```
 
 Esto registra/aplica de forma idempotente la migración que permite usar URL sin exigir item ID ni estado técnico sincronizado. En producción fue aplicada mediante Supabase MCP el 15 de julio de 2026; otros entornos todavía deben ejecutar sus migraciones.
+
+## Tienda editorial
+
+- La ruta pública y canónica del catálogo es `/tienda`.
+- `/collection` conserva compatibilidad mediante una redirección permanente que mantiene filtros y parámetros de búsqueda.
+- La cabecera, categorías rápidas y bloque del atelier reutilizan el contenido visual administrable del Home.
+- Los controles de búsqueda, orden y filtros mantienen la lógica existente con una presentación integrada al estilo handmade de la marca.

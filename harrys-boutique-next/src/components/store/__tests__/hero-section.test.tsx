@@ -72,7 +72,7 @@ describe('HeroSection — tests de ejemplo', () => {
     expect(screen.getByText('Moda para tu mejor amigo')).toBeInTheDocument()
     expect(screen.getByAltText("Harry's Boutique")).toBeInTheDocument()
     const ctaLink = screen.getByRole('link', { name: /ver colección/i })
-    expect(ctaLink).toHaveAttribute('href', '/collection')
+    expect(ctaLink).toHaveAttribute('href', '/tienda')
   })
 
   it('muestra el botón CTA en el slide', () => {

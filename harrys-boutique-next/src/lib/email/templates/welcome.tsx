@@ -45,7 +45,7 @@ export function WelcomeEmail({ name, frontendUrl }: WelcomeEmailProps) {
               colección de ropa y accesorios para tu mascota.
             </Text>
             <Button
-              href={`${frontendUrl}/collection`}
+              href={`${frontendUrl}/tienda`}
               style={{
                 backgroundColor: '#1a1a1a',
                 color: '#ffffff',

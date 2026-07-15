@@ -154,7 +154,7 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
           eyebrow="COLECCIONES"
           title="Explora nuestras colecciones"
           link="Ver todas las colecciones"
-          href="/collection"
+          href="/tienda"
         />
         <div className="grid gap-4 md:grid-cols-3 lg:gap-6">
           {content.collections.map((collection) => (
@@ -227,7 +227,7 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
           eyebrow="SELECCIÓN HARRY'S"
           title="Productos destacados"
           link="Ver todos los productos"
-          href="/collection"
+          href="/tienda"
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           {content.products.map((product) => (
@@ -273,7 +273,7 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
             eyebrow="COLECCIÓN"
             title={block.title}
             link="Ver colección"
-            href={`/collection?category=${encodeURIComponent(block.title)}`}
+            href={`/tienda?category=${encodeURIComponent(block.title)}`}
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             {block.products.map((product) => (

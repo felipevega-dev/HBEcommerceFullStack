@@ -10,7 +10,7 @@ import { CollectionFilters } from '../collection-filters'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
-  usePathname: () => '/collection',
+  usePathname: () => '/tienda',
   useSearchParams: () => new URLSearchParams(),
 }))
 

@@ -49,7 +49,7 @@ export const DEFAULT_ABOUT_CONTENT: AboutContent = {
   heroText:
     "Harry's Boutique es una tienda familiar enfocada en prendas y accesorios que se sienten bien, duran en el tiempo y tienen una identidad clara. Diseñamos para que cada mascota esté cómoda, y para que cada familia compre con confianza.",
   primaryCtaLabel: 'Ver colección',
-  primaryCtaHref: '/collection',
+  primaryCtaHref: '/tienda',
   secondaryCtaLabel: 'Contacto',
   secondaryCtaHref: '/contact',
   standardsTitle: 'Nuestro enfoque',

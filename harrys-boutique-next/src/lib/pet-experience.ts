@@ -93,7 +93,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     tagline: 'Actitud de paseo, foto lista para redes.',
     description:
       'Looks urbanos, contrastes fuertes, polerones, accesorios con nombre y piezas que se sienten como drop limitado.',
-    href: '/collection?search=streetwear',
+    href: '/tienda?search=streetwear',
     accentClass: 'bg-black text-white',
   },
   royal: {
@@ -102,7 +102,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     tagline: 'Elegancia dulce para mascotas que se saben protagonistas.',
     description:
       'Vestidos, tonos suaves, detalles brillantes y conjuntos pensados para fotos familiares, cumpleanos y celebraciones.',
-    href: '/collection?subCategory=Vestidos',
+    href: '/tienda?subCategory=Vestidos',
     accentClass: 'bg-[var(--color-accent)] text-white',
   },
   anime: {
@@ -111,7 +111,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     tagline: 'Tierno, expresivo y un poco dramatico.',
     description:
       'Prendas comodas con energia kawaii, colores expresivos y potencial para challenges, reels y matching con fandoms.',
-    href: '/collection?search=anime',
+    href: '/tienda?search=anime',
     accentClass: 'bg-[#4a6fa5] text-white',
   },
   cozy: {
@@ -120,7 +120,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     tagline: 'Comodidad premium para quedarse mirando.',
     description:
       'Texturas suaves, calces relajados y prendas faciles de usar todos los dias sin perder estilo.',
-    href: '/collection?subCategory=Polerones',
+    href: '/tienda?subCategory=Polerones',
     accentClass: 'bg-[var(--color-gold)] text-white',
   },
   explorer: {
@@ -129,7 +129,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     tagline: 'Para mascotas de paseo largo, viaje y aventura.',
     description:
       'Capas practicas, accesorios resistentes y looks pensados para lluvia, ruta, plaza y escapadas de fin de semana.',
-    href: '/collection?search=viaje',
+    href: '/tienda?search=viaje',
     accentClass: 'bg-[#4a7c59] text-white',
   },
 }
@@ -222,13 +222,13 @@ export const OCCASION_SHOPS: OccasionShop[] = [
   {
     title: 'Lluvia y frio',
     description: 'Capas comodas, polerones y prendas para salir sin perder estilo.',
-    href: '/collection?search=invierno',
+    href: '/tienda?search=invierno',
     icon: 'shipping',
   },
   {
     title: 'Foto familiar',
     description: 'Prendas mas elegantes, matching fits y tonos faciles de combinar.',
-    href: '/collection?search=foto',
+    href: '/tienda?search=foto',
     icon: 'camera',
   },
   {
@@ -240,13 +240,13 @@ export const OCCASION_SHOPS: OccasionShop[] = [
   {
     title: 'Streetwear pet',
     description: 'Piezas urbanas, nombres bordados y actitud de drop limitado.',
-    href: '/collection?search=streetwear',
+    href: '/tienda?search=streetwear',
     icon: 'shirt',
   },
   {
     title: 'Viaje y aventura',
     description: 'Looks practicos para moverse, explorar y aparecer perfecto en ruta.',
-    href: '/collection?search=viaje',
+    href: '/tienda?search=viaje',
     icon: 'location',
   },
 ]

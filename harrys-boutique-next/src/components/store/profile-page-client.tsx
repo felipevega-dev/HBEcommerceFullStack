@@ -416,7 +416,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               <h3 className="mt-1 text-xl font-medium">Mi mascota</h3>
             </div>
             <Link
-              href="/collection"
+              href="/tienda"
               className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
             >
               Ver colecciÃ³n
