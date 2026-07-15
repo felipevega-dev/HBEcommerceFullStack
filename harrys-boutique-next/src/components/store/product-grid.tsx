@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { BrandIcon } from '@/components/ui/brand-icon'
 import { EmptyState } from '@/components/ui/design-system'
 import { ProductCard } from './product-card'
+import type { MercadoLibreListingStatus } from '@/lib/mercado-libre'
 
 interface Product {
   id: string
@@ -19,6 +20,9 @@ interface Product {
   showWishlist?: boolean
   bestSeller?: boolean
   originalPrice?: number
+  mercadoLibreUrl?: string | null
+  mercadoLibreItemId?: string | null
+  mercadoLibreStatus?: MercadoLibreListingStatus
 }
 
 interface Props {

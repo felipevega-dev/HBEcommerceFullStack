@@ -430,42 +430,49 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 </Link>
               )}
 
-              {/* Cart with total */}
-              <button
-                onClick={openDrawer}
-                className="relative group"
-                aria-label={cartCount > 0 ? `Carrito (${cartCount} productos)` : 'Carrito'}
-              >
-                <div className="flex items-center gap-2 px-3 py-2 hover:bg-[var(--color-surface)] rounded-lg transition-colors">
-                  <div className="relative">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M5 9h14l-1 11H6L5 9zM8 9V6a4 4 0 018 0v3"
-                      />
-                    </svg>
-                    {cartCount > 0 && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -right-2 -top-2 bg-[var(--color-accent)] text-white w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold shadow-md"
+              {/* Direct checkout stays out of the main navigation until it is relevant. */}
+              {cartCount > 0 && (
+                <button
+                  onClick={openDrawer}
+                  className="relative group"
+                  aria-label={cartCount > 0 ? `Carrito (${cartCount} productos)` : 'Carrito'}
+                >
+                  <div className="flex items-center gap-2 px-3 py-2 hover:bg-[var(--color-surface)] rounded-lg transition-colors">
+                    <div className="relative">
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        {cartCount}
-                      </motion.span>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M5 9h14l-1 11H6L5 9zM8 9V6a4 4 0 018 0v3"
+                        />
+                      </svg>
+                      {cartCount > 0 && (
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -right-2 -top-2 bg-[var(--color-accent)] text-white w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold shadow-md"
+                        >
+                          {cartCount}
+                        </motion.span>
+                      )}
+                    </div>
+                    {cartCount > 0 && (
+                      <div className="hidden sm:flex flex-col items-start">
+                        <span className="text-xs text-[var(--color-text-muted)]">Mi carrito</span>
+                        <span className="text-sm font-bold text-[var(--color-accent)]">
+                          ${cartTotal.toLocaleString('es-CL')}
+                        </span>
+                      </div>
                     )}
                   </div>
-                  {cartCount > 0 && (
-                    <div className="hidden sm:flex flex-col items-start">
-                      <span className="text-xs text-[var(--color-text-muted)]">Mi carrito</span>
-                      <span className="text-sm font-bold text-[var(--color-accent)]">
-                        ${cartTotal.toLocaleString('es-CL')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </button>
+                </button>
+              )}
 
               {/* Mobile hamburger */}
               <button

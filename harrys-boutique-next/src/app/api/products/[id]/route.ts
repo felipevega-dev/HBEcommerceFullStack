@@ -4,7 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { revalidateCatalogCache } from '@/lib/cache'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
-import { getMercadoLibreValidationError, MERCADO_LIBRE_LISTING_STATUSES } from '@/lib/mercado-libre'
+import {
+  getMercadoLibreValidationError,
+  mergeMercadoLibreListingInput,
+  MERCADO_LIBRE_LISTING_STATUSES,
+} from '@/lib/mercado-libre'
 
 const updateProductSchema = z.object({
   name: z.string().min(1).optional(),
@@ -78,7 +82,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         { status: 404 },
       )
     }
-    const mercadoLibreError = getMercadoLibreValidationError({ ...current, ...data! })
+    const mercadoLibreListing = mergeMercadoLibreListingInput(current, data!)
+    const mercadoLibreError = getMercadoLibreValidationError(mercadoLibreListing)
     if (mercadoLibreError) {
       return NextResponse.json({ success: false, message: mercadoLibreError }, { status: 400 })
     }
@@ -94,7 +99,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
     const product = await prisma.product.update({
       where: { id },
-      data: { ...data!, ...(slug ? { slug } : {}) },
+      data: { ...data!, ...mercadoLibreListing, ...(slug ? { slug } : {}) },
     })
     revalidateCatalogCache()
     return NextResponse.json({ success: true, product })

@@ -208,6 +208,17 @@ describe('validateStep6Options', () => {
     expect(result.valid).toBe(false)
     expect(result.errors.some((e) => e.field === 'stock')).toBe(true)
   })
+
+  it('should reject a non-listing Mercado Libre URL', () => {
+    const result = validateStep6Options(5, {
+      mercadoLibreUrl: 'https://www.mercadolibre.cl/listado/mascotas',
+      mercadoLibreItemId: '',
+      mercadoLibreStatus: 'INACTIVE',
+    })
+
+    expect(result.valid).toBe(false)
+    expect(result.errors.some((error) => error.field === 'mercadoLibreUrl')).toBe(true)
+  })
 })
 
 describe('validateImageFile', () => {

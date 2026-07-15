@@ -17,6 +17,7 @@ export default async function AdminProductsPage({
     status?: string
     stock?: string
     bestSeller?: string
+    mercadoLibre?: string
   }>
 }) {
   const params = await searchParams
@@ -34,6 +35,8 @@ export default async function AdminProductsPage({
     ...(params.stock === 'out' ? { stock: 0 } : {}),
     ...(params.stock === 'low' ? { stock: { gt: 0, lte: 5 } } : {}),
     ...(params.stock === 'available' ? { stock: { gt: 5 } } : {}),
+    ...(params.mercadoLibre === 'published' ? { mercadoLibreUrl: { not: null } } : {}),
+    ...(params.mercadoLibre === 'unpublished' ? { mercadoLibreUrl: null } : {}),
   }
 
   const [rawProducts, total, rawCategories] = await Promise.all([
@@ -63,6 +66,7 @@ export default async function AdminProductsPage({
     subCategory: product.subCategory,
     category: product.category,
     variantCount: product._count.variants,
+    mercadoLibreUrl: product.mercadoLibreUrl,
   }))
 
   return (

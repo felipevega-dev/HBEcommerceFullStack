@@ -112,11 +112,11 @@ export default async function CollectionPage({
           currentParams={params}
         />
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-6">
+          <div className="mb-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--color-text-secondary)]">
               {total} {total === 1 ? 'producto' : 'productos'}
             </p>
-            <div className="flex items-center gap-3">
+            <div className="grid w-full grid-cols-2 items-center gap-3 sm:flex sm:w-auto">
               <Suspense>
                 <SearchInput defaultValue={params.search} />
               </Suspense>

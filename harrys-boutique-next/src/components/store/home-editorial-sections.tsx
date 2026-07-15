@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { HomeContent } from '@/lib/home-content'
+import type { HomeProduct } from '@/lib/home-content'
+import { resolveProductPurchaseChannel } from '@/lib/mercado-libre'
+import { MercadoLibreLink } from './mercado-libre-link'
 
 type Tone = 'peach' | 'stone' | 'ink' | 'sage' | 'sand' | 'denim'
 
@@ -15,6 +18,34 @@ function Arrow() {
         strokeLinejoin="round"
       />
     </svg>
+  )
+}
+
+function HomeProductAction({ product }: { product: HomeProduct }) {
+  const channel = resolveProductPurchaseChannel(product)
+
+  if (channel.type === 'mercadolibre') {
+    return (
+      <MercadoLibreLink
+        href={channel.listing.url}
+        itemId={channel.listing.itemId}
+        productId={product.id}
+        productName={product.name}
+        location="featured_section"
+        className="inline-flex items-center gap-2 rounded-full border border-[#e8c56c] bg-[#fff8e8] px-3 py-2 text-xs font-semibold text-[#684707] transition-colors hover:bg-[#ffefc5]"
+      >
+        Comprar en Mercado Libre <Arrow />
+      </MercadoLibreLink>
+    )
+  }
+
+  return (
+    <Link
+      href={product.href}
+      className="inline-flex items-center gap-2 rounded-full border border-[#eee4dd] px-3 py-2 text-xs font-semibold text-[#29231f] transition-colors hover:border-[#d79a18] hover:text-[#a96808]"
+    >
+      Comprar en Harry&apos;s <Arrow />
+    </Link>
   )
 }
 
@@ -43,7 +74,13 @@ function Placeholder({
   if (image) {
     const imageContent = (
       <>
-        <Image src={image} alt={label} fill sizes="100vw" className="object-cover" />
+        <Image
+          src={image}
+          alt={label}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover"
+        />
       </>
     )
     return href ? (
@@ -210,6 +247,11 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
                     NUEVO
                   </span>
                 )}
+                {product.mercadoLibreUrl && (
+                  <span className="absolute bottom-4 left-4 rounded-full border border-[#f2d38c] bg-[#fff8e8]/95 px-2.5 py-1 text-[9px] font-bold text-[#76520d]">
+                    MERCADO LIBRE
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between gap-3 px-4 py-4">
                 <div>
@@ -218,13 +260,7 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
                     ${product.price.toLocaleString('es-CL')}
                   </p>
                 </div>
-                <Link
-                  href={product.href}
-                  aria-label={`Ver ${product.name}`}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#eee4dd] text-[#1b1b1b] transition-colors hover:border-[#d79a18] hover:text-[#a96808]"
-                >
-                  <Arrow />
-                </Link>
+                <HomeProductAction product={product} />
               </div>
             </article>
           ))}
@@ -257,6 +293,11 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
                       NUEVO
                     </span>
                   )}
+                  {product.mercadoLibreUrl && (
+                    <span className="absolute bottom-4 left-4 rounded-full border border-[#f2d38c] bg-[#fff8e8]/95 px-2.5 py-1 text-[9px] font-bold text-[#76520d]">
+                      MERCADO LIBRE
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center justify-between gap-3 px-4 py-4">
                   <div>
@@ -265,13 +306,7 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
                       ${product.price.toLocaleString('es-CL')}
                     </p>
                   </div>
-                  <Link
-                    href={product.href}
-                    aria-label={`Ver ${product.name}`}
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#eee4dd] text-[#1b1b1b] transition-colors hover:border-[#d79a18] hover:text-[#a96808]"
-                  >
-                    <Arrow />
-                  </Link>
+                  <HomeProductAction product={product} />
                 </div>
               </article>
             ))}

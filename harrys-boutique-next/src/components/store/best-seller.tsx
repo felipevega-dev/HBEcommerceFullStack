@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { ProductCard } from './product-card'
 import { BrandIcon } from '@/components/ui/brand-icon'
 import { canUseDatabaseFallback, logDatabaseFallback } from '@/lib/db-fallback'
+import type { MercadoLibreListingStatus } from '@/lib/mercado-libre'
 
 type BestSellerProduct = {
   id: string
@@ -12,6 +13,9 @@ type BestSellerProduct = {
   images: string[]
   ratingAverage: number
   ratingCount: number
+  mercadoLibreUrl: string | null
+  mercadoLibreItemId: string | null
+  mercadoLibreStatus: MercadoLibreListingStatus
 }
 
 export async function BestSeller() {
@@ -30,6 +34,9 @@ export async function BestSeller() {
         images: true,
         ratingAverage: true,
         ratingCount: true,
+        mercadoLibreUrl: true,
+        mercadoLibreItemId: true,
+        mercadoLibreStatus: true,
       },
     })
   } catch (error) {
@@ -44,6 +51,9 @@ export async function BestSeller() {
     images: p.images,
     ratingAverage: p.ratingAverage,
     ratingCount: p.ratingCount,
+    mercadoLibreUrl: p.mercadoLibreUrl,
+    mercadoLibreItemId: p.mercadoLibreItemId,
+    mercadoLibreStatus: p.mercadoLibreStatus,
   }))
 
   return (

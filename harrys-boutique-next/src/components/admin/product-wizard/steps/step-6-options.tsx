@@ -3,6 +3,7 @@
 import { ProductData } from '../types'
 import { Tooltip } from '../components/tooltip'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { validateMercadoLibreUrl } from '@/lib/mercado-libre'
 
 interface Step6OptionsProps {
   productData: ProductData
@@ -30,6 +31,9 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
     mercadoLibreItemId = '',
     mercadoLibreStatus = 'INACTIVE',
   } = productData
+  const hasValidMercadoLibreUrl = Boolean(
+    mercadoLibreUrl && validateMercadoLibreUrl(mercadoLibreUrl),
+  )
 
   return (
     <div className="space-y-6">
@@ -44,12 +48,27 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
         </p>
       </div>
 
-      <div>
+      <div className="rounded-xl border border-[#ead9b5] bg-[#fffaf0] p-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Canal de compra</p>
+            <p className="mt-1 text-sm text-gray-600">
+              Una URL válida convierte Mercado Libre en el único canal de compra del producto.
+            </p>
+          </div>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              hasValidMercadoLibreUrl ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            {hasValidMercadoLibreUrl ? 'Publicado en Mercado Libre' : 'Sin publicación'}
+          </span>
+        </div>
         <label
           htmlFor="product-mercado-libre-url"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Publicacion de Mercado Libre
+          URL de Mercado Libre
         </label>
         <input
           type="url"
@@ -57,21 +76,28 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
           value={mercadoLibreUrl}
           onChange={(e) => updateField('mercadoLibreUrl', e.target.value)}
           placeholder="https://www.mercadolibre.cl/..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors"
+          className={`w-full rounded-lg border px-4 py-2 transition-colors focus:border-transparent focus:ring-2 focus:ring-black ${
+            errors.mercadoLibreUrl ? 'border-red-500' : 'border-gray-300'
+          }`}
+          aria-invalid={Boolean(errors.mercadoLibreUrl)}
           aria-describedby="mercado-libre-url-helper"
         />
+        {errors.mercadoLibreUrl && (
+          <p className="mt-1 text-sm text-red-600">{errors.mercadoLibreUrl}</p>
+        )}
         <p id="mercado-libre-url-helper" className="mt-1 text-sm text-gray-500">
-          Solo una publicación ACTIVE con URL e item ID válidos se muestra como compra principal.
+          Acepta publicaciones oficiales de mercadolibre.cl. Déjalo vacío para usar el carrito
+          propio.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
         <div>
           <label
             htmlFor="product-mercado-libre-item-id"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Item ID de Mercado Libre
+            Item ID de Mercado Libre (opcional, fase OAuth)
           </label>
           <input
             id="product-mercado-libre-item-id"
@@ -81,7 +107,7 @@ export function Step6Options({ productData, updateField, errors = {} }: Step6Opt
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-colors"
           />
         </div>
-        <div>
+        <div className="hidden" aria-hidden="true">
           <label
             htmlFor="product-mercado-libre-status"
             className="block text-sm font-medium text-gray-700 mb-1"

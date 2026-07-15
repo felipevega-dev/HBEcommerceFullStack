@@ -22,7 +22,7 @@ export function SortSelect({ current }: { current: string }) {
     <select
       value={current}
       onChange={(e) => handleChange(e.target.value)}
-      className="ui-field min-w-44"
+      className="ui-field w-full min-w-0 sm:min-w-44"
     >
       <option value="latest">Más recientes</option>
       <option value="oldest">Más antiguos</option>

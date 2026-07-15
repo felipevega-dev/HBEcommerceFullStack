@@ -11,6 +11,7 @@ import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 import { BrandIcon } from '@/components/ui/brand-icon'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { resolveMercadoLibreListing, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
+import { MercadoLibreLink } from './mercado-libre-link'
 
 interface Product {
   id: string
@@ -176,9 +177,14 @@ export function ProductInfo({
           </>
         )}
       </div>
+      {mercadoLibreListing && (
+        <p className="-mt-2 text-xs text-[var(--color-text-muted)]">
+          Precio referencial. Confirma el precio vigente en la publicación oficial.
+        </p>
+      )}
 
       {/* Stock indicator */}
-      {product.stock !== undefined && (
+      {!mercadoLibreListing && product.stock !== undefined && (
         <div className="flex items-center gap-2 text-sm">
           {selectedStock === 0 ? (
             <span className="text-[var(--color-error)] font-medium">Sin stock</span>
@@ -226,7 +232,7 @@ export function ProductInfo({
       </div>
 
       {/* Colors */}
-      {product.colors.length > 0 && (
+      {!mercadoLibreListing && product.colors.length > 0 && (
         <div>
           <p className="text-sm font-medium mb-3">
             Color: <span className="font-normal">{selectedColor}</span>
@@ -260,7 +266,7 @@ export function ProductInfo({
       )}
 
       {/* Sizes */}
-      {sizes.length > 0 && (
+      {!mercadoLibreListing && sizes.length > 0 && (
         <div>
           <p className="text-sm font-medium mb-3">Selecciona Talla</p>
           <div className="flex flex-wrap gap-2">
@@ -298,83 +304,76 @@ export function ProductInfo({
       )}
 
       {/* Quantity */}
-      <div>
-        <p className="text-sm font-medium mb-3">Cantidad</p>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
-            aria-label="Disminuir cantidad"
-          >
-            -
-          </button>
-          <span className="w-8 text-center font-medium">{quantity}</span>
-          <button
-            onClick={() => setQuantity((q) => Math.min(selectedStock || q + 1, q + 1))}
-            className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
-            aria-label="Aumentar cantidad"
-            disabled={selectedStock > 0 && quantity >= selectedStock}
-          >
-            +
-          </button>
+      {!mercadoLibreListing && (
+        <div>
+          <p className="text-sm font-medium mb-3">Cantidad</p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
+              aria-label="Disminuir cantidad"
+            >
+              -
+            </button>
+            <span className="w-8 text-center font-medium">{quantity}</span>
+            <button
+              onClick={() => setQuantity((q) => Math.min(selectedStock || q + 1, q + 1))}
+              className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
+              aria-label="Aumentar cantidad"
+              disabled={selectedStock > 0 && quantity >= selectedStock}
+            >
+              +
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Mercado Libre is primary only for products explicitly mapped to an active listing. */}
+      {/* A valid Mercado Libre URL is the exclusive purchase channel for this product. */}
       {mercadoLibreListing && (
         <div className="rounded-xl border border-[#ffe1a6] bg-[#fff8e8] p-4">
           <p className="text-sm font-semibold text-[var(--color-text-primary)]">
-            Compra protegida en Mercado Libre
+            Compra y pago mediante Mercado Libre
           </p>
           <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
-            Paga y coordina el envio dentro de Mercado Libre para contar con sus protecciones y
-            seguimiento.
+            Precio, disponibilidad, talla, color, cantidad, protección y despacho se confirman
+            directamente en la publicación oficial.
           </p>
-          <a
+          <MercadoLibreLink
             href={mercadoLibreListing.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() =>
-              trackAnalyticsEvent('click_mercadolibre', {
-                item_id: product.id,
-                item_name: product.name,
-                item_slug: product.slug,
-                mercado_libre_item_id: mercadoLibreListing.itemId,
-                cta_location: 'product_page',
-                size: selectedSize || undefined,
-                color: selectedColor || undefined,
-                destination_url: mercadoLibreListing.url,
-              })
-            }
-            className="ui-button ui-button-secondary mt-3 w-full justify-center"
+            itemId={mercadoLibreListing.itemId}
+            productId={product.id}
+            productName={product.name}
+            productSlug={product.slug}
+            location="product_page"
+            className="ui-button ui-button-secondary mt-3 w-full justify-center !border-[#e8c56c] !bg-[#ffefc5] !text-[#684707] hover:!bg-[#ffe5a3]"
           >
             Comprar en Mercado Libre
-          </a>
+          </MercadoLibreLink>
+          <p className="mt-2 text-center text-[11px] text-[var(--color-text-muted)]">
+            Selecciona las variantes disponibles directamente en Mercado Libre.
+          </p>
         </div>
       )}
 
       {/* Add to cart */}
-      {selectedStock === 0 ? (
-        <button
-          disabled
-          className="w-full py-3 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
-        >
-          Sin stock
-        </button>
-      ) : (
-        <ButtonWithFeedback
-          onClick={handleAddToCart}
-          variant="primary"
-          size="lg"
-          className={
-            mercadoLibreListing
-              ? 'w-full !border !border-[var(--color-border-strong)] !bg-transparent !text-[var(--color-text-primary)] hover:!bg-[var(--color-surface)]'
-              : 'w-full !bg-black !text-white hover:!bg-gray-800'
-          }
-        >
-          {mercadoLibreListing ? "Comprar directo en Harry's" : 'Añadir al carrito'}
-        </ButtonWithFeedback>
-      )}
+      {!mercadoLibreListing &&
+        (selectedStock === 0 ? (
+          <button
+            disabled
+            className="w-full py-3 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+          >
+            Sin stock
+          </button>
+        ) : (
+          <ButtonWithFeedback
+            onClick={handleAddToCart}
+            variant="primary"
+            size="lg"
+            className="w-full !bg-black !text-white hover:!bg-gray-800"
+          >
+            {mercadoLibreListing ? "Comprar directo en Harry's" : 'Añadir al carrito'}
+          </ButtonWithFeedback>
+        ))}
 
       {/* Features */}
       <div className="pt-4 border-t space-y-2 text-sm text-gray-500">
@@ -382,10 +381,23 @@ export function ProductInfo({
           <BrandIcon name="check" className="h-4 w-4" />
           Producto 100% original
         </p>
-        <p className="flex items-center gap-2">
-          <BrandIcon name="check" className="h-4 w-4" />
-          Devoluciones gratis por 7 días
-        </p>
+        {mercadoLibreListing ? (
+          <>
+            <p className="flex items-center gap-2">
+              <BrandIcon name="check" className="h-4 w-4" />
+              Pago protegido mediante Mercado Libre
+            </p>
+            <p className="flex items-center gap-2">
+              <BrandIcon name="check" className="h-4 w-4" />
+              Despacho y devoluciones según la publicación oficial
+            </p>
+          </>
+        ) : (
+          <p className="flex items-center gap-2">
+            <BrandIcon name="check" className="h-4 w-4" />
+            Devoluciones gratis por 7 días
+          </p>
+        )}
         <p className="flex items-center gap-2">
           <BrandIcon name="check" className="h-4 w-4" />
           Servicio de asistencia al cliente

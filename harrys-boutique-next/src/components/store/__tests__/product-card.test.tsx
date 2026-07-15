@@ -106,7 +106,30 @@ describe('ProductCard — tests de ejemplo', () => {
 
   it('enlaza al producto correcto', () => {
     render(<ProductCard product={baseProduct} />)
-    const link = screen.getByRole('link')
+    const link = screen.getAllByRole('link', { name: 'Collar para perro' })[0]
     expect(link).toHaveAttribute('href', '/product/prod-1')
+  })
+
+  it('muestra Mercado Libre como CTA exclusivo cuando existe una URL válida', () => {
+    const mercadoLibreUrl =
+      'https://www.mercadolibre.cl/collar-bordado/up/MLCU4196933505?pdp_filters=item_id:MLC4144018020'
+
+    render(<ProductCard product={{ ...baseProduct, mercadoLibreUrl }} />)
+
+    const mercadoLibreLink = screen.getByRole('link', { name: 'Comprar en Mercado Libre' })
+    expect(mercadoLibreLink).toHaveAttribute('href', mercadoLibreUrl)
+    expect(mercadoLibreLink).toHaveAttribute('target', '_blank')
+    expect(screen.getByText('Disponible en Mercado Libre')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: "Comprar en Harry's" })).not.toBeInTheDocument()
+  })
+
+  it('mantiene el CTA directo cuando no existe una URL de Mercado Libre', () => {
+    render(<ProductCard product={baseProduct} />)
+
+    expect(screen.getByRole('link', { name: "Comprar en Harry's" })).toHaveAttribute(
+      'href',
+      '/product/prod-1',
+    )
+    expect(screen.queryByText('Disponible en Mercado Libre')).not.toBeInTheDocument()
   })
 })

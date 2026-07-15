@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
 import { findMatchingVariant, getAvailableStockForSelection } from '@/lib/product-variants'
+import { resolveProductPurchaseChannel } from '@/lib/mercado-libre'
 
 const cartItemSchema = z.object({
   productId: z.string().uuid(),
@@ -48,11 +49,14 @@ export async function POST(req: NextRequest) {
           name: true,
           stock: true,
           active: true,
+          mercadoLibreUrl: true,
+          mercadoLibreItemId: true,
           variants: { select: { id: true, size: true, color: true, stock: true, active: true } },
         },
       })
 
       if (!product?.active) continue
+      if (resolveProductPurchaseChannel(product).type === 'mercadolibre') continue
 
       const variant = findMatchingVariant(product.variants, size, color)
       const availableStock = getAvailableStockForSelection(product, size, color)
@@ -82,6 +86,7 @@ export async function POST(req: NextRequest) {
       where: { userId },
       include: {
         items: {
+          where: { product: { mercadoLibreUrl: null } },
           include: {
             product: {
               select: {

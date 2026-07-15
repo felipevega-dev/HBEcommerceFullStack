@@ -11,7 +11,11 @@ import {
 } from '@/lib/api-utils'
 import { generateSlug } from '@/lib/utils'
 import { buildProductWhere, buildProductOrderBy } from '@/lib/collection-params'
-import { getMercadoLibreValidationError, MERCADO_LIBRE_LISTING_STATUSES } from '@/lib/mercado-libre'
+import {
+  getMercadoLibreValidationError,
+  mergeMercadoLibreListingInput,
+  MERCADO_LIBRE_LISTING_STATUSES,
+} from '@/lib/mercado-libre'
 
 const createProductSchema = z.object({
   name: z.string().min(1),
@@ -98,7 +102,8 @@ export async function POST(req: NextRequest) {
     return validationError
   }
 
-  const mercadoLibreError = getMercadoLibreValidationError(data!)
+  const mercadoLibreListing = mergeMercadoLibreListingInput({}, data!)
+  const mercadoLibreError = getMercadoLibreValidationError(mercadoLibreListing)
   if (mercadoLibreError) {
     return NextResponse.json({ success: false, message: mercadoLibreError }, { status: 400 })
   }
@@ -111,7 +116,9 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.product.findFirst({ where: { slug: { startsWith: baseSlug } } })
     const slug = existing ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug
 
-    const product = await prisma.product.create({ data: { ...data!, slug } })
+    const product = await prisma.product.create({
+      data: { ...data!, ...mercadoLibreListing, slug },
+    })
     revalidateCatalogCache()
     return NextResponse.json({ success: true, product }, { status: 201 })
   } catch (e) {

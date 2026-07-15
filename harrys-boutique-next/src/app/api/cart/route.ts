@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAuth, validateBody } from '@/lib/api-utils'
 import { findMatchingVariant, getAvailableStockForSelection } from '@/lib/product-variants'
+import { resolveProductPurchaseChannel } from '@/lib/mercado-libre'
 
 const addItemSchema = z.object({
   productId: z.string().uuid(),
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest) {
       where: { userId: session!.user.id },
       include: {
         items: {
+          where: { product: { mercadoLibreUrl: null } },
           include: {
             product: {
               select: {
@@ -74,6 +76,8 @@ export async function POST(req: NextRequest) {
         name: true,
         stock: true,
         active: true,
+        mercadoLibreUrl: true,
+        mercadoLibreItemId: true,
         variants: { select: { id: true, size: true, color: true, stock: true, active: true } },
       },
     })
@@ -82,6 +86,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { success: false, message: 'Producto no disponible' },
         { status: 400 },
+      )
+    }
+
+    if (resolveProductPurchaseChannel(product).type === 'mercadolibre') {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'MERCADOLIBRE_ONLY',
+          message: 'Este producto se compra exclusivamente en Mercado Libre.',
+        },
+        { status: 409 },
       )
     }
 
@@ -128,6 +143,7 @@ export async function POST(req: NextRequest) {
       where: { userId },
       include: {
         items: {
+          where: { product: { mercadoLibreUrl: null } },
           include: {
             product: {
               select: {
@@ -179,6 +195,8 @@ export async function PUT(req: NextRequest) {
             name: true,
             stock: true,
             active: true,
+            mercadoLibreUrl: true,
+            mercadoLibreItemId: true,
             variants: { select: { id: true, size: true, color: true, stock: true, active: true } },
           },
         },
@@ -189,6 +207,17 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json(
         { success: false, message: 'Item de carrito no encontrado' },
         { status: 404 },
+      )
+    }
+
+    if (resolveProductPurchaseChannel(cartItem.product).type === 'mercadolibre') {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'MERCADOLIBRE_ONLY',
+          message: 'Este producto ahora se compra exclusivamente en Mercado Libre.',
+        },
+        { status: 409 },
       )
     }
 
@@ -216,6 +245,7 @@ export async function PUT(req: NextRequest) {
       where: { userId },
       include: {
         items: {
+          where: { product: { mercadoLibreUrl: null } },
           include: {
             product: {
               select: {

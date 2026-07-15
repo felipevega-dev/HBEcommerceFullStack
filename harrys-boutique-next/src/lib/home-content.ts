@@ -17,6 +17,8 @@ export type HomeProduct = {
   href: string
   isNew: boolean
   price: number
+  mercadoLibreUrl: string | null
+  mercadoLibreItemId: string | null
 }
 
 export type HomeInstagramPost = {
@@ -64,6 +66,8 @@ function productToHomeProduct(product: {
   slug: string
   price: unknown
   createdAt: Date
+  mercadoLibreUrl: string | null
+  mercadoLibreItemId: string | null
 }) {
   return {
     id: product.id,
@@ -72,6 +76,8 @@ function productToHomeProduct(product: {
     href: `/product/${product.slug || product.id}`,
     isNew: Date.now() - product.createdAt.getTime() < 1000 * 60 * 60 * 24 * 30,
     price: Number(product.price),
+    mercadoLibreUrl: product.mercadoLibreUrl,
+    mercadoLibreItemId: product.mercadoLibreItemId,
   }
 }
 
@@ -83,7 +89,10 @@ export async function getHomeContent(): Promise<HomeContent> {
         orderBy: [{ homeOrder: 'asc' }, { name: 'asc' }],
         include: {
           products: {
-            where: { active: true, stock: { gt: 0 } },
+            where: {
+              active: true,
+              OR: [{ stock: { gt: 0 } }, { mercadoLibreUrl: { not: null } }],
+            },
             orderBy: { updatedAt: 'desc' },
             select: { images: true },
             take: 1,
@@ -102,6 +111,8 @@ export async function getHomeContent(): Promise<HomeContent> {
               slug: true,
               price: true,
               createdAt: true,
+              mercadoLibreUrl: true,
+              mercadoLibreItemId: true,
             },
           },
         },
@@ -128,7 +139,10 @@ export async function getHomeContent(): Promise<HomeContent> {
               id: true,
               name: true,
               products: {
-                where: { active: true, stock: { gt: 0 } },
+                where: {
+                  active: true,
+                  OR: [{ stock: { gt: 0 } }, { mercadoLibreUrl: { not: null } }],
+                },
                 orderBy: [{ bestSeller: 'desc' }, { updatedAt: 'desc' }],
                 take: 24,
                 select: {
@@ -138,12 +152,20 @@ export async function getHomeContent(): Promise<HomeContent> {
                   slug: true,
                   price: true,
                   createdAt: true,
+                  mercadoLibreUrl: true,
+                  mercadoLibreItemId: true,
                 },
               },
             },
           },
           items: {
-            where: { visible: true, product: { active: true, stock: { gt: 0 } } },
+            where: {
+              visible: true,
+              product: {
+                active: true,
+                OR: [{ stock: { gt: 0 } }, { mercadoLibreUrl: { not: null } }],
+              },
+            },
             orderBy: { order: 'asc' },
             take: 24,
             include: {
@@ -155,6 +177,8 @@ export async function getHomeContent(): Promise<HomeContent> {
                   slug: true,
                   price: true,
                   createdAt: true,
+                  mercadoLibreUrl: true,
+                  mercadoLibreItemId: true,
                 },
               },
             },
@@ -168,7 +192,11 @@ export async function getHomeContent(): Promise<HomeContent> {
       ? configuredProducts.map((selection) => productToHomeProduct(selection.product))
       : (
           await prisma.product.findMany({
-            where: { active: true, stock: { gt: 0 }, bestSeller: true },
+            where: {
+              active: true,
+              bestSeller: true,
+              OR: [{ stock: { gt: 0 } }, { mercadoLibreUrl: { not: null } }],
+            },
             orderBy: [{ ratingAverage: 'desc' }, { createdAt: 'desc' }],
             take: 4,
             select: {
@@ -178,6 +206,8 @@ export async function getHomeContent(): Promise<HomeContent> {
               slug: true,
               price: true,
               createdAt: true,
+              mercadoLibreUrl: true,
+              mercadoLibreItemId: true,
             },
           })
         ).map(productToHomeProduct)

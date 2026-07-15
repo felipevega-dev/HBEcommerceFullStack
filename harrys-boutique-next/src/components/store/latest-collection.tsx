@@ -15,6 +15,9 @@ export async function LatestCollection() {
       images: true,
       ratingAverage: true,
       ratingCount: true,
+      mercadoLibreUrl: true,
+      mercadoLibreItemId: true,
+      mercadoLibreStatus: true,
     },
   })
   const products = raw.map((p) => ({
@@ -25,6 +28,9 @@ export async function LatestCollection() {
     images: p.images,
     ratingAverage: p.ratingAverage,
     ratingCount: p.ratingCount,
+    mercadoLibreUrl: p.mercadoLibreUrl,
+    mercadoLibreItemId: p.mercadoLibreItemId,
+    mercadoLibreStatus: p.mercadoLibreStatus,
   }))
 
   return (

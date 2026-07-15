@@ -19,6 +19,7 @@ interface Product {
   subCategory: string
   stock: number
   variantCount?: number
+  mercadoLibreUrl?: string | null
 }
 
 interface Category {
@@ -87,6 +88,7 @@ export function AdminProductList({
   const statusFilter = searchParams.get('status') || ''
   const stockFilter = searchParams.get('stock') || ''
   const bestSellerFilter = searchParams.get('bestSeller') || ''
+  const mercadoLibreFilter = searchParams.get('mercadoLibre') || ''
 
   const availableSubcategories = useMemo(() => {
     const source = !categoryFilter
@@ -508,6 +510,16 @@ export function AdminProductList({
           <option value="">Todos</option>
           <option value="true">Best sellers</option>
         </select>
+        <select
+          value={mercadoLibreFilter}
+          onChange={(event) => pushFilter('mercadoLibre', event.target.value)}
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          aria-label="Filtrar por publicación de Mercado Libre"
+        >
+          <option value="">Todos los canales</option>
+          <option value="published">Publicado en Mercado Libre</option>
+          <option value="unpublished">Sin publicación</option>
+        </select>
       </div>
 
       {selectedIds.size > 0 && (
@@ -620,6 +632,7 @@ export function AdminProductList({
               <th className="px-4 py-3 text-left font-medium text-gray-600">Precio</th>
               <th className="px-4 py-3 text-left font-medium text-gray-600">Stock</th>
               <th className="px-4 py-3 text-left font-medium text-gray-600">Estado</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-600">Canal</th>
               <th className="px-4 py-3 text-right font-medium text-gray-600">Acciones</th>
             </tr>
           </thead>
@@ -742,12 +755,23 @@ export function AdminProductList({
                     </label>
                   </div>
                 </td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      product.mercadoLibreUrl
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {product.mercadoLibreUrl ? 'Publicado en Mercado Libre' : 'Sin publicación'}
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-right">{renderRowActions(product)}</td>
               </tr>
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-gray-500">
+                <td colSpan={8} className="py-12 text-center text-gray-500">
                   {searchQuery ? 'No se encontraron productos' : 'No hay productos'}
                 </td>
               </tr>
@@ -779,6 +803,15 @@ export function AdminProductList({
                 <p className="text-sm font-medium">
                   ${formatPrice(product.price)} · Stock {product.stock}
                 </p>
+                <span
+                  className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    product.mercadoLibreUrl
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {product.mercadoLibreUrl ? 'Publicado en Mercado Libre' : 'Sin publicación'}
+                </span>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
@@ -802,6 +835,11 @@ export function AdminProductList({
             <div className="mt-3">{renderRowActions(product)}</div>
           </div>
         ))}
+        {products.length === 0 && (
+          <div className="rounded-xl border bg-white px-4 py-10 text-center text-sm text-gray-500">
+            {searchQuery ? 'No se encontraron productos' : 'No hay productos'}
+          </div>
+        )}
       </div>
 
       {totalPages > 1 && (

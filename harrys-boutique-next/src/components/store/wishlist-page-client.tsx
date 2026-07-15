@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ProductCard } from './product-card'
 import { toast } from 'react-toastify'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import type { MercadoLibreListingStatus } from '@/lib/mercado-libre'
 
 interface WishlistProduct {
   id: string
@@ -12,6 +13,9 @@ interface WishlistProduct {
   images: string[]
   ratingAverage: number
   ratingCount: number
+  mercadoLibreUrl?: string | null
+  mercadoLibreItemId?: string | null
+  mercadoLibreStatus?: MercadoLibreListingStatus
 }
 
 export interface WishlistWithProduct {

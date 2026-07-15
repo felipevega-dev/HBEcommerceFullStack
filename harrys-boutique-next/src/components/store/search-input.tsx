@@ -28,7 +28,7 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
   }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="relative">
+    <div className="relative min-w-0">
       <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
         onChange={(e) => setValue(e.target.value)}
         placeholder="Buscar productos..."
         aria-label="Buscar productos"
-        className="ui-field w-56 pl-9 pr-4"
+        className="ui-field w-full pl-9 pr-4 sm:w-56"
       />
     </div>
   )

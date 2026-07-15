@@ -46,7 +46,7 @@ function validationResults(data: ProductData): ValidationResult[] {
     validateStep3Pricing(data.price, data.hasDiscount, data.originalPrice),
     validateStep4Category(data.categoryId, data.subCategory),
     validateStep5SizesColors(data.sizes, data.colors),
-    validateStep6Options(data.stock),
+    validateStep6Options(data.stock, data),
   ]
 }
 

@@ -22,6 +22,7 @@ import {
   releaseExpiredStockReservations,
   reserveCouponForOrder,
 } from '@/lib/order-lifecycle'
+import { resolveProductPurchaseChannel } from '@/lib/mercado-libre'
 
 const addressSchema = z.object({
   firstname: z.string().min(1),
@@ -157,6 +158,8 @@ export async function POST(req: NextRequest) {
         active: true,
         colors: true,
         sizes: true,
+        mercadoLibreUrl: true,
+        mercadoLibreItemId: true,
         variants: {
           select: { id: true, size: true, color: true, stock: true, active: true },
         },
@@ -167,6 +170,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { success: false, message: 'Uno de los productos ya no existe o no está disponible' },
         { status: 400 },
+      )
+    }
+
+    const mercadoLibreProducts = products.filter(
+      (product) => resolveProductPurchaseChannel(product).type === 'mercadolibre',
+    )
+    if (mercadoLibreProducts.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'MERCADOLIBRE_ONLY',
+          message: `Estos productos ahora se compran en Mercado Libre: ${mercadoLibreProducts
+            .map((product) => product.name)
+            .join(', ')}`,
+        },
+        { status: 409 },
       )
     }
 

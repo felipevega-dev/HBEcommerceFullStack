@@ -25,6 +25,9 @@ export async function RelatedProducts({ categoryId, subCategory, excludeId }: Pr
       images: true,
       ratingAverage: true,
       ratingCount: true,
+      mercadoLibreUrl: true,
+      mercadoLibreItemId: true,
+      mercadoLibreStatus: true,
     },
   })
   const products = raw.map((p) => ({
@@ -35,6 +38,9 @@ export async function RelatedProducts({ categoryId, subCategory, excludeId }: Pr
     images: p.images,
     ratingAverage: p.ratingAverage,
     ratingCount: p.ratingCount,
+    mercadoLibreUrl: p.mercadoLibreUrl,
+    mercadoLibreItemId: p.mercadoLibreItemId,
+    mercadoLibreStatus: p.mercadoLibreStatus,
   }))
 
   if (products.length === 0) return null

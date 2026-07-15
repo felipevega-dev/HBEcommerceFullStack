@@ -6,6 +6,7 @@
  */
 
 import type { ProductData, ValidationError, ValidationResult } from '../types'
+import { getMercadoLibreValidationError } from '@/lib/mercado-libre'
 
 /**
  * Validates Step 1: Photo Upload
@@ -234,7 +235,10 @@ export function validateStep5SizesColors(sizes: string[], colors: string[]): Val
  * @param stock - Stock quantity
  * @returns Validation result with any errors
  */
-export function validateStep6Options(stock: number): ValidationResult {
+export function validateStep6Options(
+  stock: number,
+  mercadoLibre?: Pick<ProductData, 'mercadoLibreUrl' | 'mercadoLibreItemId' | 'mercadoLibreStatus'>,
+): ValidationResult {
   const errors: ValidationError[] = []
 
   if (stock < 0) {
@@ -249,6 +253,13 @@ export function validateStep6Options(stock: number): ValidationResult {
       field: 'stock',
       message: 'El stock debe ser un número entero',
     })
+  }
+
+  if (mercadoLibre) {
+    const mercadoLibreError = getMercadoLibreValidationError(mercadoLibre)
+    if (mercadoLibreError) {
+      errors.push({ field: 'mercadoLibreUrl', message: mercadoLibreError })
+    }
   }
 
   return {
@@ -321,7 +332,7 @@ export function validateWizardStep(stepNumber: number, productData: ProductData)
     case 5:
       return validateStep5SizesColors(productData.sizes, productData.colors)
     case 6:
-      return validateStep6Options(productData.stock)
+      return validateStep6Options(productData.stock, productData)
     case 7:
       // Step 7 is review only, no validation needed
       return { valid: true, errors: [] }
