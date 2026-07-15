@@ -123,3 +123,25 @@ Cambios ya aplicados en esta fase:
 3. unificar wizard/form clásico de productos
 4. centralizar settings de negocio como envío y moneda
 5. retirar `legacy/` y dependencias residuales no usadas
+
+## Canal de compra y Mercado Libre
+
+La tienda funciona como catálogo premium con dos canales excluyentes por producto:
+
+- Con una `mercadoLibreUrl` oficial y válida, el producto se compra únicamente desde su publicación de Mercado Libre. Cards y ficha muestran el CTA externo y el producto queda fuera del carrito y del checkout propio.
+- Sin `mercadoLibreUrl`, el producto conserva variantes, carrito, MercadoPago y pago contra entrega de Harry's Boutique.
+
+En Admin, la URL se configura desde las opciones del producto. El item ID queda disponible como dato opcional para una futura integración OAuth; el estado visible “Publicado en Mercado Libre” se deriva de la URL. La lista de productos puede filtrarse por productos con o sin publicación.
+
+La fase actual no crea carritos externos ni transfiere talla, color o varios productos hacia Mercado Libre. Mientras no exista OAuth, la ficha no muestra stock, variantes ni cantidad locales para esos productos; el precio se presenta como referencial y la disponibilidad se confirma en la publicación. El stock de los recursos públicos de Mercado Libre es referencial por rangos, por lo que no debe utilizarse como stock exacto.
+
+La fase 2 podrá consultar publicación, precio, stock exacto, variaciones, imágenes, preguntas y órdenes mediante OAuth y caché local. La creación o actualización de publicaciones queda para una fase 3.
+
+Antes de desplegar esta fase, ejecutar fuera del proceso web:
+
+```powershell
+cd harrys-boutique-next
+npm run db:migrate:deploy
+```
+
+Esto registra/aplica de forma idempotente la migración que permite usar URL sin exigir item ID ni estado técnico sincronizado. En producción fue aplicada mediante Supabase MCP el 15 de julio de 2026; otros entornos todavía deben ejecutar sus migraciones.

@@ -1,5 +1,30 @@
 # WORK_LOG.md
 
+## 2026-07-15 - Catálogo premium con compra en Mercado Libre
+
+- Rama usada: `codex/mercadolibre-catalog-flow`.
+- Objetivo: convertir Mercado Libre en el canal exclusivo de productos publicados y reservar el checkout propio para productos sin publicación.
+- Archivos principales: resolución y validación Mercado Libre, catálogo/Home, cards y ficha, admin de productos, APIs de carrito/órdenes y documentación operativa.
+- Cambios realizados:
+  - URL oficial válida determina el canal sin exigir item ID ni estado manual.
+  - Cards, destacados y ficha presentan CTA y comunicación de confianza integrados.
+  - Productos Mercado Libre quedan fuera del carrito; los carritos anónimos persistidos se revalidan al hidratar y las órdenes los rechazan nuevamente como última barrera.
+  - Admin muestra y filtra “Publicado en Mercado Libre”/“Sin publicación”, conservando datos durante ediciones parciales.
+  - El carrito global permanece oculto hasta contener productos de compra directa.
+  - La revisión móvil corrigió el desborde de búsqueda/orden del catálogo y añadió el estado vacío del filtro de Mercado Libre en el admin.
+  - Productos Mercado Libre ya no muestran stock, talla, color ni cantidad locales; el precio queda identificado como referencial hasta implementar OAuth.
+- Migración: la restricción antigua que exigía URL e item ID cuando el estado técnico era ACTIVE fue eliminada en Supabase producción mediante la migración `allow_url_only_mercado_libre_listing` y verificada con `constraint_exists = false`.
+- Validaciones:
+  - `npm run type-check`.
+  - `npm run test` — 25 archivos, 298 tests.
+  - `npm run build` — compilación de producción correcta.
+  - Prettier focalizado sobre todos los archivos modificados y `git diff --check`.
+  - Revisión responsive en navegador de catálogo, ficha directa, navbar y filtro del admin, sin errores de render ni desborde horizontal.
+  - `npm run lint` global no queda verde por 64 archivos preexistentes fuera de formato; los archivos de esta fase sí pasan Prettier.
+- Integraciones verificadas: proyecto Supabase `Harrysboutique` saludable y proyecto Vercel `harrysboutique` con último deployment de producción `READY`. No existen variables Mercado Libre en los archivos de entorno locales.
+- Pendientes: registrar una aplicación en Mercado Libre, configurar OAuth en Vercel y luego sincronizar precio, stock exacto, variaciones y estado con caché local. Órdenes, preguntas y administración de publicaciones continúan fuera de esta entrega.
+- Riesgos: el stock público de Mercado Libre es referencial; no debe mostrarse ni persistirse como cantidad exacta. Cada entorno distinto de producción debe ejecutar su migración.
+
 ## 2026-07-13 - Home content data layer and Admin connection
 
 - Rama usada: `codex/home-content-admin`.
