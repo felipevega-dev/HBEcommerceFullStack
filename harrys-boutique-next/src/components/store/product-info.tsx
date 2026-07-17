@@ -220,7 +220,7 @@ export function ProductInfo({
             Harry&apos;s Atelier
           </div>
           <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
-            Para nombre bordado, matching fit o regalo especial, revisa la experiencia custom.
+            Para un nombre bordado, un conjunto coordinado o un regalo especial, revisa el Atelier.
           </p>
           <Link
             href="/contact"
@@ -395,7 +395,7 @@ export function ProductInfo({
         ) : (
           <p className="flex items-center gap-2">
             <BrandIcon name="check" className="h-4 w-4" />
-            Devoluciones gratis por 7 días
+            Retracto de 10 días en productos estándar
           </p>
         )}
         <p className="flex items-center gap-2">
@@ -404,7 +404,7 @@ export function ProductInfo({
         </p>
         <p className="flex items-center gap-2">
           <BrandIcon name="camera" className="h-4 w-4" />
-          Comparte tu look con #HarrysFitCheck
+          Comparte su estilo con la comunidad Harry&apos;s
         </p>
       </div>
 

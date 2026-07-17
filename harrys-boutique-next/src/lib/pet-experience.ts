@@ -92,7 +92,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     name: 'Street Royal',
     tagline: 'Actitud de paseo, foto lista para redes.',
     description:
-      'Looks urbanos, contrastes fuertes, polerones, accesorios con nombre y piezas que se sienten como drop limitado.',
+      'Estilos urbanos, contrastes fuertes, polerones, accesorios con nombre y piezas de edición limitada.',
     href: '/tienda?search=streetwear',
     accentClass: 'bg-black text-white',
   },
@@ -101,7 +101,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     name: 'Mini Royal',
     tagline: 'Elegancia dulce para mascotas que se saben protagonistas.',
     description:
-      'Vestidos, tonos suaves, detalles brillantes y conjuntos pensados para fotos familiares, cumpleanos y celebraciones.',
+      'Vestidos, tonos suaves, detalles brillantes y conjuntos pensados para fotos familiares, cumpleaños y celebraciones.',
     href: '/tienda?subCategory=Vestidos',
     accentClass: 'bg-[var(--color-accent)] text-white',
   },
@@ -110,7 +110,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     name: 'Anime Cozy',
     tagline: 'Tierno, expresivo y un poco dramatico.',
     description:
-      'Prendas comodas con energia kawaii, colores expresivos y potencial para challenges, reels y matching con fandoms.',
+      'Prendas cómodas con energía kawaii, colores expresivos y potencial para desafíos, videos y combinaciones inspiradas en sus historias favoritas.',
     href: '/tienda?search=anime',
     accentClass: 'bg-[#4a6fa5] text-white',
   },
@@ -128,7 +128,7 @@ export const STYLE_PROFILES: Record<StyleProfileId, StyleProfile> = {
     name: 'Explorer Chic',
     tagline: 'Para mascotas de paseo largo, viaje y aventura.',
     description:
-      'Capas practicas, accesorios resistentes y looks pensados para lluvia, ruta, plaza y escapadas de fin de semana.',
+      'Capas prácticas, accesorios resistentes y conjuntos pensados para lluvia, ruta, plaza y escapadas de fin de semana.',
     href: '/tienda?search=viaje',
     accentClass: 'bg-[#4a7c59] text-white',
   },
@@ -143,7 +143,7 @@ export const STYLE_QUIZ_QUESTIONS: StyleQuizQuestion[] = [
       {
         id: 'boss',
         label: 'Llega como celebridad',
-        detail: 'Quiere mirada, camara y atencion.',
+        detail: 'Quiere mirada, cámara y atención.',
         scores: { street: 2, royal: 2 },
       },
       {
@@ -168,7 +168,7 @@ export const STYLE_QUIZ_QUESTIONS: StyleQuizQuestion[] = [
       {
         id: 'photos',
         label: 'Fotos y celebraciones',
-        detail: 'Cumpleanos, visitas, domingos familiares.',
+        detail: 'Cumpleaños, visitas y domingos familiares.',
         scores: { royal: 3, anime: 1 },
       },
       {
@@ -188,11 +188,11 @@ export const STYLE_QUIZ_QUESTIONS: StyleQuizQuestion[] = [
   {
     id: 'visual',
     eyebrow: 'Vibe',
-    question: 'Que energia quieres que comunique el look?',
+    question: '¿Qué energía quieres que comunique su estilo?',
     options: [
       {
         id: 'limited',
-        label: 'Drop exclusivo',
+        label: 'Edición exclusiva',
         detail: 'Algo que parezca dificil de conseguir.',
         scores: { street: 3, explorer: 1 },
       },
@@ -214,8 +214,8 @@ export const STYLE_QUIZ_QUESTIONS: StyleQuizQuestion[] = [
 
 export const OCCASION_SHOPS: OccasionShop[] = [
   {
-    title: 'Cumpleanos',
-    description: 'Looks, accesorios y caja sorpresa para celebrar como evento familiar.',
+    title: 'Cumpleaños',
+    description: 'Prendas, accesorios y una caja sorpresa para celebrar en familia.',
     href: '/experiencias#birthday',
     icon: 'gift',
   },
@@ -227,7 +227,7 @@ export const OCCASION_SHOPS: OccasionShop[] = [
   },
   {
     title: 'Foto familiar',
-    description: 'Prendas mas elegantes, matching fits y tonos faciles de combinar.',
+    description: 'Prendas más elegantes, conjuntos coordinados y tonos fáciles de combinar.',
     href: '/tienda?search=foto',
     icon: 'camera',
   },
@@ -239,13 +239,13 @@ export const OCCASION_SHOPS: OccasionShop[] = [
   },
   {
     title: 'Streetwear pet',
-    description: 'Piezas urbanas, nombres bordados y actitud de drop limitado.',
+    description: 'Piezas urbanas, nombres bordados y actitud de edición limitada.',
     href: '/tienda?search=streetwear',
     icon: 'shirt',
   },
   {
     title: 'Viaje y aventura',
-    description: 'Looks practicos para moverse, explorar y aparecer perfecto en ruta.',
+    description: 'Prendas prácticas para moverse, explorar y disfrutar la ruta.',
     href: '/tienda?search=viaje',
     icon: 'location',
   },
@@ -260,23 +260,23 @@ export const EXPERIENCE_CARDS: ExperienceCard[] = [
     icon: 'design',
   },
   {
-    eyebrow: 'FOMO',
-    title: 'Pet Drops',
+    eyebrow: 'Ediciones especiales',
+    title: 'Series limitadas',
     description: 'Lanzamientos limitados con preventa, contador y acceso anticipado para clientes.',
     href: '/experiencias#drops',
     icon: 'sparkles',
   },
   {
     eyebrow: 'Comunidad',
-    title: '#HarrysFitCheck',
-    description: 'Campanas para subir fotos, participar en desafios y aparecer en la web.',
+    title: 'Comunidad Harry’s',
+    description: 'Comparte fotos, participa en desafíos y celebra el estilo de tu mascota.',
     href: '/experiencias#ugc',
     icon: 'camera',
   },
   {
     eyebrow: 'Recurrencia',
     title: "Club Harry's",
-    description: 'Cumpleanos, puntos, acceso anticipado, cajas trimestrales y regalos sorpresa.',
+    description: 'Cumpleaños, puntos, acceso anticipado, cajas trimestrales y regalos sorpresa.',
     href: '/experiencias#club',
     icon: 'star',
   },
@@ -318,21 +318,21 @@ export const CO_CREATED_DROPS: CoCreatedDrop[] = [
 export const COMMUNITY_CHALLENGES: CommunityChallenge[] = [
   {
     title: 'Mascota del Mes',
-    prompt: 'Sube el mejor look, etiqueta a la tienda y junta votos de tu comunidad.',
+    prompt: 'Sube su mejor conjunto, etiqueta a la tienda y reúne votos de la comunidad.',
     reward: "Bordado gratis + portada en Harry's World",
-    metric: 'Top 12 looks',
+    metric: '12 estilos destacados',
     icon: 'star',
   },
   {
-    title: 'Matching Domingo',
+    title: 'Domingo en conjunto',
     prompt: 'Dueno y mascota con una paleta parecida, un paseo real y una foto vertical.',
-    reward: 'Acceso anticipado al proximo drop',
-    metric: '7 dias',
+    reward: 'Acceso anticipado a la próxima edición',
+    metric: '7 días',
     icon: 'camera',
   },
   {
     title: 'Unboxing Ritual',
-    prompt: 'Graba la reaccion, muestra la tarjeta y termina con un fit check.',
+    prompt: 'Graba la reacción, muestra la tarjeta y termina con la prenda puesta.',
     reward: 'HarryCoins extra en la siguiente fase',
     metric: 'Reels/TikTok',
     icon: 'gift',
@@ -343,8 +343,9 @@ export const CLUB_TIERS: ClubTier[] = [
   {
     name: 'Club Mini',
     price: 'Gratis',
-    description: 'Para clientes que quieren volver por drops, misiones y cumpleanos.',
-    perks: ['HarryCoins', 'alertas de drop', 'recordatorio de cumpleanos'],
+    description:
+      'Para clientes que quieren volver por ediciones especiales, misiones y cumpleaños.',
+    perks: ['HarryCoins', 'alertas de novedades', 'recordatorio de cumpleaños'],
     highlight: 'Entrada a comunidad',
     icon: 'paw',
   },
@@ -360,7 +361,7 @@ export const CLUB_TIERS: ClubTier[] = [
     name: 'Club Legend',
     price: 'Premium',
     description: 'Experiencia personalizada con atelier, regalos y prioridad en limitados.',
-    perks: ['atelier express', 'regalo cumpleanos', 'drops reservados'],
+    perks: ['Atelier preferente', 'regalo de cumpleaños', 'ediciones reservadas'],
     highlight: 'Estatus y exclusividad',
     icon: 'star',
   },
@@ -377,8 +378,8 @@ export const HARRYS_LOYALTY_MISSIONS: LoyaltyMission[] = [
   },
   {
     id: 'birthday',
-    title: 'Agenda su cumpleanos',
-    description: 'Desbloquea recordatorio para birthday box y regalos.',
+    title: 'Agenda su cumpleaños',
+    description: 'Activa un recordatorio para su cumpleaños y regalos especiales.',
     reward: 60,
     href: '/profile',
     icon: 'gift',
@@ -386,7 +387,7 @@ export const HARRYS_LOYALTY_MISSIONS: LoyaltyMission[] = [
   {
     id: 'style-quiz',
     title: 'Descubre su estilo',
-    description: 'Completa el quiz y guarda una personalidad de look.',
+    description: 'Completa el cuestionario y guarda su estilo favorito.',
     reward: 70,
     href: '/experiencias#quiz',
     icon: 'sparkles',
@@ -401,16 +402,16 @@ export const HARRYS_LOYALTY_MISSIONS: LoyaltyMission[] = [
   },
   {
     id: 'shipping-ready',
-    title: 'Deja su envio listo',
-    description: 'Guarda una direccion para drops y preventas rapidas.',
+    title: 'Deja su envío listo',
+    description: 'Guarda una dirección para pedidos directos y preventas ágiles.',
     reward: 40,
     href: '/profile',
     icon: 'shipping',
   },
   {
     id: 'fit-check',
-    title: 'Prepara un Fit Check',
-    description: 'Participa en la campana social #HarrysFitCheck.',
+    title: 'Comparte su estilo',
+    description: 'Participa en las actividades de la comunidad Harry’s.',
     reward: 120,
     href: '/experiencias#ugc',
     icon: 'star',

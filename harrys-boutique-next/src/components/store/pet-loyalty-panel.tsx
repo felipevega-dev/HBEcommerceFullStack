@@ -29,8 +29,8 @@ export function PetLoyaltyPanel({
             Misiones de la comunidad
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
-            Gana puntos por completar acciones que hacen la experiencia mas personal, social y
-            rapida para futuros drops.
+            Gana puntos por completar acciones que hacen la experiencia más personal, cercana y ágil
+            para futuras ediciones especiales.
           </p>
         </div>
         <div className="rounded-xl bg-[var(--color-primary)] px-5 py-4 text-white">

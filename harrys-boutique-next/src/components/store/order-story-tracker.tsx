@@ -23,25 +23,25 @@ const STORY_STEPS: StoryStep[] = [
   {
     status: 'PENDING',
     title: 'Pedido recibido',
-    description: 'Tu seleccion quedo guardada y estamos validando el pago.',
+    description: 'Tu selección quedó guardada y estamos validando el pago.',
     icon: 'shopping-bag',
   },
   {
     status: 'PROCESSING',
-    title: 'Preparando el look',
+    title: 'Preparando la prenda',
     description: 'Estamos revisando talla, prendas y detalles antes de empacar.',
     icon: 'shirt',
   },
   {
     status: 'SHIPPED',
     title: 'Camino a casa',
-    description: 'El paquete ya salio. Prepara la camara para el primer fit check.',
+    description: 'El paquete ya salió. Pronto podrán estrenar su nueva prenda.',
     icon: 'shipping',
   },
   {
     status: 'DELIVERED',
-    title: 'Look entregado',
-    description: 'Tu mascota ya puede estrenar. Comparte el resultado con #HarrysFitCheck.',
+    title: 'Pedido entregado',
+    description: 'Tu mascota ya puede estrenar. Si quieres, comparte el resultado con Harry’s.',
     icon: 'camera',
   },
 ]
@@ -90,8 +90,8 @@ export function OrderStoryTracker(props: OrderStoryTrackerProps) {
           <div>
             <p className="font-semibold text-red-900">Pedido cancelado</p>
             <p className="mt-1 text-sm leading-6 text-red-800">
-              Este pedido quedo cerrado. Si fue un error o quieres rearmar el look, contactanos para
-              ayudarte con una nueva seleccion.
+              Este pedido quedó cerrado. Si fue un error o quieres elegir otra prenda, contáctanos
+              para ayudarte con una nueva selección.
             </p>
           </div>
         </div>
@@ -104,13 +104,13 @@ export function OrderStoryTracker(props: OrderStoryTrackerProps) {
       <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-dark)]">
-            Tracking con historia
+            Seguimiento del pedido
           </p>
           <h3 className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">
-            Tu pedido tiene una mini aventura
+            Tu pedido avanza paso a paso
           </h3>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-            Cada estado traduce el proceso en algo mas facil de seguir y compartir.
+            Cada estado muestra de forma clara en qué etapa se encuentra.
           </p>
         </div>
         {props.trackingNumber ? (
@@ -129,8 +129,8 @@ export function OrderStoryTracker(props: OrderStoryTrackerProps) {
             <BrandIcon name="payment" className="mt-0.5 h-5 w-5 text-[var(--color-warning)]" />
             <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
               {props.paymentStatus === 'FAILED'
-                ? 'El pago necesita revision antes de preparar el pedido.'
-                : 'Cuando el pago se confirme, el pedido pasa a preparacion.'}
+                ? 'El pago necesita revisión antes de preparar el pedido.'
+                : 'Cuando el pago se confirme, el pedido pasa a preparación.'}
             </p>
           </div>
         </div>

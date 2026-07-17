@@ -7,7 +7,6 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
-import { FREE_SHIPPING_THRESHOLD } from '@/lib/commerce'
 
 export function CartDrawer() {
   const { items, isOpen, closeDrawer, removeItem, updateQuantity, getTotal } = useCartStore()
@@ -35,9 +34,6 @@ export function CartDrawer() {
     closeDrawer()
     router.push('/tienda')
   }
-
-  const shippingProgress = Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100)
-  const remaining = FREE_SHIPPING_THRESHOLD - total
 
   return (
     <AnimatePresence>
@@ -104,47 +100,22 @@ export function CartDrawer() {
                     <p className="font-medium text-[var(--color-text-primary)]">
                       Tu carrito está vacío
                     </p>
-                    <p className="text-sm mt-1">Agregá productos para comenzar</p>
+                    <p className="mt-1 max-w-xs text-sm leading-6">
+                      Este carrito es para productos directos o encargos coordinados con
+                      Harry&apos;s.
+                    </p>
                   </div>
                   <button onClick={handleExploreCollection} className="ui-button ui-button-primary">
-                    Explorar colección
+                    Explorar tienda
                   </button>
                 </div>
               ) : (
                 <>
-                  {/* Free shipping progress bar */}
-                  <div className="bg-[var(--color-surface)] rounded-lg p-3 space-y-2">
-                    {total >= FREE_SHIPPING_THRESHOLD ? (
-                      <div className="flex items-center gap-2 text-[var(--color-success)] text-sm font-medium">
-                        <svg
-                          className="w-4 h-4 flex-shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span>¡Envío gratis!</span>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-[var(--color-text-secondary)]">
-                        Te faltan ${remaining.toLocaleString('es-CL')} para envío gratis
-                      </p>
-                    )}
-                    <div className="w-full h-1.5 bg-[var(--color-border)] rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${shippingProgress}%`,
-                          backgroundColor: 'var(--color-accent)',
-                        }}
-                      />
-                    </div>
+                  <div className="rounded-lg border border-[#e7d8c9] bg-[var(--color-surface)] p-3">
+                    <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
+                      Compra directa Harry&apos;s. El despacho y el total final se confirman antes
+                      de pagar.
+                    </p>
                   </div>
 
                   {/* Items */}
@@ -247,7 +218,7 @@ export function CartDrawer() {
                   onClick={closeDrawer}
                   className="ui-button ui-button-primary w-full"
                 >
-                  Ir al checkout
+                  Finalizar compra
                 </Link>
                 <Link
                   href="/cart"

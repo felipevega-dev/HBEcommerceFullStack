@@ -419,7 +419,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               href="/tienda"
               className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
             >
-              Ver colecciÃ³n
+              Ver colección
             </Link>
           </div>
 
@@ -458,7 +458,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block text-sm font-medium">
-                Cumpleanos
+                Cumpleaños
                 <input
                   type="date"
                   className={inputClass}
@@ -492,7 +492,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
             </p>
             <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
               {petPassport.size ? `Talla ${petPassport.size}` : 'Talla por definir'} -{' '}
-              {petPassport.birthday ? 'birthday box disponible' : 'agrega cumpleanos'}
+              {petPassport.birthday ? 'fecha especial guardada' : 'agrega su cumpleaños'}
             </p>
           </div>
         </div>

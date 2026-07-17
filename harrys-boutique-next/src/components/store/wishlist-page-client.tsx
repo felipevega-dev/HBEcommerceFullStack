@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { ProductCard } from './product-card'
 import { toast } from 'react-toastify'
 import { BrandIcon } from '@/components/ui/brand-icon'
@@ -40,24 +41,32 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
 
   if (wishlist.length === 0) {
     return (
-      <div className="border-t py-10">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-[var(--color-border)] bg-white p-8 text-center shadow-[var(--shadow-sm)]">
-          <BrandIcon name="heart" className="mx-auto h-8 w-8 text-[var(--color-accent-dark)]" />
-          <h1 className="mb-4 mt-4 text-3xl font-medium">Mis Favoritos</h1>
-          <p className="text-gray-500">
-            Aun no tienes favoritos. Empieza con el quiz de estilo y guarda looks para cumpleanos,
-            drops o matching outfits.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <a href="/tienda" className="ui-button ui-button-primary">
-              Explorar colecciÃ³n
-            </a>
-            <a
-              href="/tienda"
-              className="rounded-lg border border-[var(--color-border)] px-5 py-3 text-sm font-semibold hover:border-[var(--color-accent)]"
+      <div className="border-t py-10 sm:py-14">
+        <div className="relative mx-auto max-w-3xl overflow-hidden rounded-[2rem] border border-[#e5d6c8] bg-[linear-gradient(135deg,#fffaf4_0%,#f5e8dc_100%)] p-8 text-center shadow-[0_18px_45px_rgba(70,48,35,0.07)] sm:p-12">
+          <div className="pointer-events-none absolute inset-3 rounded-[1.45rem] border border-dashed border-[#d8ba83]/70" />
+          <div className="relative">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[var(--color-accent-dark)]">
+              <BrandIcon name="heart" className="h-6 w-6" />
+            </span>
+            <p className="ui-eyebrow mt-5">Tu selección personal</p>
+            <h1
+              className="mt-3 text-4xl text-[var(--color-text-primary)] sm:text-5xl"
+              style={{ fontFamily: 'var(--font-display)' }}
             >
-              Ver tienda
-            </a>
+              Tus favoritos están listos para comenzar.
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[var(--color-text-secondary)]">
+              Guarda prendas para una ocasión especial, compara estilos y vuelve cuando encuentres
+              la combinación perfecta para tu mascota.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Link href="/tienda" className="ui-button ui-button-primary">
+                Explorar tienda
+              </Link>
+              <Link href="/experiencias#atelier" className="ui-button ui-button-secondary">
+                Conocer el Atelier
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -66,15 +75,18 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
 
   return (
     <div className="border-t py-10">
-      <div className="mb-8 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="mb-10 grid gap-5 rounded-[1.5rem] border border-[#e5d6c8] bg-[var(--color-surface)] p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-dark)]">
-            Smart wishlist
-          </p>
-          <h1 className="mt-2 text-3xl font-medium">Mis Favoritos</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
-            Guarda prendas para cumpleanos, compara estilos y vuelve cuando haya drops o nuevas
-            combinaciones para tu mascota.
+          <p className="ui-eyebrow">Tu selección personal</p>
+          <h1
+            className="mt-3 text-4xl text-[var(--color-text-primary)]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Mis favoritos
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
+            Compara estilos, guarda prendas para una ocasión especial y vuelve cuando quieras
+            decidir con calma.
           </p>
         </div>
         <div className="rounded-xl border border-[var(--color-border)] bg-white p-5 shadow-[var(--shadow-sm)]">
@@ -84,25 +96,25 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
             </span>
             <div>
               <p className="font-semibold text-[var(--color-text-primary)]">
-                Proximo look sugerido
+                Una idea para tu próximo conjunto
               </p>
               <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-                {heroProduct?.name} puede convertirse en birthday look, fit check o parte de un
-                matching outfit.
+                {heroProduct?.name} puede ser el punto de partida para combinar colores o preparar
+                un regalo especial.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <a
-                  href="/tienda?sort=newest"
+                <Link
+                  href={`/product/${heroProduct?.id}`}
                   className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
                 >
-                  Guardar para cumpleanos
-                </a>
-                <a
-                  href="/contact"
+                  Ver producto
+                </Link>
+                <Link
+                  href="/experiencias#atelier"
                   className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--color-accent)]"
                 >
-                  Convertir en fit check
-                </a>
+                  Consultar personalización
+                </Link>
               </div>
             </div>
           </div>
@@ -115,8 +127,8 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
             <ProductCard product={product} />
             <button
               onClick={() => remove(product.id)}
+              aria-label={`Eliminar ${product.name} de favoritos`}
               className="absolute right-2 top-2 rounded-full bg-white p-1 text-red-500 shadow hover:bg-red-50"
-              title="Eliminar de favoritos"
             >
               <BrandIcon name="heart" className="h-5 w-5" />
             </button>

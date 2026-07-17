@@ -9,7 +9,7 @@ import {
   type PricingSettings,
 } from '@/lib/checkout'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { EmptyState } from '@/components/ui/design-system'
+import { BrandIcon } from '@/components/ui/brand-icon'
 
 export function CartPageClient({
   pricingSettings = DEFAULT_PRICING_SETTINGS,
@@ -21,15 +21,34 @@ export function CartPageClient({
   if (items.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center py-14">
-        <EmptyState
-          title="Tu carro está vacío"
-          description="Descubre prendas hechas con cariño y encuentra el próximo favorito de tu mascota."
-          action={
-            <Link href="/tienda" className="ui-button ui-button-primary">
-              Explorar colección
-            </Link>
-          }
-        />
+        <section className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-[#e5d6c8] bg-[linear-gradient(135deg,#fffaf4_0%,#f5e8dc_100%)] p-8 text-center shadow-[0_18px_45px_rgba(70,48,35,0.07)] sm:p-12">
+          <div className="pointer-events-none absolute inset-3 rounded-[1.45rem] border border-dashed border-[#d8ba83]/70" />
+          <div className="relative">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[var(--color-accent-strong)]">
+              <BrandIcon name="shopping-bag" className="h-6 w-6" />
+            </span>
+            <p className="ui-eyebrow mt-5">Compra directa</p>
+            <h1
+              className="mt-3 text-4xl text-[var(--color-text-primary)] sm:text-5xl"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              Tu carrito está esperando una pieza especial.
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[var(--color-text-secondary)]">
+              Este carrito está reservado para productos de compra directa y encargos coordinados
+              con Harry&apos;s. Los productos publicados en Mercado Libre se compran desde su ficha
+              oficial.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Link href="/tienda" className="ui-button ui-button-primary">
+                Explorar tienda
+              </Link>
+              <Link href="/experiencias#atelier" className="ui-button ui-button-secondary">
+                Conocer el Atelier
+              </Link>
+            </div>
+          </div>
+        </section>
       </div>
     )
   }
@@ -40,7 +59,18 @@ export function CartPageClient({
 
   return (
     <div className="flex flex-col border-t pt-14">
-      <h1 className="text-3xl font-medium mb-8 text-center">Carro de Compras</h1>
+      <div className="mb-8 text-center">
+        <p className="ui-eyebrow">Compra directa Harry&apos;s</p>
+        <h1
+          className="mt-3 text-4xl text-[var(--color-text-primary)]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Carrito de compras
+        </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
+          Aquí solo aparecen productos directos. El despacho y el total se confirman antes de pagar.
+        </p>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Product list */}
@@ -92,6 +122,7 @@ export function CartPageClient({
                   <input
                     type="number"
                     min="1"
+                    aria-label={`Cantidad de ${item.name}`}
                     value={item.quantity}
                     onChange={(e) => {
                       const value = parseInt(e.target.value)
@@ -154,11 +185,12 @@ export function CartPageClient({
           </div>
 
           <div className="flex flex-col gap-3">
-            <Link href="/tienda">
-              <button className="ui-button ui-button-secondary w-full">Seguir comprando</button>
+            <Link href="/tienda" className="ui-button ui-button-secondary w-full">
+              Seguir comprando
             </Link>
             <Link
               href="/checkout"
+              className="ui-button ui-button-primary w-full"
               onClick={() =>
                 trackAnalyticsEvent('start_direct_checkout', {
                   cta_location: 'cart',
@@ -167,7 +199,7 @@ export function CartPageClient({
                 })
               }
             >
-              <button className="ui-button ui-button-primary w-full">Continuar Compra</button>
+              Finalizar compra
             </Link>
           </div>
         </div>

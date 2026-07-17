@@ -78,7 +78,7 @@ export function CheckoutPageClient({
   // Show payment result feedback from MP redirect
   useEffect(() => {
     if (paymentStatus === 'failure') {
-      toast.error('El pago fue rechazado. Podés intentarlo de nuevo.')
+      toast.error('El pago fue rechazado. Puedes intentarlo de nuevo.')
     } else if (paymentStatus === 'pending') {
       toast.info('Tu pago está pendiente de confirmación.')
     }
