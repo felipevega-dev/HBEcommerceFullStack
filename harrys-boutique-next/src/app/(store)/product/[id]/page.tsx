@@ -6,8 +6,8 @@ import { ProductInfo } from '@/components/store/product-info'
 import { ProductReviews } from '@/components/store/product-reviews'
 import { RelatedProducts } from '@/components/store/related-products'
 import { getProductByIdOrSlug } from '@/lib/catalog'
-import { CURRENCY_CODE } from '@/lib/commerce'
 import { getSiteUrl } from '@/lib/site'
+import { getProductStructuredData, stringifyJsonLd } from '@/lib/structured-data'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -91,41 +91,27 @@ export default async function ProductPage({ params }: Props) {
   }))
 
   const productUrl = `${getSiteUrl()}/product/${product.slug || product.id}`
-  const productStructuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    '@id': productUrl,
+  const productStructuredData = getProductStructuredData({
+    id: product.id,
     name: product.name,
     description: product.description,
-    image: product.images,
+    images: product.images,
     category: [product.category.name, product.subCategory].filter(Boolean).join(' > '),
-    brand: {
-      '@type': 'Brand',
-      name: "Harry's Boutique",
-    },
-    offers: {
-      '@type': 'Offer',
-      url: productUrl,
-      price: product.price,
-      priceCurrency: CURRENCY_CODE,
-      itemCondition: 'https://schema.org/NewCondition',
-      availability:
-        product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-    },
-    ...(product.ratingCount > 0 && {
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: product.ratingAverage,
-        reviewCount: product.ratingCount,
-      },
-    }),
-  }
+    price: product.price,
+    stock: product.stock,
+    ratingAverage: product.ratingAverage,
+    ratingCount: product.ratingCount,
+    mercadoLibreUrl: product.mercadoLibreUrl,
+    mercadoLibreItemId: product.mercadoLibreItemId,
+    mercadoLibreStatus: product.mercadoLibreStatus,
+    url: productUrl,
+  })
 
   return (
     <div className="border-t pt-10">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productStructuredData) }}
+        dangerouslySetInnerHTML={{ __html: stringifyJsonLd(productStructuredData) }}
       />
       <div className="flex flex-col lg:flex-row gap-12">
         <ProductGallery images={product.images} name={product.name} />

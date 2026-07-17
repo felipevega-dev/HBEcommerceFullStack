@@ -1,4 +1,6 @@
 import { getSiteUrl } from '@/lib/site'
+import { CURRENCY_CODE } from '@/lib/commerce'
+import { resolveProductPurchaseChannel, type MercadoLibreListingInput } from '@/lib/mercado-libre'
 
 const STORE_NAME = "Harry's Boutique"
 const INSTAGRAM_URL = 'https://www.instagram.com/harrysboutique.CL'
@@ -67,5 +69,54 @@ export function getFaqStructuredData(faqs: Array<{ q: string; a: string }>) {
         text: item.a,
       },
     })),
+  }
+}
+
+interface ProductStructuredDataInput extends MercadoLibreListingInput {
+  id: string
+  name: string
+  description: string
+  images: string[]
+  category: string
+  price: number
+  stock: number
+  ratingAverage: number
+  ratingCount: number
+  url: string
+}
+
+export function getProductStructuredData(product: ProductStructuredDataInput) {
+  const purchaseChannel = resolveProductPurchaseChannel(product)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': product.url,
+    name: product.name,
+    description: product.description,
+    image: product.images,
+    category: product.category,
+    brand: {
+      '@type': 'Brand',
+      name: STORE_NAME,
+    },
+    offers: {
+      '@type': 'Offer',
+      url: product.url,
+      price: product.price,
+      priceCurrency: CURRENCY_CODE,
+      itemCondition: 'https://schema.org/NewCondition',
+      ...(purchaseChannel.type === 'direct' && {
+        availability:
+          product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      }),
+    },
+    ...(product.ratingCount > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.ratingAverage,
+        reviewCount: product.ratingCount,
+      },
+    }),
   }
 }
