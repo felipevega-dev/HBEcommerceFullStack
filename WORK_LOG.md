@@ -916,6 +916,39 @@ en `harrys-boutique-next/`.
 - Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
   `git diff --check` correctos.
 
+## 2026-07-16 - Neutralización editorial de páginas interiores
+
+- Rama usada: `codex/editorial-neutralization`.
+- Objetivo: reducir la acumulación de crema, rosa y dorado fuera del Home para
+  recuperar contraste y una percepción más sobria y profesional.
+- Cambios realizados:
+  - El shell público interior usa fondo gris marfil, superficies blancas,
+    bordes neutros y eyebrows gris cálido.
+  - El Home restablece explícitamente sus tokens cálidos originales y conserva
+    su composición sin cambios visuales.
+  - FAQ, Envíos y Devoluciones reemplazan paneles teñidos por tarjetas blancas;
+    Mercado Libre conserva el amarillo solo como icono y filete de identificación.
+  - Carrito y Favoritos usan estados editoriales blancos con sombras neutras.
+  - Contacto y Nosotros mantienen sus fotografías y tipografía, pero reducen
+    fondos crema, rosa y radios excesivos.
+  - Footer y drawer del carrito pasan a superficies blancas y neutrales.
+- Revisión visual:
+  - Home, Tienda, producto Mercado Libre, FAQ, carrito, Contacto y Nosotros.
+  - Viewports de 375 y 1280 px sin overflow, pantallas vacías ni overlays.
+  - El único 404 detectado corresponde al `favicon.ico` preexistente.
+- Validaciones:
+  - `npx next typegen`.
+  - `npm run type-check`.
+  - `npm run test`: 29 archivos y 308 pruebas.
+  - `npm run build`.
+  - `git diff --check`.
+  - Los archivos intervenidos pasan Prettier.
+  - `npm run lint` conserva advertencias de formato preexistentes en 112
+    archivos ajenos a esta fase.
+- Resultado: la identidad handmade se conserva mediante tipografía, fotografía
+  y pequeños acentos; las superficies interiores dejan de competir con el
+  producto y el contenido.
+
 ## 2026-07-16 - Confianza y postventa según canal de compra
 
 - Rama usada: `codex/channel-trust-postsale`.

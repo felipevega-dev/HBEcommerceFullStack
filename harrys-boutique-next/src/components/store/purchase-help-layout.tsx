@@ -15,9 +15,9 @@ export function PurchaseHelpHero({
   description: string
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-[#ead9ca] bg-[linear-gradient(135deg,#fffaf4_0%,#f5e8dc_100%)] px-7 py-11 shadow-[0_18px_45px_rgba(70,48,35,0.07)] sm:px-11 sm:py-14 lg:px-16">
-      <div className="pointer-events-none absolute inset-3 rounded-[1.45rem] border border-dashed border-[#d8ba83]/70" />
-      <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full border border-[#dec59c]/60" />
+    <section className="relative overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-[linear-gradient(135deg,#ffffff_0%,#f1f1ee_100%)] px-7 py-11 shadow-[0_16px_40px_rgba(20,20,20,0.05)] sm:px-11 sm:py-14 lg:px-16">
+      <div className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-dashed border-[#d5d5cf]" />
+      <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full border border-[#d6d6d0]" />
       <div className="relative max-w-3xl">
         <p className="ui-eyebrow">{eyebrow}</p>
         <h1
@@ -54,16 +54,16 @@ export function PurchaseChannelGuide({ channels }: { channels: PurchaseChannelHe
           return (
             <article
               key={item.channel}
-              className={`relative overflow-hidden rounded-[1.5rem] border p-6 sm:p-8 ${
-                isMercadoLibre ? 'border-[#efcf7c] bg-[#fff9ea]' : 'border-[#e4d7ca] bg-white'
+              className={`relative overflow-hidden rounded-[1.25rem] border bg-white p-6 sm:p-8 ${
+                isMercadoLibre
+                  ? 'border-[#ded9ca] shadow-[inset_3px_0_0_#d7a51f]'
+                  : 'border-[#deded9]'
               }`}
             >
               <div className="flex items-start gap-4">
                 <span
                   className={`grid h-12 w-12 shrink-0 place-items-center rounded-full ${
-                    isMercadoLibre
-                      ? 'bg-[#ffe7a7] text-[#76520d]'
-                      : 'bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]'
+                    isMercadoLibre ? 'bg-[#ffe7a7] text-[#76520d]' : 'bg-[#efefec] text-[#3d3d39]'
                   }`}
                 >
                   <BrandIcon
@@ -121,7 +121,7 @@ export function PurchaseHelpCta({
   description?: string
 }) {
   return (
-    <section className="mt-12 rounded-[1.5rem] border border-[#e5d5c5] bg-[var(--color-surface)] p-7 text-center sm:p-9">
+    <section className="mt-12 rounded-[1.25rem] border border-[#deded9] bg-white p-7 text-center sm:p-9">
       <h2
         className="text-3xl text-[var(--color-text-primary)]"
         style={{ fontFamily: 'var(--font-display)' }}

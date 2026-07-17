@@ -145,6 +145,30 @@
 }
 
 @layer components {
+  .store-neutral-shell {
+    --color-surface: #ffffff;
+    --color-surface-2: #f0f0ed;
+    --color-border: #deded9;
+    --color-border-strong: #c9c8c2;
+    --color-accent-light: #f2eeee;
+  }
+
+  .store-neutral-shell .ui-eyebrow {
+    color: #6b6660;
+  }
+
+  .store-neutral-shell .home-warm {
+    --color-surface: #fffdf8;
+    --color-surface-2: var(--color-surface-warm);
+    --color-border: #e6d8c8;
+    --color-border-strong: #cfbda9;
+    --color-accent-light: var(--color-accent-soft);
+  }
+
+  .store-neutral-shell .home-warm .ui-eyebrow {
+    color: var(--color-accent-dark);
+  }
+
   .ui-container {
     width: min(100%, var(--content-max-width));
     margin-inline: auto;

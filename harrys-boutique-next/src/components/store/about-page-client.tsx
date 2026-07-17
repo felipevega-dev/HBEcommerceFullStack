@@ -10,7 +10,7 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
   const values = content.values.slice(0, 4)
 
   return (
-    <main className="bg-[var(--color-background)]">
+    <main>
       <section className="ui-container pb-10 pt-5 sm:pb-16 sm:pt-8 lg:pb-20 lg:pt-10">
         <nav aria-label="breadcrumb" className="mb-8 text-sm text-[var(--color-text-muted)]">
           <Link href="/" className="hover:text-[var(--color-text-primary)]">
@@ -22,7 +22,7 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
           <span className="text-[var(--color-text-primary)]">{content.heroEyebrow}</span>
         </nav>
 
-        <div className="grid overflow-hidden rounded-[2rem] bg-[var(--color-surface)] lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-white lg:grid-cols-[0.9fr_1.1fr]">
           <div className="flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16 lg:py-16">
             <p className="ui-eyebrow">{content.heroEyebrow}</p>
             <h1
@@ -85,7 +85,7 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
         </div>
       </section>
 
-      <section className="bg-[var(--color-surface)]">
+      <section className="border-y border-[#deded9] bg-white">
         <div className="ui-container grid gap-12 py-16 sm:py-20 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
           <div>
             <p className="ui-eyebrow">El oficio detrás de cada pieza</p>
@@ -102,7 +102,7 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {values.map((value) => (
-              <article key={value.title} className="ui-card bg-[var(--color-background)] p-6">
+              <article key={value.title} className="ui-card bg-[#f4f4f1] p-6">
                 <BrandIcon name={value.icon} className="h-6 w-6 text-[var(--color-accent)]" />
                 <h3 className="mt-5 text-lg font-medium text-[var(--color-text-primary)]">
                   {value.title}

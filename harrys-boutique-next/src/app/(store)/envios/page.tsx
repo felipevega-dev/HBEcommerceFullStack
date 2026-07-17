@@ -56,8 +56,8 @@ export default async function ShippingPage() {
       <PurchaseChannelGuide channels={channels} />
 
       <section className="mt-14 grid gap-7 lg:grid-cols-[0.9fr_1.1fr]">
-        <article className="rounded-[1.5rem] border border-[#e5d6c8] bg-[var(--color-surface)] p-7 sm:p-9">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-[var(--color-accent-strong)]">
+        <article className="rounded-[1.25rem] border border-[#deded9] bg-white p-7 sm:p-9">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-[#efefec] text-[#3d3d39]">
             <BrandIcon name="shipping" className="h-5 w-5" />
           </span>
           <p className="ui-eyebrow mt-6">Compra directa</p>
@@ -70,7 +70,7 @@ export default async function ShippingPage() {
           <p className="mt-4 text-sm leading-7 text-[var(--color-text-secondary)]">
             {getDirectShippingSummary(pricing)} El valor final se confirma en el resumen del pedido.
           </p>
-          <dl className="mt-6 space-y-3 border-t border-[#dfd1c3] pt-5 text-sm">
+          <dl className="mt-6 space-y-3 border-t border-[#deded9] pt-5 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-[var(--color-text-secondary)]">Tarifa base</dt>
               <dd className="font-semibold text-[var(--color-text-primary)]">
@@ -105,7 +105,7 @@ export default async function ShippingPage() {
             {directEstimates.map((item) => (
               <article
                 key={item.zone}
-                className="rounded-[1.15rem] border border-[#e8ddd2] bg-white p-5"
+                className="rounded-[1rem] border border-[#dfdfda] bg-white p-5"
               >
                 <p className="font-semibold text-[var(--color-text-primary)]">{item.zone}</p>
                 <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{item.estimate}</p>
@@ -115,7 +115,7 @@ export default async function ShippingPage() {
         </section>
       </section>
 
-      <section className="mt-10 rounded-[1.5rem] border border-[#ead09a] bg-[#fff9ea] p-7 sm:p-9">
+      <section className="mt-10 rounded-[1.25rem] border border-[#ded9ca] bg-white p-7 shadow-[inset_3px_0_0_#d7a51f] sm:p-9">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#ffe7a7] text-[#76520d]">
             <BrandIcon name="package" className="h-5 w-5" />

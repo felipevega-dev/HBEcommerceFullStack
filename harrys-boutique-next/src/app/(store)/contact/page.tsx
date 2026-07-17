@@ -33,9 +33,9 @@ const contactItems = [
 
 export default function ContactPage() {
   return (
-    <main className="bg-[var(--color-background)]">
+    <main>
       <section className="ui-container py-10 sm:py-16 lg:py-20">
-        <div className="grid overflow-hidden rounded-[2rem] bg-[var(--color-surface)] lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="grid overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-white lg:grid-cols-[0.8fr_1.2fr]">
           <div className="flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16">
             <p className="ui-eyebrow">Hablemos</p>
             <h1
@@ -100,7 +100,7 @@ export default function ContactPage() {
                   rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="ui-card flex items-center gap-4 p-5 transition-transform hover:-translate-y-0.5"
                 >
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#efefec] text-[#3d3d39]">
                     <BrandIcon name={item.icon} className="h-5 w-5" />
                   </span>
                   <span className="min-w-0">
@@ -115,7 +115,7 @@ export default function ContactPage() {
               ))}
             </div>
 
-            <div className="ui-card bg-[var(--color-surface)] p-6">
+            <div className="ui-card bg-white p-6">
               <div className="flex items-start gap-4">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--color-background)] text-[var(--color-accent-strong)]">
                   <BrandIcon name="location" className="h-5 w-5" />

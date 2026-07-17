@@ -42,10 +42,10 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
   if (wishlist.length === 0) {
     return (
       <div className="border-t py-10 sm:py-14">
-        <div className="relative mx-auto max-w-3xl overflow-hidden rounded-[2rem] border border-[#e5d6c8] bg-[linear-gradient(135deg,#fffaf4_0%,#f5e8dc_100%)] p-8 text-center shadow-[0_18px_45px_rgba(70,48,35,0.07)] sm:p-12">
-          <div className="pointer-events-none absolute inset-3 rounded-[1.45rem] border border-dashed border-[#d8ba83]/70" />
+        <div className="relative mx-auto max-w-3xl overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-[linear-gradient(135deg,#ffffff_0%,#f1f1ee_100%)] p-8 text-center shadow-[0_16px_40px_rgba(20,20,20,0.05)] sm:p-12">
+          <div className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-dashed border-[#d5d5cf]" />
           <div className="relative">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[var(--color-accent-dark)]">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[#3d3d39] shadow-[0_4px_14px_rgba(20,20,20,0.06)]">
               <BrandIcon name="heart" className="h-6 w-6" />
             </span>
             <p className="ui-eyebrow mt-5">Tu selección personal</p>
@@ -75,7 +75,7 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
 
   return (
     <div className="border-t py-10">
-      <div className="mb-10 grid gap-5 rounded-[1.5rem] border border-[#e5d6c8] bg-[var(--color-surface)] p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="mb-10 grid gap-5 rounded-[1.25rem] border border-[#deded9] bg-white p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <p className="ui-eyebrow">Tu selección personal</p>
           <h1
@@ -91,7 +91,7 @@ export function WishlistPageClient({ wishlist: initial }: { wishlist: WishlistWi
         </div>
         <div className="rounded-xl border border-[var(--color-border)] bg-white p-5 shadow-[var(--shadow-sm)]">
           <div className="flex items-start gap-3">
-            <span className="rounded-full bg-[var(--color-accent-light)] p-2 text-[var(--color-accent-dark)]">
+            <span className="rounded-full bg-[#efefec] p-2 text-[#3d3d39]">
               <BrandIcon name="sparkles" className="h-5 w-5" />
             </span>
             <div>

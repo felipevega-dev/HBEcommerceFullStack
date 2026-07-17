@@ -21,10 +21,10 @@ export function CartPageClient({
   if (items.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center py-14">
-        <section className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-[#e5d6c8] bg-[linear-gradient(135deg,#fffaf4_0%,#f5e8dc_100%)] p-8 text-center shadow-[0_18px_45px_rgba(70,48,35,0.07)] sm:p-12">
-          <div className="pointer-events-none absolute inset-3 rounded-[1.45rem] border border-dashed border-[#d8ba83]/70" />
+        <section className="relative w-full max-w-3xl overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-[linear-gradient(135deg,#ffffff_0%,#f1f1ee_100%)] p-8 text-center shadow-[0_16px_40px_rgba(20,20,20,0.05)] sm:p-12">
+          <div className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-dashed border-[#d5d5cf]" />
           <div className="relative">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[var(--color-accent-strong)]">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[#3d3d39] shadow-[0_4px_14px_rgba(20,20,20,0.06)]">
               <BrandIcon name="shopping-bag" className="h-6 w-6" />
             </span>
             <p className="ui-eyebrow mt-5">Compra directa</p>

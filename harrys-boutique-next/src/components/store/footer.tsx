@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-[var(--color-border)] bg-[var(--color-surface)] py-14 px-4 sm:px-8">
+    <footer className="mt-16 border-t border-[#deded9] bg-white px-4 py-14 sm:px-8">
       <div className="ui-container">
         {/* Columnas principales */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
@@ -142,7 +142,7 @@ export function Footer() {
             El canal de compra se indica en cada producto:
           </p>
           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold">
-            <span className="rounded-full border border-[#efcf7c] bg-[#fff9ea] px-3 py-2 text-[#76520d]">
+            <span className="rounded-full border border-[#d7c88f] bg-white px-3 py-2 text-[#76520d]">
               Compra protegida en Mercado Libre
             </span>
             <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-2 text-[var(--color-text-primary)]">

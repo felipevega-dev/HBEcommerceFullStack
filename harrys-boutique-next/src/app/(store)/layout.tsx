@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
+    <div className="store-neutral-shell flex min-h-screen flex-col bg-[#f6f6f3]">
       <Navbar />
       <main className="ui-store-main flex-grow">{children}</main>
       <Footer />

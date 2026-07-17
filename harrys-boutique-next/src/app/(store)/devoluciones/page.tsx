@@ -65,7 +65,7 @@ export default async function ReturnsPage() {
       <PurchaseChannelGuide channels={channels} />
 
       <section className="mt-14 grid gap-6 lg:grid-cols-3">
-        <article className="rounded-[1.4rem] border border-[#e5d6c8] bg-white p-6">
+        <article className="rounded-[1.2rem] border border-[#deded9] bg-white p-6">
           <BrandIcon name="handshake" className="h-6 w-6 text-[var(--color-accent-strong)]" />
           <h2 className="mt-5 text-xl font-semibold text-[var(--color-text-primary)]">
             Retracto en compra directa
@@ -75,7 +75,7 @@ export default async function ReturnsPage() {
             los 10 días siguientes a la recepción, siempre que la prenda no haya sido usada.
           </p>
         </article>
-        <article className="rounded-[1.4rem] border border-[#e5d6c8] bg-white p-6">
+        <article className="rounded-[1.2rem] border border-[#deded9] bg-white p-6">
           <BrandIcon name="check-circle" className="h-6 w-6 text-[var(--color-accent-strong)]" />
           <h2 className="mt-5 text-xl font-semibold text-[var(--color-text-primary)]">
             Garantía legal
@@ -86,7 +86,7 @@ export default async function ReturnsPage() {
             corresponde.
           </p>
         </article>
-        <article className="rounded-[1.4rem] border border-[#ead09a] bg-[#fff9ea] p-6">
+        <article className="rounded-[1.2rem] border border-[#ded9ca] bg-white p-6 shadow-[inset_0_3px_0_#d7a51f]">
           <BrandIcon name="design" className="h-6 w-6 text-[#76520d]" />
           <h2 className="mt-5 text-xl font-semibold text-[var(--color-text-primary)]">
             Encargos personalizados
@@ -112,9 +112,9 @@ export default async function ReturnsPage() {
           {directReturnSteps.map((step, index) => (
             <article
               key={step.title}
-              className="rounded-[1.2rem] border border-[#e8ddd2] bg-white p-5"
+              className="rounded-[1rem] border border-[#dfdfda] bg-white p-5"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--color-accent-soft)] text-sm font-bold text-[var(--color-accent-strong)]">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-[#efefec] text-sm font-bold text-[#3d3d39]">
                 {index + 1}
               </span>
               <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">{step.title}</h3>
@@ -126,7 +126,7 @@ export default async function ReturnsPage() {
         </div>
       </section>
 
-      <aside className="mt-10 rounded-[1.35rem] border border-[#e5d6c8] bg-[var(--color-surface)] p-6 text-sm leading-7 text-[var(--color-text-secondary)]">
+      <aside className="mt-10 rounded-[1.15rem] border border-[#deded9] bg-white p-6 text-sm leading-7 text-[var(--color-text-secondary)]">
         <strong className="text-[var(--color-text-primary)]">Importante:</strong> una compra hecha
         en Mercado Libre debe gestionarse desde el detalle de esa compra. Este procedimiento de
         contacto corresponde únicamente a pedidos directos de Harry&apos;s.

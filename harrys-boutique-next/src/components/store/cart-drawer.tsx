@@ -111,7 +111,7 @@ export function CartDrawer() {
                 </div>
               ) : (
                 <>
-                  <div className="rounded-lg border border-[#e7d8c9] bg-[var(--color-surface)] p-3">
+                  <div className="rounded-lg border border-[#deded9] bg-[#f4f4f1] p-3">
                     <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
                       Compra directa Harry&apos;s. El despacho y el total final se confirman antes
                       de pagar.

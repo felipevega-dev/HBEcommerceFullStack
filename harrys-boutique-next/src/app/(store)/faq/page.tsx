@@ -79,7 +79,7 @@ export default async function FaqPage() {
             <section key={section.category} aria-labelledby={`faq-section-${sectionIndex}`}>
               <h3
                 id={`faq-section-${sectionIndex}`}
-                className="mb-4 border-b border-[#e2d3c4] pb-3 text-lg font-semibold text-[var(--color-text-primary)]"
+                className="mb-4 border-b border-[#dcdcd7] pb-3 text-lg font-semibold text-[var(--color-text-primary)]"
               >
                 {section.category}
               </h3>
@@ -87,7 +87,7 @@ export default async function FaqPage() {
                 {section.items.map((item) => (
                   <details
                     key={item.q}
-                    className="group rounded-[1.1rem] border border-[#e8ddd2] bg-white px-5 py-4 open:shadow-[var(--shadow-sm)]"
+                    className="group rounded-[1rem] border border-[#dfdfda] bg-white px-5 py-4 open:shadow-[0_8px_24px_rgba(20,20,20,0.05)]"
                   >
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-[var(--color-text-primary)] marker:hidden">
                       {item.q}

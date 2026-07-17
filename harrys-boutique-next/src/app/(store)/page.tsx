@@ -19,7 +19,7 @@ export default async function HomePage() {
   const homeContent = await getHomeContent()
 
   return (
-    <main className="-mx-4 flex flex-col sm:-mx-[5vw] md:-mx-[7vw] lg:-mx-[9vw]">
+    <main className="home-warm -mx-4 flex flex-col bg-[var(--color-background)] sm:-mx-[5vw] md:-mx-[7vw] lg:-mx-[9vw]">
       <HomeEditorialHero />
       <HomeEditorialSections content={homeContent} />
     </main>
