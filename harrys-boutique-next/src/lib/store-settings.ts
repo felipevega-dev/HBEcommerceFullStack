@@ -81,7 +81,7 @@ export const STORE_SETTING_DEFINITIONS = [
     key: 'store_email',
     label: 'Email de contacto',
     description: 'Correo publico para consultas de clientes.',
-    defaultValue: 'contacto@harrys-boutique.com',
+    defaultValue: 'contacto@harrysboutique.cl',
     type: 'email',
     group: 'contact',
   },

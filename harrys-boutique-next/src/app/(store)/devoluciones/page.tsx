@@ -1,139 +1,141 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import {
+  PurchaseChannelGuide,
+  PurchaseHelpCta,
+  PurchaseHelpHero,
+} from '@/components/store/purchase-help-layout'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { getPricingSettings } from '@/lib/commerce-settings'
+import { PUBLIC_CONTACT_EMAIL, getPurchaseChannelHelp } from '@/lib/purchase-channel-content'
 
 export const metadata: Metadata = {
-  title: "Devoluciones y Cambios — Harry's Boutique",
+  title: "Cambios y devoluciones — Harry's Boutique",
   description:
-    'Conocé nuestra política de devoluciones y cambios. Aceptamos devoluciones dentro de los 7 días de recibido el producto.',
+    'Conoce cómo gestionar devoluciones en Mercado Libre y los derechos aplicables a compras directas de Harry’s Boutique.',
 }
 
-export default function DevolucionesPage() {
+export const dynamic = 'force-dynamic'
+
+const directReturnSteps = [
+  {
+    title: 'Escríbenos',
+    description: `Envía el número de pedido y el motivo a ${PUBLIC_CONTACT_EMAIL}.`,
+  },
+  {
+    title: 'Recibe las instrucciones',
+    description: 'Te responderemos con los pasos y la dirección de devolución correspondientes.',
+  },
+  {
+    title: 'Protege la prenda',
+    description: 'Envíala sin uso, con sus etiquetas y accesorios, en un embalaje adecuado.',
+  },
+  {
+    title: 'Revisión y solución',
+    description:
+      'Al recibirla, confirmaremos si corresponde retracto, cambio, reparación o reembolso.',
+  },
+]
+
+export default async function ReturnsPage() {
+  const pricing = await getPricingSettings()
+  const channels = getPurchaseChannelHelp(pricing)
+
   return (
-    <main className="py-16 px-4 max-w-3xl mx-auto">
-      <nav aria-label="breadcrumb" className="mb-6">
+    <main className="ui-container py-10 sm:py-16">
+      <nav aria-label="Breadcrumb" className="mb-6">
         <ol className="flex gap-2 text-sm text-[var(--color-text-muted)]">
           <li>
-            <Link href="/" className="hover:text-[var(--color-text-primary)] transition-colors">
+            <Link href="/" className="transition-colors hover:text-[var(--color-text-primary)]">
               Inicio
             </Link>
           </li>
-          <li>/</li>
-          <li className="text-[var(--color-text-primary)]">Devoluciones</li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-[var(--color-text-primary)]">
+            Cambios y devoluciones
+          </li>
         </ol>
       </nav>
 
-      <h1
-        className="text-3xl font-medium mb-2 text-[var(--color-text-primary)]"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
-        Devoluciones y Cambios
-      </h1>
-      <p className="text-[var(--color-text-secondary)] mb-12">
-        Tu satisfacción es nuestra prioridad. Si no estás conforme con tu compra, te ayudamos.
-      </p>
+      <PurchaseHelpHero
+        eyebrow="Postventa clara"
+        title="Te acompañamos también después de comprar."
+        description="El procedimiento depende del canal donde completaste el pago. Conserva el comprobante y revisa aquí el camino que corresponde."
+      />
+      <PurchaseChannelGuide channels={channels} />
 
-      <div className="space-y-8">
-        {/* Política */}
-        <section>
-          <h2 className="text-xl font-medium mb-4 text-[var(--color-text-primary)]">
-            Nuestra política
+      <section className="mt-14 grid gap-6 lg:grid-cols-3">
+        <article className="rounded-[1.4rem] border border-[#e5d6c8] bg-white p-6">
+          <BrandIcon name="handshake" className="h-6 w-6 text-[var(--color-accent-strong)]" />
+          <h2 className="mt-5 text-xl font-semibold text-[var(--color-text-primary)]">
+            Retracto en compra directa
           </h2>
-          <div className="bg-[var(--color-surface)] rounded-xl p-6 space-y-3 text-sm text-[var(--color-text-secondary)] leading-relaxed">
-            <p>
-              Aceptamos devoluciones y cambios dentro de los{' '}
-              <strong className="text-[var(--color-text-primary)]">7 días corridos</strong> desde la
-              recepción del producto.
-            </p>
-            <p>
-              El producto debe estar en perfectas condiciones: sin uso, con su etiqueta original y
-              en su embalaje original.
-            </p>
-            <p>
-              Los gastos de envío de la devolución corren por cuenta del cliente, salvo que el
-              producto presente defectos de fabricación.
-            </p>
-          </div>
-        </section>
-
-        {/* Pasos */}
-        <section>
-          <h2 className="text-xl font-medium mb-4 text-[var(--color-text-primary)]">
-            ¿Cómo solicitar una devolución?
+          <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+            Para productos estándar comprados a distancia, puedes solicitar el retracto dentro de
+            los 10 días siguientes a la recepción, siempre que la prenda no haya sido usada.
+          </p>
+        </article>
+        <article className="rounded-[1.4rem] border border-[#e5d6c8] bg-white p-6">
+          <BrandIcon name="check-circle" className="h-6 w-6 text-[var(--color-accent-strong)]" />
+          <h2 className="mt-5 text-xl font-semibold text-[var(--color-text-primary)]">
+            Garantía legal
           </h2>
-          <div className="space-y-3">
-            {[
-              {
-                step: '1',
-                title: 'Contactanos',
-                desc: 'Envianos un email a hola@harrys-boutique.com con tu número de pedido y el motivo de la devolución.',
-              },
-              {
-                step: '2',
-                title: 'Confirmación',
-                desc: 'Te responderemos dentro de las 48 horas hábiles con las instrucciones para el envío de devolución.',
-              },
-              {
-                step: '3',
-                title: 'Envío',
-                desc: 'Empaquetá el producto en su embalaje original y envialo a la dirección que te indicaremos.',
-              },
-              {
-                step: '4',
-                title: 'Reembolso o cambio',
-                desc: 'Una vez recibido y verificado el producto, procesamos el reembolso o el cambio en un plazo de 5 días hábiles.',
-              },
-            ].map((item) => (
-              <div
-                key={item.step}
-                className="flex gap-4 items-start bg-[var(--color-surface)] rounded-xl p-4"
-              >
-                <div className="w-8 h-8 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
-                  {item.step}
-                </div>
-                <div>
-                  <p className="font-medium text-[var(--color-text-primary)] text-sm">
-                    {item.title}
-                  </p>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Excepciones */}
-        <section>
-          <h2 className="text-xl font-medium mb-4 text-[var(--color-text-primary)]">
-            Productos sin devolución
+          <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+            Si el producto presenta una falla, la garantía legal permite solicitar cambio,
+            reparación o devolución dentro de los seis meses siguientes a la recepción, cuando
+            corresponde.
+          </p>
+        </article>
+        <article className="rounded-[1.4rem] border border-[#ead09a] bg-[#fff9ea] p-6">
+          <BrandIcon name="design" className="h-6 w-6 text-[#76520d]" />
+          <h2 className="mt-5 text-xl font-semibold text-[var(--color-text-primary)]">
+            Encargos personalizados
           </h2>
-          <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
-            {[
-              'Productos con signos de uso o lavado',
-              'Productos sin etiqueta original',
-              'Productos en oferta o liquidación (salvo defecto de fabricación)',
-              'Accesorios de higiene por razones sanitarias',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <BrandIcon name="x" className="mt-0.5 h-4 w-4 text-[var(--color-error)]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+          <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+            Las piezas confeccionadas según tus especificaciones pueden tener condiciones
+            particulares. Las informaremos de forma destacada antes de confirmar el encargo y el
+            pago.
+          </p>
+        </article>
+      </section>
 
-      <div className="mt-12 p-6 bg-[var(--color-accent-light)] rounded-xl text-center">
-        <p className="text-[var(--color-text-secondary)] mb-3">
-          ¿Necesitás ayuda con tu devolución?
-        </p>
-        <Link
-          href="/contact"
-          className="inline-block px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors"
+      <section aria-labelledby="direct-return-heading" className="mt-14">
+        <p className="ui-eyebrow">Pedidos directos</p>
+        <h2
+          id="direct-return-heading"
+          className="mt-3 text-4xl text-[var(--color-text-primary)]"
+          style={{ fontFamily: 'var(--font-display)' }}
         >
-          Contactanos
-        </Link>
-      </div>
+          Cómo iniciar una solicitud
+        </h2>
+        <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {directReturnSteps.map((step, index) => (
+            <article
+              key={step.title}
+              className="rounded-[1.2rem] border border-[#e8ddd2] bg-white p-5"
+            >
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--color-accent-soft)] text-sm font-bold text-[var(--color-accent-strong)]">
+                {index + 1}
+              </span>
+              <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">{step.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+                {step.description}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <aside className="mt-10 rounded-[1.35rem] border border-[#e5d6c8] bg-[var(--color-surface)] p-6 text-sm leading-7 text-[var(--color-text-secondary)]">
+        <strong className="text-[var(--color-text-primary)]">Importante:</strong> una compra hecha
+        en Mercado Libre debe gestionarse desde el detalle de esa compra. Este procedimiento de
+        contacto corresponde únicamente a pedidos directos de Harry&apos;s.
+      </aside>
+
+      <PurchaseHelpCta
+        title="Revisemos tu caso"
+        description="Ten a mano el número de pedido, fotografías y una breve descripción. Así podremos orientarte con mayor rapidez."
+      />
     </main>
   )
 }

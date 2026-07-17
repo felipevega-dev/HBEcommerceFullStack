@@ -128,7 +128,7 @@ export function Footer() {
           <div>
             <p className="font-semibold text-[var(--color-text-primary)] mb-3">Newsletter</p>
             <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-              Suscribite para recibir novedades y ofertas exclusivas
+              Suscríbete para recibir novedades y ofertas exclusivas
             </p>
             <Link href="/contact" className="ui-button ui-button-primary">
               Suscribirse
@@ -136,22 +136,18 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Métodos de pago */}
+        {/* Canales de compra */}
         <div className="border-t border-[var(--color-border)] pt-6 mb-6">
-          <p className="text-xs text-[var(--color-text-secondary)] mb-3">Pagos seguros con:</p>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center h-8 px-2 rounded border border-[var(--color-border)] bg-white">
-              <span className="text-xs font-bold text-[#009ee3]">MP</span>
-            </div>
-            <div className="flex items-center justify-center h-8 px-2 rounded border border-[var(--color-border)] bg-white">
-              <span className="text-xs font-bold text-[#1a1f71] tracking-wider">VISA</span>
-            </div>
-            <div className="flex items-center justify-center h-8 px-2 rounded border border-[var(--color-border)] bg-white">
-              <svg width="32" height="20" viewBox="0 0 32 20" aria-label="Mastercard" role="img">
-                <circle cx="12" cy="10" r="9" fill="#eb001b" />
-                <circle cx="20" cy="10" r="9" fill="#f79e1b" fillOpacity="0.85" />
-              </svg>
-            </div>
+          <p className="text-xs text-[var(--color-text-secondary)] mb-3">
+            El canal de compra se indica en cada producto:
+          </p>
+          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold">
+            <span className="rounded-full border border-[#efcf7c] bg-[#fff9ea] px-3 py-2 text-[#76520d]">
+              Compra protegida en Mercado Libre
+            </span>
+            <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-2 text-[var(--color-text-primary)]">
+              Compra directa mediante MercadoPago
+            </span>
           </div>
         </div>
 

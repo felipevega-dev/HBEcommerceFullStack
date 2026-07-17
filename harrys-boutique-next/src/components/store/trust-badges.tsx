@@ -6,23 +6,23 @@ import { ShieldCheck, Truck, Lock, CreditCard } from 'lucide-react'
 const badges = [
   {
     icon: ShieldCheck,
-    title: 'Compra Segura',
-    description: 'Protección SSL',
+    title: 'Compra directa',
+    description: "Solo productos de Harry's",
   },
   {
     icon: Truck,
-    title: 'Envío Gratis',
-    description: 'En compras +$50.000',
+    title: 'Despacho informado',
+    description: 'Revisa el resumen final',
   },
   {
     icon: Lock,
-    title: 'Pago Seguro',
-    description: 'Datos protegidos',
+    title: 'Pago protegido',
+    description: 'Procesado por MercadoPago',
   },
   {
     icon: CreditCard,
-    title: 'Múltiples Métodos',
-    description: 'Tarjeta o efectivo',
+    title: 'Total confirmado',
+    description: 'Antes de finalizar',
   },
 ]
 
