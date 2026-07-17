@@ -916,6 +916,49 @@ en `harrys-boutique-next/`.
 - Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
   `git diff --check` correctos.
 
+## 2026-07-16 - Confianza y postventa según canal de compra
+
+- Rama usada: `codex/channel-trust-postsale`.
+- Objetivo: separar con claridad la compra y postventa de productos publicados
+  en Mercado Libre y productos de compra directa o personalizada en Harry's.
+- Cambios realizados:
+  - FAQ, Envíos y Devoluciones comparten contenido tipado por canal y una
+    presentación editorial coherente con Home y Tienda.
+  - FAQ y JSON-LD se generan desde la misma fuente; los plazos y el umbral de
+    envío directo se leen desde la configuración vigente.
+  - La política directa informa 10 días de retracto para productos estándar y
+    seis meses de garantía legal; los encargos personalizados informan sus
+    condiciones antes de confirmar el pedido.
+  - Footer, checkout, Favoritos, Perfil, Experiencias, seguimiento y carrito
+    usan mensajes neutrales o específicos del canal, sin promesas universales.
+  - Los productos de Mercado Libre omiten `availability` en los datos
+    estructurados hasta contar con sincronización real de stock.
+  - Se eliminan `USPSection` y `OurPolicy`, que no tenían referencias y
+    conservaban promesas obsoletas.
+  - Se añadió la migración idempotente
+    `20260716120000_normalize_store_email`, limitada a correos antiguos
+    conocidos. El valor del proyecto Supabase `Harrysboutique` se actualizó y
+    verificó como `contacto@harrysboutique.cl` sin sobrescribir valores
+    personalizados.
+- Validaciones ejecutadas:
+  - `npm run type-check`.
+  - `npm run test`: 29 archivos y 308 pruebas.
+  - Las 9 pruebas enfocadas de contenido, SEO y Favoritos también pasan.
+  - `npm run build`.
+  - Revisión responsive mediante Chrome DevTools Protocol a 375, 768, 1280 y
+    1440 px, sin desbordamiento horizontal en FAQ, Envíos, Devoluciones y
+    carrito.
+  - El lint global conserva advertencias de formato preexistentes en 101
+    archivos ajenos a esta fase; los archivos intervenidos se formatearon con
+    Prettier.
+- Resultado: ambos canales quedan diferenciados en descubrimiento, confianza y
+  postventa. El stock de Mercado Libre no se inventa ni se deriva del stock
+  local.
+- Pendientes: OAuth y sincronización de precio, stock, órdenes o devoluciones de
+  Mercado Libre permanecen fuera de esta fase.
+- Riesgos: las condiciones legales y comerciales deberán revisarse cuando se
+  incorporen nuevos tipos de productos personalizados o cambie la normativa.
+
 ## 2026-07-13 - Featured Products Admin Control
 
 - Rama usada: `codex/home-content-admin`.
