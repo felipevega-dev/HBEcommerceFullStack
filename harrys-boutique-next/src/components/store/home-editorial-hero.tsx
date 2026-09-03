@@ -103,14 +103,14 @@ const assurances: Array<{ icon: AssuranceIconType; title: string; description: s
 export function HomeEditorialHero() {
   return (
     <section className="w-full bg-[var(--color-background)]">
-      <div className="relative isolate h-[min(85vh,920px)] min-h-[680px] overflow-hidden bg-[var(--color-background)] max-lg:h-auto max-lg:min-h-[700px]">
+      <div className="relative isolate h-auto min-h-[82dvh] overflow-hidden bg-[var(--color-background)] md:min-h-[88dvh] lg:h-[min(85vh,920px)] lg:min-h-[680px]">
         <Image
           src="/hero.png"
           alt="Perro usando una prenda de Harry's Boutique"
           fill
           priority
           sizes="100vw"
-          className="hidden object-cover object-center lg:block"
+          className="hidden object-cover object-right lg:block"
         />
         <Image
           src="/bannermobile.png"
@@ -118,9 +118,9 @@ export function HomeEditorialHero() {
           fill
           priority
           sizes="100vw"
-          className="block object-cover object-top lg:hidden"
+          className="block object-cover object-[center_bottom] lg:hidden"
         />
-        <div className="relative flex h-full flex-col justify-start px-6 pb-12 pt-16 sm:px-12 lg:max-w-[64%] lg:justify-center lg:px-12 lg:pb-10 lg:pt-28 xl:px-16">
+        <div className="relative flex h-full flex-col justify-start px-6 pb-40 pt-16 sm:px-12 sm:pb-44 md:max-w-[32rem] md:pb-48 lg:max-w-[64%] lg:justify-center lg:px-12 lg:pb-10 lg:pt-28 xl:px-16">
           <h1 className="ui-display mt-6 max-w-3xl text-5xl leading-[0.98] sm:text-6xl lg:text-[3.5rem] xl:text-[4.5rem]">
             <span className="lg:hidden">
               Prendas hechas
