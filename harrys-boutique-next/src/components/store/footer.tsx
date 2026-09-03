@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-[#deded9] bg-white px-4 py-14 sm:px-8">
+    <footer className="mt-16 border-t border-[var(--color-stitch-line)] bg-[var(--color-surface)] px-4 py-14 sm:px-8">
       <div className="ui-container">
         {/* Columnas principales */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
@@ -48,7 +48,7 @@ export function Footer() {
 
           {/* Columna 2: Tienda */}
           <div>
-            <p className="font-semibold text-[var(--color-text-primary)] mb-3">Tienda</p>
+            <p className="ui-eyebrow mb-3">Tienda</p>
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
               <li>
                 <Link
@@ -87,7 +87,7 @@ export function Footer() {
 
           {/* Columna 3: Ayuda */}
           <div>
-            <p className="font-semibold text-[var(--color-text-primary)] mb-3">Ayuda</p>
+            <p className="ui-eyebrow mb-3">Ayuda</p>
             <ul className="space-y-2 text-sm text-[var(--color-text-secondary)]">
               <li>
                 <Link
@@ -126,7 +126,7 @@ export function Footer() {
 
           {/* Columna 4: Newsletter */}
           <div>
-            <p className="font-semibold text-[var(--color-text-primary)] mb-3">Newsletter</p>
+            <p className="ui-eyebrow mb-3">Newsletter</p>
             <p className="text-sm text-[var(--color-text-secondary)] mb-3">
               Suscríbete para recibir novedades y ofertas exclusivas
             </p>
@@ -142,10 +142,10 @@ export function Footer() {
             El canal de compra se indica en cada producto:
           </p>
           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold">
-            <span className="rounded-full border border-[#d7c88f] bg-white px-3 py-2 text-[#76520d]">
+            <span className="rounded-full border border-[var(--color-ml-border)] bg-[var(--color-ml-bg)] px-3 py-2 text-[var(--color-ml-text)]">
               Compra protegida en Mercado Libre
             </span>
-            <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-2 text-[var(--color-text-primary)]">
+            <span className="rounded-full border border-[var(--color-stitch-line)] bg-[var(--color-surface)] px-3 py-2 text-[var(--color-text-primary)]">
               Compra directa mediante MercadoPago
             </span>
           </div>

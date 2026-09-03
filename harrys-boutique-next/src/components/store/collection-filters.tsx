@@ -34,10 +34,10 @@ function AccordionSection({
   children: React.ReactNode
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-[#eadfce] bg-white/75">
+    <div className="overflow-hidden rounded-xl border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/75">
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between bg-[#fffaf4] px-5 py-3 text-[#4f423b] transition-colors hover:bg-[#f6ecdf]"
+        className="flex w-full items-center justify-between bg-[var(--color-panel-soft)] px-5 py-3 text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface-2)]"
       >
         <span className="font-medium">{title}</span>
         <svg
@@ -217,7 +217,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
         params.delete(key)
       }
       params.delete('page')
-      router.push(`${pathname}?${params.toString()}`)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
       trackAnalyticsEvent('use_catalog_filter', {
         filter_type: key,
         filter_value: value,
@@ -245,7 +245,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
         params.delete(key)
       }
       params.delete('page')
-      router.push(`${pathname}?${params.toString()}`)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
     },
     [
       router,
@@ -258,7 +258,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
     ],
   )
 
-  const clearAll = () => router.push(pathname)
+  const clearAll = () => router.push(pathname, { scroll: false })
 
   const hasFilters =
     selectedCategories.length > 0 ||
@@ -296,7 +296,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
     <>
       {/* Mobile: "Filtros" button */}
       <button
-        className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[#d9c4ad] bg-white/80 px-4 py-3 text-sm font-semibold text-[#4f423b] shadow-[0_8px_20px_rgba(70,48,35,0.05)] sm:hidden"
+        className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)]/80 px-4 py-3 text-sm font-semibold text-[var(--color-text)] shadow-[var(--shadow-editorial)] sm:hidden"
         onClick={() => setDrawerOpen(true)}
         aria-label="Abrir filtros"
       >
@@ -333,7 +333,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
             />
             {/* Drawer */}
             <motion.div
-              className="fixed left-0 top-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto bg-[#fbf7ef] sm:hidden"
+              className="fixed left-0 top-0 z-50 h-full w-80 max-w-[85vw] overflow-y-auto bg-[var(--color-background)] sm:hidden"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -407,7 +407,7 @@ export function CollectionFilters({ categories, colors, sizes, currentParams }: 
 
       {/* Desktop sidebar */}
       <aside className="hidden w-64 flex-shrink-0 sm:block">
-        <div className="sticky top-24 space-y-4 rounded-[1.35rem] border border-[#eadfce] bg-white/70 p-4 shadow-[0_10px_28px_rgba(70,48,35,0.05)]">
+        <div className="sticky top-24 space-y-4 rounded-[1.35rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/70 p-4 shadow-[var(--shadow-editorial)]">
           <div className="mb-2 flex items-end justify-between">
             <div>
               <p className="text-[9px] font-bold tracking-[0.2em] text-[#a96808]">TU SELECCIÓN</p>

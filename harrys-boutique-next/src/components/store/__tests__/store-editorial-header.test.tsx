@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { StoreEditorialHeader } from '../store-editorial-header'
+import { StoreCategoryRow, StoreEditorialHeader } from '../store-editorial-header'
 
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @next/next/no-img-element
@@ -29,13 +29,24 @@ const categories = [
 ]
 
 describe('StoreEditorialHeader', () => {
-  it('mantiene el lenguaje editorial del Home y enlaza categorías a /tienda', () => {
-    render(<StoreEditorialHeader categories={categories} />)
+  it('mantiene el lenguaje editorial del Home', () => {
+    render(<StoreEditorialHeader />)
 
     expect(
       screen.getByRole('heading', { name: /Prendas con oficio, pensadas para acompañarlos/i }),
     ).toBeInTheDocument()
     expect(screen.getByText('Hecho a mano en Chile')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Ver colecciones/i })).toHaveAttribute(
+      'href',
+      '#catalogo',
+    )
+  })
+})
+
+describe('StoreCategoryRow', () => {
+  it('enlaza cada categoría destacada a /tienda', () => {
+    render(<StoreCategoryRow categories={categories} />)
+
     expect(screen.getByRole('link', { name: /Prendas/i })).toHaveAttribute(
       'href',
       '/tienda?category=Prendas',

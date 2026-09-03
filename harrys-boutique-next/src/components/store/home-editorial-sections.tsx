@@ -1,51 +1,25 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Image from 'next/image'
-import type { HomeContent } from '@/lib/home-content'
-import type { HomeProduct } from '@/lib/home-content'
-import { resolveProductPurchaseChannel } from '@/lib/mercado-libre'
-import { MercadoLibreLink } from './mercado-libre-link'
+import type { HomeContent, HomeProduct } from '@/lib/home-content'
+import { EditorialArrow, SectionTitle } from './editorial'
+import { ProductCard } from './product-card'
 
 type Tone = 'peach' | 'stone' | 'ink' | 'sage' | 'sand' | 'denim'
 
-function Arrow() {
+function HomeProductCard({ product }: { product: HomeProduct }) {
   return (
-    <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 20 20" fill="none">
-      <path
-        d="M3 10h13M11 5l5 5-5 5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function HomeProductAction({ product }: { product: HomeProduct }) {
-  const channel = resolveProductPurchaseChannel(product)
-
-  if (channel.type === 'mercadolibre') {
-    return (
-      <MercadoLibreLink
-        href={channel.listing.url}
-        itemId={channel.listing.itemId}
-        productId={product.id}
-        productName={product.name}
-        location="featured_section"
-        className="inline-flex items-center gap-2 rounded-full border border-[#e8c56c] bg-[#fff8e8] px-3 py-2 text-xs font-semibold text-[#684707] transition-colors hover:bg-[#ffefc5]"
-      >
-        Comprar en Mercado Libre <Arrow />
-      </MercadoLibreLink>
-    )
-  }
-
-  return (
-    <Link
-      href={product.href}
-      className="inline-flex items-center gap-2 rounded-full border border-[#eee4dd] px-3 py-2 text-xs font-semibold text-[#29231f] transition-colors hover:border-[#d79a18] hover:text-[#a96808]"
-    >
-      Comprar en Harry&apos;s <Arrow />
-    </Link>
+    <ProductCard
+      product={{
+        id: product.id,
+        slug: product.href.replace(/^\/product\//, ''),
+        name: product.name,
+        price: product.price,
+        images: product.image ? [product.image] : [],
+        isNew: product.isNew,
+        mercadoLibreUrl: product.mercadoLibreUrl,
+        mercadoLibreItemId: product.mercadoLibreItemId,
+      }}
+    />
   )
 }
 
@@ -112,40 +86,6 @@ function Placeholder({
   )
 }
 
-function SectionTitle({
-  eyebrow,
-  title,
-  link,
-  href,
-}: {
-  eyebrow: string
-  title: string
-  link?: string
-  href?: string
-}) {
-  return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <p className="text-[10px] font-bold tracking-[0.2em] text-[#d79a18]">{eyebrow}</p>
-        <h2
-          className="mt-3 text-4xl leading-none text-[#1b1b1b] sm:text-5xl"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          {title}
-        </h2>
-      </div>
-      {link && href && (
-        <Link
-          href={href}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#1b1b1b] hover:text-[#a96808]"
-        >
-          {link} <Arrow />
-        </Link>
-      )}
-    </div>
-  )
-}
-
 export function HomeEditorialSections({ content }: { content: HomeContent }) {
   return (
     <div className="mx-auto w-full max-w-[1536px] space-y-20 px-4 py-14 sm:px-6 sm:py-20 lg:space-y-28 lg:px-8 lg:py-24">
@@ -161,11 +101,11 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
             <Link
               key={collection.id}
               href={collection.href}
-              className="group overflow-hidden rounded-[1.5rem] bg-white shadow-[0_10px_30px_rgba(70,48,35,0.06)]"
+              className="group overflow-hidden rounded-[1.5rem] bg-[var(--color-surface)] shadow-[var(--shadow-editorial)]"
             >
               <div className="relative aspect-[1.08] overflow-hidden">
                 <Placeholder
-                  label={`Fotografía colección ${collection.title}`}
+                  label={`Fotograf\u00EDa colecci\u00F3n ${collection.title}`}
                   tone="sage"
                   image={collection.image}
                   className="h-full transition-transform duration-500 group-hover:scale-[1.02]"
@@ -173,23 +113,29 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
               </div>
               <div className="flex items-center justify-between px-5 py-5">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1b1b1b]">{collection.title}</h3>
+                  <h3 className="text-lg font-semibold text-[var(--color-ink)]">
+                    {collection.title}
+                  </h3>
                   {collection.description && (
-                    <p className="mt-1 text-xs text-[#756b63]">{collection.description}</p>
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                      {collection.description}
+                    </p>
                   )}
-                  <p className="mt-1 text-xs text-[#756b63]">Ver colección</p>
+                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                    {`Ver colecci\u00F3n`}
+                  </p>
                 </div>
-                <Arrow />
+                <EditorialArrow />
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="grid overflow-hidden rounded-[2rem] bg-[#f8eee7] lg:grid-cols-2">
+      <section className="grid overflow-hidden rounded-[2rem] bg-[var(--color-panel)] lg:grid-cols-2">
         <div className="relative min-h-[360px] overflow-hidden lg:min-h-[540px]">
           <Placeholder
-            label="Fotografía lifestyle de Harry's Boutique"
+            label={`Fotograf\u00EDa lifestyle de Harry's Boutique`}
             tone="denim"
             className="h-full min-h-[360px] lg:min-h-[540px]"
           />
@@ -202,67 +148,29 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
           />
         </div>
         <div className="relative flex flex-col justify-center px-8 py-14 sm:px-14 lg:px-20">
-          <p className="text-[10px] font-bold tracking-[0.2em] text-[#a96808]">NUESTRA HISTORIA</p>
-          <h2
-            className="mt-5 max-w-md text-5xl leading-[0.96] text-[#1b1b1b] sm:text-6xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Más que ropa, creamos momentos.
+          <p className="ui-eyebrow">NUESTRA HISTORIA</p>
+          <h2 className="ui-display mt-5 max-w-md text-5xl leading-[0.96] sm:text-6xl">
+            {`M\u00E1s que ropa, creamos momentos.`}
           </h2>
-          <p className="mt-7 max-w-md text-base leading-7 text-[#635a54]">
-            Harry&apos;s Boutique nace para acompañar la personalidad y los pequeños rituales que
-            hacen única la vida junto a una mascota.
+          <p className="mt-7 max-w-md text-base leading-7 text-[var(--color-text-secondary)]">
+            {`Harry's Boutique nace para acompa\u00F1ar la personalidad y los peque\u00F1os rituales que hacen \u00FAnica la vida junto a una mascota.`}
           </p>
-          <Link
-            href="/about"
-            className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-[#2f2823] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#a96808]"
-          >
-            Conoce más sobre nosotros <Arrow />
+          <Link href="/about" className="ui-button ui-button-primary mt-8 w-fit rounded-full">
+            {`Conoce m\u00E1s sobre nosotros`} <EditorialArrow />
           </Link>
         </div>
       </section>
 
       <section>
         <SectionTitle
-          eyebrow="SELECCIÓN HARRY'S"
+          eyebrow={`SELECCI\u00D3N HARRY'S`}
           title="Productos destacados"
           link="Ver todos los productos"
           href="/tienda"
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           {content.products.map((product) => (
-            <article
-              key={product.id}
-              className="overflow-hidden rounded-[1.4rem] bg-white shadow-[0_10px_30px_rgba(70,48,35,0.06)]"
-            >
-              <div className="relative">
-                <Placeholder
-                  label={`Fotografía ${product.name}`}
-                  tone="denim"
-                  image={product.image}
-                  className="aspect-square"
-                />
-                {product.isNew && (
-                  <span className="absolute left-4 top-4 rounded-full bg-white px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-[#a96808]">
-                    NUEVO
-                  </span>
-                )}
-                {product.mercadoLibreUrl && (
-                  <span className="absolute bottom-4 left-4 rounded-full border border-[#f2d38c] bg-[#fff8e8]/95 px-2.5 py-1 text-[9px] font-bold text-[#76520d]">
-                    MERCADO LIBRE
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-between gap-3 px-4 py-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-[#29231f]">{product.name}</h3>
-                  <p className="mt-1 text-xs text-[#847970]">
-                    ${product.price.toLocaleString('es-CL')}
-                  </p>
-                </div>
-                <HomeProductAction product={product} />
-              </div>
-            </article>
+            <HomeProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
@@ -270,45 +178,14 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
       {content.categoryBlocks.map((block) => (
         <section key={block.categoryId}>
           <SectionTitle
-            eyebrow="COLECCIÓN"
+            eyebrow={`COLECCI\u00D3N`}
             title={block.title}
-            link="Ver colección"
+            link={`Ver colecci\u00F3n`}
             href={`/tienda?category=${encodeURIComponent(block.title)}`}
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             {block.products.map((product) => (
-              <article
-                key={product.id}
-                className="overflow-hidden rounded-[1.4rem] bg-white shadow-[0_10px_30px_rgba(70,48,35,0.06)]"
-              >
-                <div className="relative">
-                  <Placeholder
-                    label={`Fotografía ${product.name}`}
-                    tone="sand"
-                    image={product.image}
-                    className="aspect-square"
-                  />
-                  {product.isNew && (
-                    <span className="absolute left-4 top-4 rounded-full bg-white px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-[#a96808]">
-                      NUEVO
-                    </span>
-                  )}
-                  {product.mercadoLibreUrl && (
-                    <span className="absolute bottom-4 left-4 rounded-full border border-[#f2d38c] bg-[#fff8e8]/95 px-2.5 py-1 text-[9px] font-bold text-[#76520d]">
-                      MERCADO LIBRE
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-3 px-4 py-4">
-                  <div>
-                    <h3 className="text-sm font-semibold text-[#29231f]">{product.name}</h3>
-                    <p className="mt-1 text-xs text-[#847970]">
-                      ${product.price.toLocaleString('es-CL')}
-                    </p>
-                  </div>
-                  <HomeProductAction product={product} />
-                </div>
-              </article>
+              <HomeProductCard key={product.id} product={product} />
             ))}
           </div>
         </section>
@@ -316,13 +193,13 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
 
       <section className={content.instagramPosts.length === 0 ? 'hidden' : ''}>
         {content.instagramPosts.length > 0 && (
-          <SectionTitle eyebrow="COMUNIDAD" title="Síguenos en Instagram" />
+          <SectionTitle eyebrow="COMUNIDAD" title={`S\u00EDguenos en Instagram`} />
         )}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-4">
           {content.instagramPosts.map((post, index) => (
             <Placeholder
               key={post.id}
-              label={`Fotografía Instagram ${index + 1}`}
+              label={`Fotograf\u00EDa Instagram ${index + 1}`}
               tone={(['peach', 'sand', 'denim', 'sage', 'stone', 'ink'] as Tone[])[index]}
               image={post.imageUrl}
               href={post.instagramUrl}
@@ -334,9 +211,9 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
           href="https://www.instagram.com/harrysboutique.cl/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#1b1b1b] hover:text-[#a96808]"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-ink)] hover:text-[var(--color-gold-dark)]"
         >
-          @harrysboutique.cl <Arrow />
+          @harrysboutique.cl <EditorialArrow />
         </a>
       </section>
 
@@ -344,64 +221,40 @@ export function HomeEditorialSections({ content }: { content: HomeContent }) {
         className={`grid gap-8 lg:grid-cols-[0.62fr_1.38fr] lg:items-center ${content.testimonial ? '' : 'hidden'}`}
       >
         <div>
-          <p className="text-[10px] font-bold tracking-[0.2em] text-[#d79a18]">
-            COMUNIDAD HARRY&apos;S
-          </p>
-          <h2
-            className="mt-3 text-5xl leading-[0.95] text-[#1b1b1b] sm:text-6xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <p className="ui-eyebrow">COMUNIDAD HARRY&apos;S</p>
+          <h2 className="ui-display mt-3 text-5xl leading-[0.95] sm:text-6xl">
             Lo que dicen nuestros clientes
           </h2>
         </div>
         {content.testimonial && (
-          <div className="rounded-[1.5rem] bg-white px-8 py-9 shadow-[0_12px_35px_rgba(70,48,35,0.07)] sm:px-12">
-            <p className="text-sm tracking-[0.25em] text-[#d79a18]">
-              {'★'.repeat(Math.max(0, Math.min(5, content.testimonial.rating)))}
+          <div className="rounded-[1.5rem] bg-[var(--color-surface)] px-8 py-9 shadow-[var(--shadow-editorial)] sm:px-12">
+            <p className="text-sm tracking-[0.25em] text-[var(--color-gold)]">
+              {'\u2605'.repeat(Math.max(0, Math.min(5, content.testimonial.rating)))}
             </p>
-            <blockquote
-              className="mt-5 max-w-2xl text-2xl leading-relaxed text-[#2b2521]"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              “{content.testimonial.comment}”
+            <blockquote className="ui-display mt-5 max-w-2xl text-2xl leading-relaxed">
+              {'\u201C'}
+              {content.testimonial.comment}
+              {'\u201D'}
             </blockquote>
-            <p className="mt-5 text-sm text-[#7e746d]">
+            <p className="mt-5 text-sm text-[var(--color-text-secondary)]">
               {content.testimonial.name}
-              {content.testimonial.role ? ` · ${content.testimonial.role}` : ''}
+              {content.testimonial.role ? ` \u00B7 ${content.testimonial.role}` : ''}
             </p>
           </div>
         )}
-        <div className="hidden rounded-[1.5rem] bg-white px-8 py-9 shadow-[0_12px_35px_rgba(70,48,35,0.07)] sm:px-12">
-          <p className="text-sm tracking-[0.25em] text-[#d79a18]">★★★★★</p>
-          <blockquote
-            className="mt-5 max-w-2xl text-2xl leading-relaxed text-[#2b2521]"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            “Tu experiencia con Harry&apos;s Boutique podría aparecer aquí.”
-          </blockquote>
-          <p className="mt-5 text-sm text-[#7e746d]">
-            Espacio reservado para testimonios verificados.
-          </p>
-        </div>
       </section>
 
-      <section className="grid overflow-hidden rounded-[2rem] bg-[#f6eee8] lg:grid-cols-[0.62fr_0.78fr_1fr]">
+      <section className="grid overflow-hidden rounded-[2rem] bg-[var(--color-panel)] lg:grid-cols-[0.62fr_0.78fr_1fr]">
         <div className="flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-10">
-          <p className="text-[10px] font-bold tracking-[0.2em] text-[#d79a18]">VISÍTANOS</p>
-          <h2
-            className="mt-4 text-4xl leading-none text-[#1b1b1b]"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <p className="ui-eyebrow">{`VIS\u00CDTANOS`}</p>
+          <h2 className="ui-display mt-4 text-4xl leading-none">
             Encuentra a Harry&apos;s Boutique
           </h2>
-          <p className="mt-5 text-sm leading-6 text-[#6e635c]">
-            La ubicación, horarios y referencias se publicarán desde información verificada.
+          <p className="mt-5 text-sm leading-6 text-[var(--color-text-secondary)]">
+            {`La ubicaci\u00F3n, horarios y referencias se publicar\u00E1n desde informaci\u00F3n verificada.`}
           </p>
-          <Link
-            href="/contact"
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-[#2d2724] px-4 py-2.5 text-sm font-semibold text-[#29231f] transition-colors hover:bg-[#1b1b1b] hover:text-white"
-          >
-            Consultar ubicación <Arrow />
+          <Link href="/contact" className="ui-button ui-button-secondary mt-7 w-fit rounded-full">
+            {`Consultar ubicaci\u00F3n`} <EditorialArrow />
           </Link>
         </div>
         <div className="relative min-h-[260px] overflow-hidden">

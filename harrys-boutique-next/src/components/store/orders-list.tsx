@@ -61,7 +61,9 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
   if (orders.length === 0) {
     return (
       <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4">
-        <p className="text-gray-500 text-center">No tienes pedidos aún. ¡Empieza a comprar!</p>
+        <p className="text-[var(--color-text-muted)] text-center">
+          No tienes pedidos aún. ¡Empieza a comprar!
+        </p>
       </div>
     )
   }
@@ -79,20 +81,22 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
         const shippingFee = Math.max(0, Number(order.amount) + discountAmount - itemsSubtotal)
 
         return (
-          <div key={order.id} className="bg-white rounded-lg shadow-sm overflow-hidden border">
+          <div key={order.id} className="ui-card overflow-hidden rounded-lg">
             <div className="p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Orden #{order.id.slice(-8).toUpperCase()}</p>
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    Orden #{order.id.slice(-8).toUpperCase()}
+                  </p>
                   <div className="flex items-center gap-4 mt-2">
                     <p className="text-xl font-medium">
                       ${Number(order.amount).toLocaleString('es-CL')}
                     </p>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-[var(--color-text-muted)]">
                       {order.items.length} {order.items.length === 1 ? 'producto' : 'productos'}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-[var(--color-text-muted)] mt-1">
                     {new Date(order.createdAt).toLocaleDateString('es-CL', {
                       year: 'numeric',
                       month: 'long',
@@ -108,15 +112,17 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">{order.paymentMethod}</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-[var(--color-text-muted)]">
+                      {order.paymentMethod}
+                    </span>
+                    <span className="text-sm text-[var(--color-text-muted)]">
                       {PAYMENT_STATUS_LABELS[order.paymentStatus]}
                     </span>
                   </div>
 
                   <button
                     onClick={() => setExpanded(isExpanded ? null : order.id)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="rounded-full p-2 transition-colors hover:bg-[var(--color-panel-soft)]"
                   >
                     <svg
                       className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
@@ -137,7 +143,7 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
 
               {/* Expanded details */}
               {isExpanded && (
-                <div className="mt-4 bg-gray-50 p-6 rounded-lg space-y-6">
+                <div className="mt-4 space-y-6 rounded-lg bg-[var(--color-panel-soft)] p-6">
                   <OrderStoryTracker
                     status={order.status}
                     paymentStatus={order.paymentStatus}
@@ -155,7 +161,7 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                     {order.items.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm"
+                        className="flex items-center gap-4 rounded-lg bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)]"
                       >
                         {item.image && (
                           <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
@@ -170,7 +176,7 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                         )}
                         <div className="flex-1">
                           <p className="font-medium">{item.name}</p>
-                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                          <div className="flex items-center gap-4 mt-1 text-sm text-[var(--color-text-secondary)]">
                             <span>Talla: {item.size}</span>
                             <span>Cantidad: {item.quantity}</span>
                             <span>${Number(item.price).toLocaleString('es-CL')}</span>
@@ -184,19 +190,19 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                   </div>
 
                   {/* Cost breakdown */}
-                  <div className="bg-white p-4 rounded-lg space-y-2">
+                  <div className="space-y-2 rounded-lg bg-[var(--color-surface)] p-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal:</span>
+                      <span className="text-[var(--color-text-secondary)]">Subtotal:</span>
                       <span>${itemsSubtotal.toLocaleString('es-CL')}</span>
                     </div>
                     {discountAmount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Descuento:</span>
+                        <span className="text-[var(--color-text-secondary)]">Descuento:</span>
                         <span>-${discountAmount.toLocaleString('es-CL')}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Envío:</span>
+                      <span className="text-[var(--color-text-secondary)]">Envío:</span>
                       <span>
                         {shippingFee === 0 ? 'Gratis' : `$${shippingFee.toLocaleString('es-CL')}`}
                       </span>
@@ -209,50 +215,50 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
 
                   {/* Shipping info */}
                   {address && (
-                    <div className="bg-white p-4 rounded-lg">
+                    <div className="rounded-lg bg-[var(--color-surface)] p-4">
                       <h4 className="font-medium mb-4">Información de envío</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600">Nombre:</span>
+                          <span className="text-[var(--color-text-secondary)]">Nombre:</span>
                           <p>
                             {address.firstname} {address.lastname}
                           </p>
                         </div>
                         {address.email && (
                           <div>
-                            <span className="text-gray-600">Email:</span>
+                            <span className="text-[var(--color-text-secondary)]">Email:</span>
                             <p>{address.email}</p>
                           </div>
                         )}
                         {address.phone && (
                           <div>
-                            <span className="text-gray-600">Teléfono:</span>
+                            <span className="text-[var(--color-text-secondary)]">Teléfono:</span>
                             <p>{address.phone}</p>
                           </div>
                         )}
                         <div>
-                          <span className="text-gray-600">Dirección:</span>
+                          <span className="text-[var(--color-text-secondary)]">Dirección:</span>
                           <p>{address.street}</p>
                         </div>
                         <div>
-                          <span className="text-gray-600">Ciudad:</span>
+                          <span className="text-[var(--color-text-secondary)]">Ciudad:</span>
                           <p>{address.city}</p>
                         </div>
                         {address.region && (
                           <div>
-                            <span className="text-gray-600">Región:</span>
+                            <span className="text-[var(--color-text-secondary)]">Región:</span>
                             <p>{address.region}</p>
                           </div>
                         )}
                         {order.courier && (
                           <div>
-                            <span className="text-gray-600">Courier:</span>
+                            <span className="text-[var(--color-text-secondary)]">Courier:</span>
                             <p>{order.courier}</p>
                           </div>
                         )}
                         {order.trackingNumber && (
                           <div>
-                            <span className="text-gray-600">Seguimiento:</span>
+                            <span className="text-[var(--color-text-secondary)]">Seguimiento:</span>
                             <p>{order.trackingNumber}</p>
                           </div>
                         )}

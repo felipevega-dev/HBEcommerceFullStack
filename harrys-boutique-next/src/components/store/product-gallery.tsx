@@ -31,8 +31,8 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             onClick={() => setCurrent(i)}
             className={`relative flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-lg overflow-hidden border-2 transition-all ${
               i === current
-                ? 'border-[var(--color-accent)]'
-                : 'border-transparent hover:border-gray-300'
+                ? 'border-[var(--color-gold)]'
+                : 'border-transparent hover:border-[var(--color-dashed)]'
             }`}
           >
             <Image
@@ -50,7 +50,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
       <div className="flex-1 relative">
         <div
           ref={imgRef}
-          className="relative rounded-xl overflow-hidden bg-gray-100 aspect-[19/20] cursor-zoom-in"
+          className="relative aspect-[19/20] cursor-zoom-in overflow-hidden rounded-xl bg-[var(--color-panel-soft)]"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
@@ -78,7 +78,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
         <div className="absolute top-4 right-4 flex gap-2 z-10">
           <button
             onClick={() => setZoom((z) => Math.min(3, z + 0.5))}
-            className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
+            className="rounded-full bg-[var(--color-surface)]/80 p-2 shadow-lg backdrop-blur-sm transition-colors hover:bg-[var(--color-surface)]"
             title="Acercar"
           >
             <svg
@@ -94,7 +94,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
           </button>
           <button
             onClick={() => setZoom((z) => Math.max(1, z - 0.5))}
-            className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
+            className="rounded-full bg-[var(--color-surface)]/80 p-2 shadow-lg backdrop-blur-sm transition-colors hover:bg-[var(--color-surface)]"
             title="Alejar"
           >
             <svg

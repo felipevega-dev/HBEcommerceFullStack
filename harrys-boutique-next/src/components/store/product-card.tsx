@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import Image from 'next/image'
@@ -20,6 +20,7 @@ interface Product {
   wishlisted?: boolean
   showWishlist?: boolean
   bestSeller?: boolean
+  isNew?: boolean
   mercadoLibreUrl?: string | null
   mercadoLibreItemId?: string | null
   mercadoLibreStatus?: MercadoLibreListingStatus
@@ -34,16 +35,21 @@ export function ProductCard({ product }: { product: Product }) {
   const purchaseChannel = resolveProductPurchaseChannel(product)
 
   return (
-    <article className="group space-y-3 rounded-[1.35rem] border border-transparent p-2 transition-all duration-300 hover:border-[#eadfce] hover:bg-white/70 hover:shadow-[0_14px_34px_rgba(70,48,35,0.06)]">
-      <div className="space-y-2">
+    <article className="group flex h-full flex-col gap-2.5 rounded-[1.35rem] border border-transparent p-1.5 transition-all duration-300 hover:border-[var(--color-stitch-line)] hover:bg-[var(--color-surface)]/70 hover:shadow-[var(--shadow-editorial)]">
+      <div className="flex-1 space-y-2">
         <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-hover)]">
           {product.bestSeller && (
-            <span className="absolute left-2 top-2 z-10 rounded-full bg-[var(--color-gold)] px-2 py-0.5 text-xs font-medium text-white">
+            <span className="absolute left-2 top-2 z-10 rounded-full bg-[var(--color-gold)] px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-white uppercase">
               Más Vendido
             </span>
           )}
+          {product.isNew && !product.bestSeller && (
+            <span className="absolute left-2 top-2 z-10 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-[var(--color-gold-dark)]">
+              NUEVO
+            </span>
+          )}
           {purchaseChannel.type === 'mercadolibre' && (
-            <span className="absolute bottom-2 left-2 z-10 rounded-full border border-[#f2d38c] bg-[#fff8e8]/95 px-2 py-1 text-[10px] font-semibold text-[#76520d] shadow-sm">
+            <span className="absolute bottom-2 left-2 right-2 z-10 truncate rounded-full border border-[var(--color-ml-border)] bg-[var(--color-ml-bg)]/95 px-2 py-1 text-center text-[9px] font-semibold text-[var(--color-ml-text)] shadow-sm">
               Disponible en Mercado Libre
             </span>
           )}
@@ -55,7 +61,7 @@ export function ProductCard({ product }: { product: Product }) {
                   src={image}
                   alt={product.name}
                   fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
                   loading="lazy"
                   className={`object-cover object-center transition-opacity duration-300 ${secondImage ? 'group-hover:opacity-0' : ''}`}
                 />
@@ -64,7 +70,7 @@ export function ProductCard({ product }: { product: Product }) {
                     src={secondImage}
                     alt={`${product.name} - vista alternativa`}
                     fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
                     loading="lazy"
                     className="absolute inset-0 object-cover object-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                   />
@@ -106,7 +112,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="space-y-1 px-1">
           <Link
             href={href}
-            className="line-clamp-2 text-sm text-[var(--color-text-secondary)] transition-colors group-hover:text-[var(--color-primary)]"
+            className="line-clamp-2 text-[13px] leading-5 text-[var(--color-text-secondary)] transition-colors group-hover:text-[var(--color-primary)]"
           >
             {product.name}
           </Link>
@@ -140,12 +146,15 @@ export function ProductCard({ product }: { product: Product }) {
           productName={product.name}
           productSlug={product.slug}
           location="product_card"
-          className="ui-button ui-button-secondary w-full justify-center !border-[#e8c56c] !bg-[#fff8e8] !text-[#684707] hover:!bg-[#ffefc5]"
+          className="ui-button ui-button-ml ui-button-sm w-full justify-center"
         >
           Comprar en Mercado Libre
         </MercadoLibreLink>
       ) : (
-        <Link href={href} className="ui-button ui-button-primary w-full justify-center">
+        <Link
+          href={href}
+          className="ui-button ui-button-primary ui-button-sm w-full justify-center"
+        >
           Comprar en Harry&apos;s
         </Link>
       )}

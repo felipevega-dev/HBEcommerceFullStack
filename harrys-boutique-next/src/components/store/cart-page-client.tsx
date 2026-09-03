@@ -10,6 +10,7 @@ import {
 } from '@/lib/checkout'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { BrandIcon } from '@/components/ui/brand-icon'
+import { EditorialPanel } from './editorial'
 
 export function CartPageClient({
   pricingSettings = DEFAULT_PRICING_SETTINGS,
@@ -21,17 +22,13 @@ export function CartPageClient({
   if (items.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center py-14">
-        <section className="relative w-full max-w-3xl overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-[linear-gradient(135deg,#ffffff_0%,#f1f1ee_100%)] p-8 text-center shadow-[0_16px_40px_rgba(20,20,20,0.05)] sm:p-12">
-          <div className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-dashed border-[#d5d5cf]" />
+        <EditorialPanel className="w-full max-w-3xl p-8 text-center sm:p-12" tone="soft">
           <div className="relative">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[#3d3d39] shadow-[0_4px_14px_rgba(20,20,20,0.06)]">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[var(--color-surface)] text-[var(--color-ink)] shadow-[var(--shadow-editorial)]">
               <BrandIcon name="shopping-bag" className="h-6 w-6" />
             </span>
             <p className="ui-eyebrow mt-5">Compra directa</p>
-            <h1
-              className="mt-3 text-4xl text-[var(--color-text-primary)] sm:text-5xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <h1 className="ui-display mt-3 text-4xl sm:text-5xl">
               Tu carrito está esperando una pieza especial.
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-[var(--color-text-secondary)]">
@@ -48,7 +45,7 @@ export function CartPageClient({
               </Link>
             </div>
           </div>
-        </section>
+        </EditorialPanel>
       </div>
     )
   }
@@ -61,12 +58,7 @@ export function CartPageClient({
     <div className="flex flex-col border-t pt-14">
       <div className="mb-8 text-center">
         <p className="ui-eyebrow">Compra directa Harry&apos;s</p>
-        <h1
-          className="mt-3 text-4xl text-[var(--color-text-primary)]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Carrito de compras
-        </h1>
+        <h1 className="ui-display mt-3 text-4xl">Carrito de compras</h1>
         <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
           Aquí solo aparecen productos directos. El despacho y el total se confirman antes de pagar.
         </p>
@@ -75,7 +67,7 @@ export function CartPageClient({
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Product list */}
         <div className="flex-grow">
-          <div className="hidden sm:grid grid-cols-[4fr_2fr_0.5fr] items-center gap-4 text-sm text-gray-500 pb-4 border-b">
+          <div className="hidden items-center gap-4 border-b border-[var(--color-stitch-line)] pb-4 text-sm text-[var(--color-text-muted)] sm:grid sm:grid-cols-[4fr_2fr_0.5fr]">
             <div>Producto</div>
             <div>Cantidad</div>
             <div />
@@ -84,7 +76,7 @@ export function CartPageClient({
           {items.map((item) => (
             <div
               key={getCartLineKey(item)}
-              className="py-6 border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
+              className="grid grid-cols-[4fr_0.5fr_0.5fr] items-center gap-4 border-b border-[var(--color-stitch-line)] py-6 text-[var(--color-text)] sm:grid-cols-[4fr_2fr_0.5fr]"
             >
               <Link
                 href={`/product/${item.productId}`}
@@ -107,7 +99,7 @@ export function CartPageClient({
                   </p>
                   <div className="flex items-center gap-3 mt-1">
                     <p className="text-sm sm:text-base">${item.price.toLocaleString('es-CL')}</p>
-                    <span className="px-2 py-1 text-xs border rounded-md bg-gray-50">
+                    <span className="rounded-md border border-[var(--color-stitch-line)] bg-[var(--color-panel-soft)] px-2 py-1 text-xs">
                       {item.size}
                     </span>
                   </div>
@@ -115,7 +107,7 @@ export function CartPageClient({
               </Link>
 
               <div className="relative">
-                <div className="sm:hidden absolute -top-4 left-0 text-xs text-gray-500">
+                <div className="absolute -top-4 left-0 text-xs text-[var(--color-text-muted)] sm:hidden">
                   Cantidad
                 </div>
                 <div className="flex items-center gap-2">
@@ -130,9 +122,9 @@ export function CartPageClient({
                         updateQuantity(item.productId, item.size, item.color, value)
                       }
                     }}
-                    className="w-16 px-2 py-1 border rounded-md focus:ring-2 focus:ring-gray-200 focus:border-gray-300 outline-none text-sm"
+                    className="ui-field w-16 px-2 py-1 text-sm"
                   />
-                  <p className="hidden sm:block text-sm text-gray-500">
+                  <p className="hidden text-sm text-[var(--color-text-muted)] sm:block">
                     × ${item.price.toLocaleString('es-CL')}
                   </p>
                 </div>
@@ -166,14 +158,14 @@ export function CartPageClient({
 
         {/* Summary */}
         <div className="lg:w-[380px] space-y-6">
-          <div className="border rounded-xl p-6 space-y-3">
+          <div className="ui-card space-y-3 rounded-xl p-6">
             <h2 className="font-semibold text-lg">Resumen del pedido</h2>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal</span>
+              <span className="text-[var(--color-text-secondary)]">Subtotal</span>
               <span>${subtotal.toLocaleString('es-CL')}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Envío</span>
+              <span className="text-[var(--color-text-secondary)]">Envío</span>
               <span>
                 {shippingFee === 0 ? 'Gratis' : `$${shippingFee.toLocaleString('es-CL')}`}
               </span>

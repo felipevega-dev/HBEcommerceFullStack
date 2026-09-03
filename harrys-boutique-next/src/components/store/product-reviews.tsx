@@ -66,7 +66,7 @@ export function ProductReviews({
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-5 py-3 text-sm capitalize ${activeTab === tab ? 'border-b-2 border-black font-medium' : 'text-gray-500'}`}
+            className={`px-5 py-3 text-sm capitalize ${activeTab === tab ? 'border-b-2 border-[var(--color-ink)] font-medium' : 'text-[var(--color-text-muted)]'}`}
           >
             {tab === 'description' ? 'Descripción' : `Reseñas (${ratingCount})`}
           </button>
@@ -80,17 +80,17 @@ export function ProductReviews({
               <div key={review.id} className="border-b pb-4">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium text-sm">{review.user.name}</span>
-                  <span className="flex gap-0.5 text-yellow-400">
+                  <span className="flex gap-0.5 text-[var(--color-gold)]">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <BrandIcon
                         key={star}
                         name="star"
-                        className={`h-4 w-4 ${star <= review.rating ? 'fill-current' : 'text-gray-200'}`}
+                        className={`h-4 w-4 ${star <= review.rating ? 'fill-current' : 'text-[var(--color-border)]'}`}
                       />
                     ))}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">{review.comment}</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">{review.comment}</p>
               </div>
             ))}
 
@@ -103,7 +103,7 @@ export function ProductReviews({
                       key={s}
                       type="button"
                       onClick={() => setRating(s)}
-                      className={`${s <= rating ? 'text-yellow-400' : 'text-gray-200'}`}
+                      className={`${s <= rating ? 'text-[var(--color-gold)]' : 'text-[var(--color-border)]'}`}
                     >
                       <BrandIcon name="star" className="h-6 w-6 fill-current" />
                     </button>
@@ -116,13 +116,9 @@ export function ProductReviews({
                   rows={3}
                   maxLength={500}
                   required
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  className="ui-field w-full py-2"
                 />
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 disabled:opacity-50"
-                >
+                <button type="submit" disabled={submitting} className="ui-button ui-button-primary">
                   {submitting ? 'Publicando...' : 'Publicar reseña'}
                 </button>
               </form>

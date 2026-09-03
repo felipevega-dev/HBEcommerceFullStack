@@ -1,5 +1,68 @@
 # WORK_LOG.md
 
+## 2026-09-02 - Limpieza final: quitar sección "Guía Harry's" y tokenizar navbar
+
+- Rama usada: `feature/storefront-style-regularization`.
+- Objetivo: cerrar cabos sueltos detectados durante la revisión visual de `/tienda`.
+- Cambios:
+  - Se quitó la sección "Guía Harry's" (3 pasos: talla, personalidad, confianza) al final de `/tienda` por pedido explícito del usuario. Se limpió el import `SectionTitle` que quedó sin uso.
+  - `ProductGridSkeleton` (no usado actualmente pero vivo en el código) tenía columnas/gap desactualizados (`grid-cols-4 gap-6`) respecto al grid real (`xl:5 2xl:6 gap-4/5`); se igualó para evitar un futuro layout shift si se conecta a un `Suspense`.
+  - `CollectionFilters`: el fondo del drawer de filtros mobile usaba `bg-[#fbf7ef]` hardcodeado en vez de `var(--color-background)`.
+  - `Navbar`: quedaban ~15 valores hex sueltos (gradiente de fondo, bordes de dropdowns, texto de links, buscador desktop, indicador de sección activa) de antes de la regularización visual. Se reemplazaron todos por las variables ya definidas en `globals.css` (`--color-stitch-line`, `--color-surface`, `--color-panel-soft`, `--color-surface-warm`, `--color-text-secondary`, `--color-accent`, `--color-ink`, `--color-gold-dark`, `--color-dashed`, `--color-craft-edge`), eligiendo en cada caso el token cuyo valor es igual o casi idéntico al hex original para no alterar el resultado visual.
+- Validaciones: `npm run type-check` OK; `npm run test` OK (309 tests); verificación visual en browser (mobile y `/tienda`); Prettier aplicado.
+- Pendientes sugeridos (no implementados, quedan para decidir prioridad): mensaje de "sin resultados" distinto para búsqueda de texto vs. filtros; estado de carga visual en la grilla mientras se aplica un filtro/búsqueda (hoy no hay feedback de "cargando").
+
+## 2026-09-02 - Hero de /tienda full-bleed + botones pill completos
+
+- Rama usada: `feature/storefront-style-regularization`.
+- Objetivo: eliminar el gap/marco visible entre el navbar y el hero de la tienda (quedaba como card flotante con borde/sombra/esquinas redondeadas) y corregir los botones craft/ghost-gold, que se veían con el exterior en pill pero la "costura" dashed interior con esquinas cuadradas.
+- Archivos modificados: `src/app/(store)/tienda/page.tsx`, `src/components/store/store-editorial-header.tsx`, `src/app/globals.css`.
+- Cambios:
+  - `StoreEditorialHeader` dejó de ser una card (`rounded-[2rem]`, `border`, `shadow`, overlay dashed) para ser una sección `border-b` que respeta el ancho de contenido (`max-w-[1536px]`) pero sin marco propio.
+  - En `tienda/page.tsx` se sacó el hero del contenedor con `pt-6`/padding y se envolvió en `-mx-4 sm:-mx-[5vw] md:-mx-[7vw] lg:-mx-[9vw]` (mismo patrón que usa `HomePage` para el hero), cancelando el padding-inline de `.ui-store-main` y logrando que quede pegado y a todo el ancho justo debajo del navbar.
+  - `.ui-button-craft` y `.ui-button-ghost-gold`: `border-radius` del contenedor y del `<span>` interior (la costura dashed) pasaron de `0.7rem`/`0.375rem` a `9999px` (pill completo). Este fix es global, así que también corrige el hero del Home, que usaba las mismas clases.
+- Validaciones: `npm run type-check` OK; `npm run test` OK (309 tests); verificación visual en browser en `localhost:3000/tienda`.
+- Riesgos: ninguno detectado; cambio es puramente visual y reutiliza clases existentes.
+
+## 2026-09-02 - Fix scroll-jump al buscar + panel promocional en /tienda
+
+- Rama usada: `feature/storefront-style-regularization`.
+- Objetivo: corregir que la página saltara al top al escribir en el buscador (o usar filtros/orden), y quitar el panel "Cada detalle tiene una historia" que cortaba la grilla de productos en medio de una fila.
+- Archivos modificados: `search-input.tsx`, `sort-select.tsx`, `collection-filters.tsx`, `product-grid.tsx`.
+- Causa raíz del scroll-jump: `router.push`/`router.replace` de Next.js hacen scroll-to-top por defecto en cada navegación (aunque sea solo un cambio de query string). Se agregó `{ scroll: false }` a todas las llamadas de navegación del catálogo (búsqueda, orden, filtros de categoría/color/talla, limpiar filtros).
+- Panel promocional: antes se inyectaba dentro del `.map()` de productos en la posición fija `index === 3`, con `col-span` distinto al de la fila (rompía la alineación en xl/2xl con 5-6 columnas y se repetía en cada página). Se sacó del grid y ahora se renderiza como bloque completo debajo de la grilla, una sola vez, solo en la página 1.
+- Validaciones: `npm run type-check` OK; `npm run test` OK (309 tests); Prettier aplicado.
+- Pendientes: revisión visual en browser para confirmar que el scroll ya no salta.
+
+## 2026-09-02 - Densidad y layout de /tienda
+
+- Rama usada: `feature/storefront-style-regularization`.
+- Objetivo: corregir el catálogo desbordado (cards gigantes en pantallas anchas) y adoptar el layout del mockup (hero con foto única, fila de categorías, franja de confianza) manteniendo la paleta cream/oro.
+- Archivos modificados: `src/app/(store)/tienda/page.tsx`, `src/components/store/store-editorial-header.tsx`, `product-card.tsx`, `product-grid.tsx`, `sort-select.tsx`, `src/app/globals.css`, `__tests__/store-editorial-header.test.tsx`.
+- Cambios realizados:
+  - Causa raíz de las "imágenes gigantes": `/tienda` no tenía `max-width` (solo padding en `vw`) y el grid se topaba en `lg:grid-cols-4`. Se añadió `max-w-[1536px]` y escalado `xl:5 / 2xl:6` columnas, con `sizes` de `next/image` acorde.
+  - `ProductCard` compacto: `.ui-button-sm` nuevo, badges de 9px, nombre a 13px, tarjeta en flex column para alturas parejas.
+  - Header de tienda: copy + CTAs a la izquierda y una sola foto lifestyle a la derecha con tres tarjetas de garantía superpuestas (chips apilados en mobile). Se eliminaron las tres tiras verticales de categoría.
+  - Nuevos `StoreCategoryRow` (3 tarjetas landscape) y `StoreTrustStrip` (5 sellos) bajo el header.
+  - Toolbar del catálogo en `flex-wrap` con anchos fijos: se elimina el recorte del buscador y del select de orden.
+- Validaciones: `npm run type-check` OK; `npm run test` OK (309 tests); Prettier aplicado a los archivos tocados.
+- Pendientes: revisión visual en 1440 / 2560 / 390; decidir si `/tienda?category=` merece copy propio en el header.
+- Riesgos: el header usa `/bannerharryluna.JPG` (foto navideña); conviene reemplazarla por una foto de catálogo neutra.
+
+## 2026-09-02 - Regularización visual del storefront
+
+- Rama usada: `feature/storefront-style-regularization`.
+- Objetivo: unificar el storefront con el lenguaje de Home y Tienda (cream, oro, costura dashed, Playfair) y eliminar la piel gris `store-neutral-shell`.
+- Archivos principales: `globals.css`, layout store, `editorial.tsx`, Home/Tienda, nav/footer/drawer, PDP, funnel (cart/checkout/auth/account), about/contact/help.
+- Cambios realizados:
+  - Tokens de marca alineados a Home (`--color-ink`, `--color-stitch-line`, `--color-panel`, CTAs craft/ghost-gold/ML).
+  - `.ui-eyebrow` en oro; una sola piel cream en `(store)`.
+  - Home tokenizado sin rediseño; CTA “Conoce el taller” apunta a `/experiencias#atelier`; cards Home reutilizan `ProductCard`.
+  - Chrome, ficha, carrito, checkout, auth, pedidos, favoritos y páginas de ayuda sin bordes `#deded9`.
+- Validaciones: `npm run type-check` OK; `npm run test` OK (vitest --run).
+- Pendientes: verificación visual en browser (1440 / 390); admin fuera de alcance.
+- Riesgos: `.ui-eyebrow` dorado también aparece en admin si usa esa clase.
+
 ## 2026-07-15 - Experiencia editorial para la tienda
 
 - Rama usada: `codex/collection-editorial-experience`.
@@ -1063,3 +1126,40 @@ en `harrys-boutique-next/`.
     cambiar el flujo de contacto.
 - Validaciones: `npm run type-check`, `npm run build`, `npm run test` y
   `git diff --check` correctos.
+
+## 2026-09-02 - Auditoria responsiva Home + Tienda
+
+- Rama usada: feature/storefront-style-regularization.
+- Objetivo: confirmar que Home y Tienda se ven correctamente en las
+  resoluciones criticas (375, 640, 1024, 1920) tras la regularizacion visual
+  y el fix del hero full-bleed, sin introducir cambios de layout nuevos.
+- Metodo: capturas via CDP (Emulation.setDeviceMetricsOverride) + scroll
+  nativo del navegador embebido en cada breakpoint para Home y Tienda.
+- Resultado:
+  - 375px: hero apilado, tarjetas de confianza legibles, boton "Filtros"
+    full-width, toolbar de busqueda/orden apilado, grid de 2 columnas sin
+    overflow.
+  - 640px: categorias en 2 columnas, sidebar de filtros visible (breakpoint
+    sm), grid de 3 columnas.
+  - 1024px: nav desktop, hero con imagen lateral, categorias en 3 columnas,
+    sidebar + grid de 4 columnas, footer sin solapamientos.
+  - 1920px: layout centrado por max-w-[1536px], sin distorsion.
+  - No se detectaron bugs de layout nuevos; no se requirieron cambios de
+    codigo adicionales.
+- Validaciones ejecutadas sobre archivos modificados en la fase de
+  regularizacion visual (navbar, footer, cart-drawer, product-card,
+  product-grid, collection-filters, tienda/page, home-editorial-*, paginas
+  de ayuda/pago/perfil, etc.):
+  - 
+pm run type-check: OK.
+  - 
+pm run lint: OK para todos los archivos tocados (se corrio
+    prettier --write solo sobre esos archivos; persisten warnings de
+    Prettier preexistentes en ~95 archivos no tocados en esta rama, como
+    src/lib/*.ts y src/components/admin/*, fuera de alcance de esta
+    fase).
+  - 
+pm run test: 309/309 tests pasando (29 archivos).
+- Pendientes: correr prettier --write sobre el resto del repo (admin y
+  lib) en una fase de limpieza aparte, ya que no esta relacionado con la
+  regularizacion visual del storefront.

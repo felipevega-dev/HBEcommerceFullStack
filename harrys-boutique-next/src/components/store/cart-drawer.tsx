@@ -54,7 +54,7 @@ export function CartDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label="Carrito de compras"
-            className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col border-l border-[var(--color-border)] bg-[var(--color-background)] shadow-[var(--shadow-hover)]"
+            className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col border-l border-[var(--color-stitch-line)] bg-[var(--color-surface)] shadow-[var(--shadow-hover)]"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -111,7 +111,7 @@ export function CartDrawer() {
                 </div>
               ) : (
                 <>
-                  <div className="rounded-lg border border-[#deded9] bg-[#f4f4f1] p-3">
+                  <div className="rounded-lg border border-[var(--color-stitch-line)] bg-[var(--color-panel-soft)] p-3">
                     <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
                       Compra directa Harry&apos;s. El despacho y el total final se confirman antes
                       de pagar.

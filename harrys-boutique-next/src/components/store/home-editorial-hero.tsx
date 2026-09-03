@@ -102,8 +102,8 @@ const assurances: Array<{ icon: AssuranceIconType; title: string; description: s
 
 export function HomeEditorialHero() {
   return (
-    <section className="w-full bg-[#fbf7ef]">
-      <div className="relative isolate h-[min(85vh,920px)] min-h-[680px] overflow-hidden bg-[#fbf7ef] max-lg:h-auto max-lg:min-h-[700px]">
+    <section className="w-full bg-[var(--color-background)]">
+      <div className="relative isolate h-[min(85vh,920px)] min-h-[680px] overflow-hidden bg-[var(--color-background)] max-lg:h-auto max-lg:min-h-[700px]">
         <Image
           src="/hero.png"
           alt="Perro usando una prenda de Harry's Boutique"
@@ -121,54 +121,42 @@ export function HomeEditorialHero() {
           className="block object-cover object-top lg:hidden"
         />
         <div className="relative flex h-full flex-col justify-start px-6 pb-12 pt-16 sm:px-12 lg:max-w-[64%] lg:justify-center lg:px-12 lg:pb-10 lg:pt-28 xl:px-16">
-          <h1
-            className="mt-6 max-w-3xl text-5xl leading-[0.98] text-[#10192a] sm:text-6xl lg:text-[3.5rem] xl:text-[4.5rem]"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <h1 className="ui-display mt-6 max-w-3xl text-5xl leading-[0.98] sm:text-6xl lg:text-[3.5rem] xl:text-[4.5rem]">
             <span className="lg:hidden">
               Prendas hechas
               <br />
               a mano para
               <br />
-              <span className="italic text-[#c98612]">tu mejor amigo</span>
+              <span className="italic text-[var(--color-gold-italic)]">tu mejor amigo</span>
             </span>
             <span className="hidden lg:inline">
               Prendas hechas a mano
               <br />
-              para <span className="italic text-[#c98612]">tu mejor amigo</span>
+              para <span className="italic text-[var(--color-gold-italic)]">tu mejor amigo</span>
             </span>
           </h1>
 
-          <div className="mt-6 flex max-w-[36rem] items-center gap-3 text-[#c28a27]">
+          <div className="mt-6 flex max-w-[36rem] items-center gap-3 text-[var(--color-gold)]">
             <span className="h-px flex-1 bg-[repeating-linear-gradient(to_right,currentColor_0_8px,transparent_8px_16px)]" />
             <PawIcon className="h-7 w-7 shrink-0" />
           </div>
 
-          <p className="mt-4 max-w-xl text-base leading-7 text-[#45403d] sm:text-lg sm:leading-8 lg:mt-6">
+          <p className="mt-4 max-w-xl text-base leading-7 text-[var(--color-text-secondary)] sm:text-lg sm:leading-8 lg:mt-6">
             Diseños cómodos, tallas cuidadas y detalles únicos para cada mascota.
           </p>
 
           <div className="mt-6 flex flex-col items-start gap-3 sm:gap-4 lg:mt-8 lg:flex-row lg:flex-wrap">
-            <Link
-              href="/tienda"
-              className="rounded-[0.7rem] border border-[#76410e] bg-[linear-gradient(135deg,#d49824_0%,#a96512_100%)] p-1 text-[#fffdf8] shadow-[inset_0_0_0_2px_rgba(91,50,12,0.35),0_12px_24px_rgba(111,64,16,0.24)] transition-transform hover:-translate-y-0.5 hover:brightness-95 max-lg:w-[180px]"
-            >
-              <span
-                className="inline-flex items-center gap-2 rounded-md border border-dashed border-[#ffe0a2] px-6 py-2.5 text-base sm:px-8 sm:text-lg"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
+            <Link href="/tienda" className="ui-button ui-button-craft max-lg:w-[180px]">
+              <span>
                 Ver prendas
                 <PawIcon className="h-5 w-5" />
               </span>
             </Link>
             <Link
-              href="/tienda?sort=newest"
-              className="rounded-[0.7rem] border border-[#d7b26c] bg-[#fffdf8]/90 p-1 text-[#3a2d26] shadow-[inset_0_0_0_2px_rgba(255,253,248,0.9),0_8px_20px_rgba(77,55,39,0.08)] backdrop-blur-sm transition-colors hover:bg-white max-lg:w-[200px]"
+              href="/experiencias#atelier"
+              className="ui-button ui-button-ghost-gold max-lg:w-[200px]"
             >
-              <span
-                className="inline-flex items-center gap-2 rounded-md border border-dashed border-[#d7b26c] px-6 py-2.5 text-base sm:px-8 sm:text-lg"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
+              <span>
                 Conoce el taller
                 <Arrow />
               </span>
@@ -177,23 +165,20 @@ export function HomeEditorialHero() {
         </div>
       </div>
 
-      <div className="grid w-full grid-cols-2 border-y border-[#eadfce] bg-[#fffdf8] lg:grid-cols-4">
+      <div className="grid w-full grid-cols-2 border-y border-[var(--color-stitch-line)] bg-[var(--color-surface)] lg:grid-cols-4">
         {assurances.map((assurance, index) => (
           <div
             key={assurance.title}
-            className={`flex items-center gap-3 px-4 py-6 sm:gap-5 sm:px-10 sm:py-8 lg:px-12 xl:px-16 ${index > 0 ? 'lg:border-l lg:border-dashed lg:border-[#d8ba83]' : ''} ${index % 2 === 1 ? 'max-lg:border-l max-lg:border-dashed max-lg:border-[#d8ba83]' : ''} ${index > 1 ? 'max-lg:border-t max-lg:border-[#e5d8ce]' : ''}`}
+            className={`flex items-center gap-3 px-4 py-6 sm:gap-5 sm:px-10 sm:py-8 lg:px-12 xl:px-16 ${index > 0 ? 'lg:border-l lg:border-dashed lg:border-[var(--color-dashed)]' : ''} ${index % 2 === 1 ? 'max-lg:border-l max-lg:border-dashed max-lg:border-[var(--color-dashed)]' : ''} ${index > 1 ? 'max-lg:border-t max-lg:border-[var(--color-stitch-line)]' : ''}`}
           >
-            <span className="mt-0.5 text-[#b77b17]">
+            <span className="mt-0.5 text-[var(--color-gold-dark)]">
               <AssuranceIcon type={assurance.icon} />
             </span>
             <div>
-              <p
-                className="text-xl leading-6 text-[#25201d]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {assurance.title}
+              <p className="ui-display text-xl leading-6">{assurance.title}</p>
+              <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
+                {assurance.description}
               </p>
-              <p className="mt-1 text-sm leading-6 text-[#69605a]">{assurance.description}</p>
             </div>
           </div>
         ))}

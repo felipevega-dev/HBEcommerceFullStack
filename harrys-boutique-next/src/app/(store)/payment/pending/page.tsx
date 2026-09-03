@@ -1,19 +1,21 @@
 import Link from 'next/link'
+import { EditorialPanel } from '@/components/store/editorial'
 
 export default function PaymentPendingPage() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-16">
-      <div className="text-6xl mb-6">⏳</div>
-      <h1 className="text-3xl font-medium mb-4">Pago pendiente</h1>
-      <p className="text-gray-600 mb-8">
-        Tu pago está siendo procesado. Te notificaremos cuando se confirme.
-      </p>
-      <Link
-        href="/orders"
-        className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-      >
-        Ver mis pedidos
-      </Link>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center py-16 text-center">
+      <EditorialPanel className="max-w-lg p-10 text-center" tone="soft">
+        <div className="relative">
+          <p className="ui-eyebrow">MercadoPago</p>
+          <h1 className="ui-display mt-4 text-3xl">Pago pendiente</h1>
+          <p className="mt-4 mb-8 text-[var(--color-text-secondary)]">
+            Tu pago está siendo procesado. Te notificaremos cuando se confirme.
+          </p>
+          <Link href="/orders" className="ui-button ui-button-primary">
+            Ver mis pedidos
+          </Link>
+        </div>
+      </EditorialPanel>
     </div>
   )
 }

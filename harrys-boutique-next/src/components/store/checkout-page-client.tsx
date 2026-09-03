@@ -395,10 +395,7 @@ export function CheckoutPageClient({
     return (
       <div className="py-20 text-center space-y-4">
         <p className="text-[var(--color-text-secondary)] text-lg">Tu carrito está vacío.</p>
-        <Link
-          href="/tienda"
-          className="inline-block px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors"
-        >
+        <Link href="/tienda" className="ui-button ui-button-primary">
           Ver colección
         </Link>
       </div>
@@ -407,6 +404,8 @@ export function CheckoutPageClient({
 
   return (
     <div className="py-8">
+      <p className="ui-eyebrow">Compra directa</p>
+      <h1 className="ui-display mt-3 text-3xl sm:text-4xl">Checkout</h1>
       {/* Progress Indicator */}
       <CheckoutProgress currentStep={currentStep} />
 

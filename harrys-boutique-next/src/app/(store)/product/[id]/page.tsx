@@ -108,7 +108,7 @@ export default async function ProductPage({ params }: Props) {
   })
 
   return (
-    <div className="border-t pt-10">
+    <div className="pt-10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: stringifyJsonLd(productStructuredData) }}

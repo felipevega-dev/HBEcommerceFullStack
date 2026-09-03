@@ -35,13 +35,10 @@ export default function ContactPage() {
   return (
     <main>
       <section className="ui-container py-10 sm:py-16 lg:py-20">
-        <div className="grid overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-white lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="grid overflow-hidden rounded-[1.5rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)] lg:grid-cols-[0.8fr_1.2fr]">
           <div className="flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16">
             <p className="ui-eyebrow">Hablemos</p>
-            <h1
-              className="mt-5 text-5xl leading-none text-[var(--color-text-primary)] sm:text-6xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <h1 className="ui-display mt-5 text-5xl leading-none sm:text-6xl">
               Estamos aquí para ayudarte.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-8 text-[var(--color-text-secondary)]">
@@ -67,12 +64,7 @@ export default function ContactPage() {
           <div className="ui-card p-6 sm:p-9">
             <div className="mb-8">
               <p className="ui-eyebrow">Mensaje directo</p>
-              <h2
-                className="mt-3 text-3xl text-[var(--color-text-primary)] sm:text-4xl"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Cuéntanos qué necesitas
-              </h2>
+              <h2 className="ui-display mt-3 text-3xl sm:text-4xl">Cuéntanos qué necesitas</h2>
               <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
                 Completa el formulario y revisaremos tu mensaje lo antes posible.
               </p>
@@ -100,7 +92,7 @@ export default function ContactPage() {
                   rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="ui-card flex items-center gap-4 p-5 transition-transform hover:-translate-y-0.5"
                 >
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#efefec] text-[#3d3d39]">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--color-panel-soft)] text-[var(--color-ink)]">
                     <BrandIcon name={item.icon} className="h-5 w-5" />
                   </span>
                   <span className="min-w-0">

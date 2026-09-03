@@ -19,7 +19,7 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
         params.delete('search')
       }
       params.set('page', '1')
-      router.replace(`${pathname}?${params.toString()}`)
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
       if (value.trim()) {
         trackAnalyticsEvent('search_catalog', { search_term: value.trim() })
       }
@@ -29,7 +29,7 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
 
   return (
     <div className="relative min-w-0">
-      <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[var(--color-text-muted)]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-4 w-4"

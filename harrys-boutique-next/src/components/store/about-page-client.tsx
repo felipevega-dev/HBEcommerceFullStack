@@ -22,13 +22,10 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
           <span className="text-[var(--color-text-primary)]">{content.heroEyebrow}</span>
         </nav>
 
-        <div className="grid overflow-hidden rounded-[1.5rem] border border-[#deded9] bg-white lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid overflow-hidden rounded-[1.5rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)] lg:grid-cols-[0.9fr_1.1fr]">
           <div className="flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16 lg:py-16">
             <p className="ui-eyebrow">{content.heroEyebrow}</p>
-            <h1
-              className="mt-5 max-w-xl text-5xl leading-[0.95] text-[var(--color-text-primary)] sm:text-6xl"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <h1 className="ui-display mt-5 max-w-xl text-5xl leading-[0.95] sm:text-6xl">
               {content.heroTitle}
             </h1>
             <p className="mt-7 max-w-lg text-base leading-7 text-[var(--color-text-secondary)]">
@@ -85,7 +82,7 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
         </div>
       </section>
 
-      <section className="border-y border-[#deded9] bg-white">
+      <section className="border-y border-[var(--color-stitch-line)] bg-[var(--color-surface)]">
         <div className="ui-container grid gap-12 py-16 sm:py-20 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
           <div>
             <p className="ui-eyebrow">El oficio detrás de cada pieza</p>
@@ -102,8 +99,8 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {values.map((value) => (
-              <article key={value.title} className="ui-card bg-[#f4f4f1] p-6">
-                <BrandIcon name={value.icon} className="h-6 w-6 text-[var(--color-accent)]" />
+              <article key={value.title} className="ui-card bg-[var(--color-panel-soft)] p-6">
+                <BrandIcon name={value.icon} className="h-6 w-6 text-[var(--color-gold-dark)]" />
                 <h3 className="mt-5 text-lg font-medium text-[var(--color-text-primary)]">
                   {value.title}
                 </h3>
@@ -157,12 +154,10 @@ export function AboutPageClient({ content }: { content: AboutContent }) {
             sizes="(max-width: 1024px) 100vw, 1200px"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-[#2f2823]/45" />
+          <div className="absolute inset-0 bg-[var(--color-stitch)]/45" />
           <div className="relative z-10 flex min-h-[260px] items-center justify-between gap-6 px-7 py-10 sm:px-12">
             <div className="max-w-xl text-white">
-              <p className="text-[10px] font-bold tracking-[0.2em] text-[#f4d18b]">
-                HARRY&apos;S BOUTIQUE
-              </p>
+              <p className="ui-eyebrow text-[#f4d18b]">HARRY&apos;S BOUTIQUE</p>
               <h2
                 className="mt-4 text-4xl leading-none sm:text-5xl"
                 style={{ fontFamily: 'var(--font-display)' }}

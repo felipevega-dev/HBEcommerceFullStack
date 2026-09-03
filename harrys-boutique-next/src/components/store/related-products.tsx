@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { SectionTitle } from './editorial'
 import { ProductCard } from './product-card'
 
 interface Props {
@@ -46,14 +47,9 @@ export async function RelatedProducts({ categoryId, subCategory, excludeId }: Pr
   if (products.length === 0) return null
 
   return (
-    <section className="py-16 border-t">
+    <section className="border-t border-[var(--color-stitch-line)] py-16">
       <div className="space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl font-medium">Productos Relacionados</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Descubre más productos similares que podrían interesarte
-          </p>
-        </div>
+        <SectionTitle eyebrow="MÁS DEL ATELIER" title="Productos relacionados" />
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-8">
           {products.map((product) => (

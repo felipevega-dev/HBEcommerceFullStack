@@ -87,7 +87,7 @@ export default async function FaqPage() {
                 {section.items.map((item) => (
                   <details
                     key={item.q}
-                    className="group rounded-[1rem] border border-[#dfdfda] bg-white px-5 py-4 open:shadow-[0_8px_24px_rgba(20,20,20,0.05)]"
+                    className="group rounded-[1rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)] px-5 py-4 open:shadow-[var(--shadow-editorial)]"
                   >
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-[var(--color-text-primary)] marker:hidden">
                       {item.q}

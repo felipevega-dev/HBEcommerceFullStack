@@ -110,15 +110,15 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
         className={
           isOverlay
             ? 'absolute inset-x-0 top-0 z-40 border-none bg-transparent shadow-none'
-            : 'sticky top-0 z-40 border-b border-[#eadfce]/80 bg-[linear-gradient(90deg,#fffdf8_0%,#fffaf4_46%,#f7ebda_100%)] shadow-none'
+            : 'sticky top-0 z-40 border-b border-[var(--color-stitch-line)]/80 bg-[linear-gradient(90deg,var(--color-surface)_0%,var(--color-panel-soft)_46%,var(--color-surface-warm)_100%)] shadow-none'
         }
       >
         {/* Top bar - Social links y login */}
         <div
           className={`hidden lg:block ${
             isOverlay
-              ? 'border-b border-[#e6d8c8]/60 bg-transparent'
-              : 'border-b border-[#e6d8c8]/60 bg-[linear-gradient(90deg,#fffdf8_0%,#fffaf4_46%,#f7ebda_100%)]'
+              ? 'border-b border-[var(--color-stitch-line)]/60 bg-transparent'
+              : 'border-b border-[var(--color-stitch-line)]/60 bg-[linear-gradient(90deg,var(--color-surface)_0%,var(--color-panel-soft)_46%,var(--color-surface-warm)_100%)]'
           }`}
         >
           <div className="px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
@@ -134,7 +134,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"
+                      className="text-[var(--color-text-muted)] hover:text-[var(--color-gold-dark)] transition-colors"
                       aria-label={social.label}
                     >
                       <IconComponent />
@@ -147,14 +147,14 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               <div className="flex items-center gap-4">
                 {session?.user ? (
                   <div className="relative z-50 group">
-                    <button className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+                    <button className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-gold-dark)] transition-colors">
                       <div className="w-6 h-6 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center text-xs font-semibold">
                         {session.user.name?.charAt(0).toUpperCase() ?? 'U'}
                       </div>
                       <span className="text-xs font-medium">{session.user.name}</span>
                     </button>
                     <div className="absolute right-0 top-full z-[70] pt-3 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto">
-                      <div className="min-w-[196px] overflow-hidden rounded-lg border border-[var(--color-border)] bg-white shadow-xl ring-1 ring-black/5">
+                      <div className="min-w-[196px] overflow-hidden rounded-lg border border-[var(--color-stitch-line)] bg-[var(--color-surface)] shadow-[var(--shadow-editorial)]">
                         {isAdmin && (
                           <>
                             <Link
@@ -197,7 +197,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 ) : (
                   <Link
                     href="/login"
-                    className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors font-medium"
+                    className="text-[var(--color-text-secondary)] hover:text-[var(--color-gold-dark)] transition-colors font-medium"
                   >
                     INICIA SESIÓN / REGÍSTRATE
                   </Link>
@@ -216,7 +216,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               <div className="hidden">
                 <button
                   onClick={() => setCategoriesOpen(!categoriesOpen)}
-                  className="flex items-center gap-1.5 py-2 text-sm font-medium text-[#4f423b] transition-colors hover:text-[#b98278]"
+                  className="flex items-center gap-1.5 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -255,7 +255,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full z-40 mt-3 w-60 overflow-hidden rounded-xl border border-[#eaded6] bg-[#fffdfa] shadow-[0_18px_45px_rgba(59,41,31,0.14)]"
+                        className="absolute left-0 top-full z-40 mt-3 w-60 overflow-hidden rounded-xl border border-[var(--color-stitch-line)] bg-[var(--color-surface)] shadow-[0_18px_45px_rgba(59,41,31,0.14)]"
                       >
                         {categories.map((category) => (
                           <Link
@@ -305,7 +305,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               onSubmit={handleSearch}
               className="hidden max-w-[260px] flex-1 lg:flex lg:order-3 xl:max-w-[300px]"
             >
-              <div className="relative w-full rounded-[1.1rem] border border-[#bd8d4a] bg-[#fffaf1]/80 p-1 shadow-[inset_0_0_0_2px_rgba(255,253,248,0.8),0_7px_18px_rgba(100,66,28,0.1)]">
+              <div className="relative w-full rounded-[1.1rem] border border-[var(--color-dashed)] bg-[var(--color-panel-soft)]/80 p-1 shadow-[inset_0_0_0_2px_rgba(255,253,248,0.8),0_7px_18px_rgba(100,66,28,0.1)]">
                 <input
                   type="text"
                   value={searchQuery}
@@ -313,11 +313,11 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   placeholder="Buscar productos..."
-                  className="w-full rounded-[0.85rem] border border-dashed border-[#d7b26c] bg-transparent px-4 py-2.5 pr-12 text-sm outline-none transition-all placeholder:text-[#947a69] focus:border-[#a96808]"
+                  className="w-full rounded-[0.85rem] border border-dashed border-[var(--color-dashed)] bg-transparent px-4 py-2.5 pr-12 text-sm outline-none transition-all placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-gold-dark)]"
                 />
                 <button
                   type="submit"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full border border-[#8e5418] bg-[#9f6118] p-2 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] transition-colors hover:bg-[#7d4510]"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full border border-[var(--color-craft-edge)] bg-[var(--color-gold-dark)] p-2 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] transition-colors hover:brightness-90"
                   aria-label="Buscar"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,7 +333,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
             </form>
 
             {/* Desktop nav links */}
-            <ul className="order-2 hidden items-center gap-4 text-[13px] font-medium text-[#4f423b] lg:flex xl:gap-7">
+            <ul className="order-2 hidden items-center gap-4 text-[13px] font-medium text-[var(--color-text-secondary)] lg:flex xl:gap-7">
               {navItems.map((item) => (
                 <li
                   key={item.href}
@@ -343,15 +343,15 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 >
                   <Link
                     href={item.href}
-                    className={`flex flex-col items-center gap-1 transition-colors duration-200 hover:text-[#b98278] ${
-                      pathname === item.href ? 'text-[#1b1b1b]' : ''
+                    className={`flex flex-col items-center gap-1 transition-colors duration-200 hover:text-[var(--color-accent)] ${
+                      pathname === item.href ? 'text-[var(--color-ink)]' : ''
                     }`}
                   >
                     {item.label}
                     {pathname === item.href && (
                       <motion.span
                         layoutId="navbar-indicator"
-                        className="absolute -bottom-3 left-0 right-0 h-[2px] bg-[repeating-linear-gradient(to_right,#c28a27_0_7px,transparent_7px_12px)]"
+                        className="absolute -bottom-3 left-0 right-0 h-[2px] bg-[repeating-linear-gradient(to_right,var(--color-gold-dark)_0_7px,transparent_7px_12px)]"
                       />
                     )}
                   </Link>
@@ -363,16 +363,19 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -8 }}
                           transition={{ duration: 0.16 }}
-                          className="absolute left-1/2 top-full z-50 mt-4 w-60 -translate-x-1/2 overflow-hidden rounded-xl border border-[#eaded6] bg-[#fffdfa] shadow-[0_18px_45px_rgba(59,41,31,0.14)]"
+                          className="absolute left-1/2 top-full z-50 mt-4 w-60 -translate-x-1/2 overflow-hidden rounded-xl border border-[var(--color-stitch-line)] bg-[var(--color-surface)] shadow-[0_18px_45px_rgba(59,41,31,0.14)]"
                         >
                           {categories.map((category) => (
                             <Link
                               key={category.name}
                               href={category.href}
                               onClick={() => setCategoriesOpen(false)}
-                              className="flex items-center gap-3 border-b border-[#eadfce] px-4 py-3 text-sm font-medium text-[#4f423b] transition-colors hover:bg-[#f4ebdd] last:border-b-0"
+                              className="flex items-center gap-3 border-b border-[var(--color-stitch-line)] px-4 py-3 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-warm)] last:border-b-0"
                             >
-                              <BrandIcon name={category.icon} className="h-5 w-5 text-[#b77b17]" />
+                              <BrandIcon
+                                name={category.icon}
+                                className="h-5 w-5 text-[var(--color-gold-dark)]"
+                              />
                               {category.name}
                             </Link>
                           ))}
@@ -548,7 +551,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Buscar productos..."
-                      className="w-full rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                      className="w-full rounded-lg border border-[var(--color-stitch-line)] bg-[var(--color-surface)] px-4 py-3 pr-12 text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-2 focus:ring-[var(--color-gold)]/20"
                       aria-label="Buscar productos"
                     />
                     <button
@@ -572,7 +575,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                         key={category.name}
                         href={category.href}
                         onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg hover:bg-[var(--color-surface)] transition-colors text-sm"
+                        className="flex items-center gap-2 rounded-lg bg-[var(--color-surface)] px-3 py-2 text-sm transition-colors hover:bg-[var(--color-panel-soft)]"
                       >
                         <BrandIcon
                           name={category.icon}
@@ -603,7 +606,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 ))}
 
                 {/* User links */}
-                <div className="border-t-4 border-[var(--color-border)] mt-2">
+                <div className="mt-2 border-t border-[var(--color-stitch-line)]">
                   {session?.user ? (
                     <>
                       <div className="px-6 py-4 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
@@ -629,7 +632,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                             <BrandIcon name="layout-dashboard" className="h-4 w-4" />
                             Panel Admin
                           </Link>
-                          <div className="border-b-4 border-[var(--color-border)]" />
+                          <div className="border-b border-[var(--color-stitch-line)]" />
                         </>
                       )}
                       <Link

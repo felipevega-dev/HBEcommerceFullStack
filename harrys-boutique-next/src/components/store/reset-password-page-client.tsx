@@ -68,14 +68,9 @@ export function ResetPasswordPageClient() {
 
   return (
     <div className="min-h-[calc(100vh-200px)] px-4 py-10 sm:py-14">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] p-6 shadow-lg sm:p-8">
-        <div className="mb-7 text-center">
-          <h1
-            className="text-3xl font-medium text-[var(--color-text-primary)]"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Restablecer contraseña
-          </h1>
+      <div className="ui-editorial-panel ui-editorial-panel-cream mx-auto w-full max-w-md p-6 sm:p-8">
+        <div className="relative mb-7 text-center">
+          <h1 className="ui-display text-3xl">Restablecer contraseña</h1>
           <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
             Crea una nueva contraseña segura para tu cuenta.
           </p>
@@ -91,7 +86,7 @@ export function ResetPasswordPageClient() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 pr-11 text-sm outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
+                className="ui-field w-full pr-11"
                 placeholder="Ingresa tu nueva contraseña"
                 autoComplete="new-password"
               />
@@ -131,7 +126,7 @@ export function ResetPasswordPageClient() {
               type={showPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-4 py-3 text-sm outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
+              className="ui-field w-full"
               placeholder="Repite tu nueva contraseña"
               autoComplete="new-password"
             />
@@ -139,11 +134,7 @@ export function ResetPasswordPageClient() {
 
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
+          <button type="submit" disabled={loading} className="ui-button ui-button-primary w-full">
             {loading ? (
               <>
                 <BrandIcon name="loader" className="h-4 w-4 animate-spin" />

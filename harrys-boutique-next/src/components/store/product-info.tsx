@@ -145,13 +145,14 @@ export function ProductInfo({
 
       {/* Name + rating */}
       <div>
-        <h1 className="text-2xl font-medium">{product.name}</h1>
+        <p className="ui-eyebrow">{categoryName ?? 'Colección'}</p>
+        <h1 className="ui-display mt-3 text-3xl leading-none sm:text-4xl">{product.name}</h1>
         <div className="flex items-center gap-2 mt-2">
           <div className="flex">
             {[1, 2, 3, 4, 5].map((star) => (
               <svg
                 key={star}
-                className={`w-4 h-4 ${star <= Math.round(product.ratingAverage) ? 'text-yellow-400' : 'text-gray-200'}`}
+                className={`w-4 h-4 ${star <= Math.round(product.ratingAverage) ? 'text-[var(--color-gold)]' : 'text-[var(--color-border)]'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -159,7 +160,9 @@ export function ProductInfo({
               </svg>
             ))}
           </div>
-          <span className="text-sm text-gray-500">({product.ratingCount} valoraciones)</span>
+          <span className="text-sm text-[var(--color-text-muted)]">
+            ({product.ratingCount} valoraciones)
+          </span>
         </div>
       </div>
 
@@ -201,12 +204,12 @@ export function ProductInfo({
         </div>
       )}
 
-      <p className="text-gray-600 leading-relaxed">{description}</p>
+      <p className="leading-relaxed text-[var(--color-text-secondary)]">{description}</p>
 
-      <div className="grid gap-3 rounded-xl border border-[var(--color-border)] bg-white p-4 shadow-[var(--shadow-sm)] sm:grid-cols-2">
-        <div>
+      <div className="ui-editorial-panel ui-editorial-panel-cream grid gap-3 p-5 sm:grid-cols-2">
+        <div className="relative">
           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
-            <BrandIcon name="ruler" className="h-4 w-4 text-[var(--color-accent-dark)]" />
+            <BrandIcon name="ruler" className="h-4 w-4 text-[var(--color-gold-dark)]" />
             Fit Lab
           </div>
           <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
@@ -214,17 +217,17 @@ export function ProductInfo({
             comodo antes que un calce apretado.
           </p>
         </div>
-        <div>
+        <div className="relative">
           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
-            <BrandIcon name="design" className="h-4 w-4 text-[var(--color-accent-dark)]" />
+            <BrandIcon name="design" className="h-4 w-4 text-[var(--color-gold-dark)]" />
             Harry&apos;s Atelier
           </div>
           <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
             Para un nombre bordado, un conjunto coordinado o un regalo especial, revisa el Atelier.
           </p>
           <Link
-            href="/contact"
-            className="mt-3 inline-flex text-xs font-semibold text-[var(--color-accent-dark)] hover:text-[var(--color-primary)]"
+            href="/experiencias#atelier"
+            className="mt-3 inline-flex text-xs font-semibold text-[var(--color-gold-dark)] hover:text-[var(--color-ink)]"
           >
             Ver opciones custom
           </Link>
@@ -256,7 +259,7 @@ export function ProductInfo({
                   }}
                   disabled={!colorHasStock}
                   title={color}
-                  className={`w-8 h-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${selectedColor === color ? 'border-[var(--color-accent)] scale-110' : 'border-gray-200 hover:border-gray-400'}`}
+                  className={`w-8 h-8 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${selectedColor === color ? 'border-[var(--color-gold)] scale-110' : 'border-[var(--color-stitch-line)] hover:border-[var(--color-dashed)]'}`}
                   style={{ backgroundColor: colorToHex(color) }}
                 />
               )
@@ -293,7 +296,7 @@ export function ProductInfo({
                     })
                   }}
                   disabled={!sizeHasStock}
-                  className={`px-4 py-2 rounded-lg border text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${selectedSize === size ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-white' : 'border-gray-200 hover:border-gray-300'}`}
+                  className={`px-4 py-2 rounded-lg border text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${selectedSize === size ? 'border-[var(--color-gold)] bg-[var(--color-gold)] text-white' : 'border-[var(--color-stitch-line)] hover:border-[var(--color-dashed)]'}`}
                 >
                   {size}
                 </button>
@@ -310,7 +313,7 @@ export function ProductInfo({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
+              className="flex h-8 w-8 items-center justify-center rounded border border-[var(--color-stitch-line)] text-lg hover:bg-[var(--color-panel-soft)]"
               aria-label="Disminuir cantidad"
             >
               -
@@ -318,7 +321,7 @@ export function ProductInfo({
             <span className="w-8 text-center font-medium">{quantity}</span>
             <button
               onClick={() => setQuantity((q) => Math.min(selectedStock || q + 1, q + 1))}
-              className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 text-lg"
+              className="flex h-8 w-8 items-center justify-center rounded border border-[var(--color-stitch-line)] text-lg hover:bg-[var(--color-panel-soft)]"
               aria-label="Aumentar cantidad"
               disabled={selectedStock > 0 && quantity >= selectedStock}
             >
@@ -330,7 +333,7 @@ export function ProductInfo({
 
       {/* A valid Mercado Libre URL is the exclusive purchase channel for this product. */}
       {mercadoLibreListing && (
-        <div className="rounded-xl border border-[#ffe1a6] bg-[#fff8e8] p-4">
+        <div className="rounded-[1.25rem] border border-[var(--color-ml-border)] bg-[var(--color-ml-bg)] p-4">
           <p className="text-sm font-semibold text-[var(--color-text-primary)]">
             Compra y pago mediante Mercado Libre
           </p>
@@ -345,7 +348,7 @@ export function ProductInfo({
             productName={product.name}
             productSlug={product.slug}
             location="product_page"
-            className="ui-button ui-button-secondary mt-3 w-full justify-center !border-[#e8c56c] !bg-[#ffefc5] !text-[#684707] hover:!bg-[#ffe5a3]"
+            className="ui-button ui-button-ml mt-3 w-full justify-center"
           >
             Comprar en Mercado Libre
           </MercadoLibreLink>
@@ -360,7 +363,7 @@ export function ProductInfo({
         (selectedStock === 0 ? (
           <button
             disabled
-            className="w-full py-3 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+            className="ui-button ui-button-secondary w-full cursor-not-allowed opacity-55"
           >
             Sin stock
           </button>
@@ -369,14 +372,14 @@ export function ProductInfo({
             onClick={handleAddToCart}
             variant="primary"
             size="lg"
-            className="w-full !bg-black !text-white hover:!bg-gray-800"
+            className="ui-button ui-button-primary w-full"
           >
             {mercadoLibreListing ? "Comprar directo en Harry's" : 'Añadir al carrito'}
           </ButtonWithFeedback>
         ))}
 
       {/* Features */}
-      <div className="pt-4 border-t space-y-2 text-sm text-gray-500">
+      <div className="space-y-2 border-t border-[var(--color-stitch-line)] pt-4 text-sm text-[var(--color-text-secondary)]">
         <p className="flex items-center gap-2">
           <BrandIcon name="check" className="h-4 w-4" />
           Producto 100% original
@@ -422,7 +425,7 @@ export function ProductInfo({
               <h3 className="text-lg font-medium">¡Producto agregado!</h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
                 aria-label="Cerrar"
               >
                 <BrandIcon name="x" className="h-5 w-5" />
@@ -443,9 +446,9 @@ export function ProductInfo({
               )}
               <div className="flex-1">
                 <p className="font-medium">{product.name}</p>
-                <p className="text-sm text-gray-600">Talla: {selectedSize}</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">Talla: {selectedSize}</p>
                 <div className="flex items-center gap-4 mt-2">
-                  <p className="text-sm text-gray-600">Cantidad: {quantity}</p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">Cantidad: {quantity}</p>
                   <p className="text-sm font-medium">
                     ${(price * quantity).toLocaleString('es-CL')}
                   </p>
@@ -456,7 +459,7 @@ export function ProductInfo({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                className="ui-button ui-button-secondary flex-1"
                 style={{ border: '1px solid var(--color-border)' }}
                 autoFocus
               >
@@ -467,7 +470,7 @@ export function ProductInfo({
                   setShowModal(false)
                   router.push('/cart')
                 }}
-                className="flex-1 px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800"
+                className="ui-button ui-button-primary flex-1"
               >
                 Ver carrito
               </button>

@@ -246,7 +246,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Personal info + addresses */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="ui-card rounded-lg p-6">
           {/* Profile image */}
           <div className="mb-6 flex flex-col items-center">
             <div className="relative">
@@ -260,7 +260,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-3xl font-medium">
+                  <div className="w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-3xl font-medium">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -326,20 +326,24 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                       )}
                       <div className="space-y-1 text-sm">
                         <p>
-                          <span className="text-gray-600">Nombre:</span> {addr.firstname}{' '}
-                          {addr.lastname}
+                          <span className="text-[var(--color-text-secondary)]">Nombre:</span>{' '}
+                          {addr.firstname} {addr.lastname}
                         </p>
                         <p>
-                          <span className="text-gray-600">Teléfono:</span> {addr.phone}
+                          <span className="text-[var(--color-text-secondary)]">Teléfono:</span>{' '}
+                          {addr.phone}
                         </p>
                         <p>
-                          <span className="text-gray-600">Dirección:</span> {addr.street}
+                          <span className="text-[var(--color-text-secondary)]">Dirección:</span>{' '}
+                          {addr.street}
                         </p>
                         <p>
-                          <span className="text-gray-600">Ciudad:</span> {addr.city}, {addr.region}
+                          <span className="text-[var(--color-text-secondary)]">Ciudad:</span>{' '}
+                          {addr.city}, {addr.region}
                         </p>
                         <p>
-                          <span className="text-gray-600">País:</span> {addr.country}
+                          <span className="text-[var(--color-text-secondary)]">País:</span>{' '}
+                          {addr.country}
                         </p>
                       </div>
                       <div className="mt-3 flex gap-3">
@@ -362,7 +366,9 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm">No hay direcciones guardadas</p>
+                <p className="text-[var(--color-text-muted)] text-sm">
+                  No hay direcciones guardadas
+                </p>
               )}
             </div>
           </div>
@@ -407,7 +413,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
           )}
         </div>
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="ui-card rounded-lg p-6">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-dark)]">
@@ -502,7 +508,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
         </div>
 
         {/* Recent orders */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="ui-card rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-medium">Pedidos Recientes</h3>
             <Link
@@ -512,7 +518,7 @@ export function ProfilePageClient({ user: initialUser }: { user: UserWithAddress
               Ver todos los pedidos
             </Link>
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-[var(--color-text-muted)] text-sm">
             Visita la sección de{' '}
             <Link href="/orders" className="text-[var(--color-accent-dark)] hover:underline">
               Mis Pedidos

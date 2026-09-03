@@ -12,74 +12,236 @@ function Arrow() {
   return <span aria-hidden="true">→</span>
 }
 
-export function StoreEditorialHeader({ categories }: { categories: EditorialCategory[] }) {
-  const featuredCategories = [
+const iconProps = {
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.5,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  'aria-hidden': true,
+}
+
+function HeartIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M20.8 8.6c0 4.4-6.3 8.4-8.3 9.6a1 1 0 0 1-1 0C9.5 17 3.2 13 3.2 8.6A4.6 4.6 0 0 1 12 6.7a4.6 4.6 0 0 1 8.8 1.9Z" />
+    </svg>
+  )
+}
+
+function LeafIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M4 20c0-8 5-13 16-13 0 8-5 13-16 13Z" />
+      <path d="M4 20c2-5 6-8 11-9.5" />
+    </svg>
+  )
+}
+
+function TruckIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M3 6h11v9H3z" />
+      <path d="M14 9h4l3 3v3h-7z" />
+      <circle cx="7" cy="17.5" r="1.6" />
+      <circle cx="17" cy="17.5" r="1.6" />
+    </svg>
+  )
+}
+
+function SparkIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M12 3.5 13.7 9 19 10.7 13.7 12.4 12 18l-1.7-5.6L5 10.7 10.3 9Z" />
+    </svg>
+  )
+}
+
+function SwapIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M4 8h13l-3-3" />
+      <path d="M20 16H7l3 3" />
+    </svg>
+  )
+}
+
+function LockIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <rect x="4.5" y="10" width="15" height="10" rx="2" />
+      <path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10" />
+    </svg>
+  )
+}
+
+function ChatIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M20 15a2 2 0 0 1-2 2H8l-4 3V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2Z" />
+    </svg>
+  )
+}
+
+const assurances = [
+  {
+    icon: HeartIcon,
+    title: 'Hecho a mano',
+    text: 'Cada prenda es única, confeccionada con amor.',
+  },
+  {
+    icon: LeafIcon,
+    title: 'Materiales de calidad',
+    text: 'Suaves, resistentes y seguros para tu mascota.',
+  },
+  {
+    icon: TruckIcon,
+    title: 'Envíos a todo Chile',
+    text: 'Rápidos y seguros a todo el país.',
+  },
+]
+
+export function StoreEditorialHeader() {
+  return (
+    <section className="relative overflow-hidden border-b border-[var(--color-stitch-line)] bg-[var(--color-panel)]">
+      <div className="relative mx-auto grid w-full max-w-[1536px] lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="flex flex-col justify-center px-6 py-10 sm:px-11 sm:py-12 lg:px-14 xl:px-16">
+          <p className="ui-eyebrow">COLECCIÓN HARRY&apos;S</p>
+          <h1 className="ui-display mt-4 max-w-xl text-[2.5rem] leading-[0.94] sm:text-5xl">
+            Prendas con oficio, pensadas para acompañarlos.
+          </h1>
+          <p className="mt-5 max-w-md text-sm leading-6 text-[var(--color-text-secondary)]">
+            Ropa y accesorios handmade para mascotas, creados con detalles que celebran su
+            personalidad y los momentos que comparten contigo.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="#catalogo" className="ui-button ui-button-craft rounded-full">
+              <span>Ver colecciones</span>
+            </Link>
+            <Link href="/about" className="ui-button ui-button-ghost-gold rounded-full">
+              <span>Hecho a mano en Chile</span>
+            </Link>
+          </div>
+
+          <ul className="mt-8 grid gap-3 sm:grid-cols-3 lg:hidden">
+            {assurances.map(({ icon: Icon, title, text }) => (
+              <li
+                key={title}
+                className="flex items-start gap-3 rounded-[1.1rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/80 px-4 py-3"
+              >
+                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-gold-dark)]" />
+                <div>
+                  <p className="text-xs font-semibold text-[var(--color-text-primary)]">{title}</p>
+                  <p className="mt-1 text-[11px] leading-4 text-[var(--color-text-secondary)]">
+                    {text}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="relative min-h-[260px] overflow-hidden lg:min-h-[400px]">
+          <Image
+            src="/bannerharryluna.JPG"
+            alt="Mascotas con prendas handmade de Harry's Boutique"
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 55vw"
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-panel)] via-[var(--color-panel)]/20 to-transparent lg:to-[var(--color-panel)]/45" />
+
+          <ul className="absolute inset-y-6 right-6 z-10 hidden w-60 flex-col justify-center gap-3 lg:flex">
+            {assurances.map(({ icon: Icon, title, text }) => (
+              <li
+                key={title}
+                className="flex items-start gap-3 rounded-[1.1rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/95 px-4 py-3 shadow-[var(--shadow-sm)] backdrop-blur"
+              >
+                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-gold-dark)]" />
+                <div>
+                  <p className="text-xs font-semibold text-[var(--color-text-primary)]">{title}</p>
+                  <p className="mt-1 text-[11px] leading-4 text-[var(--color-text-secondary)]">
+                    {text}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function StoreCategoryRow({ categories }: { categories: EditorialCategory[] }) {
+  const featured = [
     ...categories.filter((category) => category.homeImage),
     ...categories.filter((category) => !category.homeImage),
   ].slice(0, 3)
 
-  return (
-    <section className="relative mb-10 overflow-hidden rounded-[2rem] border border-[#ead9ca] bg-[#f8eee7] shadow-[0_18px_45px_rgba(70,48,35,0.07)]">
-      <div className="pointer-events-none absolute inset-3 rounded-[1.45rem] border border-dashed border-[#d8ba83]/70" />
-      <div className="relative grid lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="flex flex-col justify-center px-7 py-10 sm:px-11 sm:py-12 lg:px-14">
-          <p className="text-[10px] font-bold tracking-[0.24em] text-[#a96808]">
-            COLECCIÓN HARRY&apos;S
-          </p>
-          <h1
-            className="mt-4 max-w-xl text-[2.7rem] leading-[0.94] text-[#1b1b1b] sm:text-6xl"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Prendas con oficio, pensadas para acompañarlos.
-          </h1>
-          <p className="mt-5 max-w-lg text-sm leading-6 text-[#635a54] sm:text-base sm:leading-7">
-            Explora ropa y accesorios handmade para mascotas, creados con detalles que celebran su
-            personalidad y los momentos que comparten contigo.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-2 text-[11px] font-semibold text-[#5f5045]">
-            <span className="rounded-full border border-[#dcc7b1] bg-white/70 px-3 py-2">
-              Hecho a mano en Chile
-            </span>
-            <span className="rounded-full border border-[#dcc7b1] bg-white/70 px-3 py-2">
-              Diseños en series pequeñas
-            </span>
-            <span className="rounded-full border border-[#dcc7b1] bg-white/70 px-3 py-2">
-              Compra segura en Mercado Libre
-            </span>
-          </div>
-        </div>
+  if (featured.length === 0) return null
 
-        <div className="grid grid-cols-3 gap-2 px-5 pb-6 sm:gap-3 sm:px-8 lg:min-h-[360px] lg:px-5 lg:py-5 lg:pl-0">
-          {featuredCategories.map((category, index) => (
-            <Link
-              key={category.id}
-              href={`/tienda?category=${encodeURIComponent(category.name)}`}
-              className={`group relative min-h-44 overflow-hidden rounded-[1.25rem] bg-[#dfd4c8] ${
-                index === 1 ? 'lg:translate-y-5 lg:-mb-5' : ''
-              }`}
-            >
-              {category.homeImage ? (
-                <Image
-                  src={category.homeImage}
-                  alt={`Colección ${category.name} de Harry's Boutique`}
-                  fill
-                  sizes="(max-width: 1024px) 33vw, 18vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#fdf9f3_0_3px,transparent_4px),linear-gradient(145deg,#e8d9ca,#cbb8a5)] bg-[length:22px_22px,auto]" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#2f2823]/80 via-transparent to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-                <p className="text-sm font-semibold sm:text-base">{category.name}</p>
-                <p className="mt-1 hidden items-center gap-2 text-[11px] text-white/80 sm:flex">
-                  Ver colección <Arrow />
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
+  return (
+    <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {featured.map((category) => (
+        <Link
+          key={category.id}
+          href={`/tienda?category=${encodeURIComponent(category.name)}`}
+          className="group grid grid-cols-[7.5rem_1fr] items-stretch overflow-hidden rounded-[1.35rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/80 shadow-[var(--shadow-editorial)] transition-colors hover:border-[var(--color-gold-soft)] sm:grid-cols-[8.5rem_1fr]"
+        >
+          <div className="relative min-h-[6.5rem] bg-[var(--color-surface-2)]">
+            {category.homeImage ? (
+              <Image
+                src={category.homeImage}
+                alt={`Colección ${category.name} de Harry's Boutique`}
+                fill
+                sizes="(max-width: 640px) 40vw, 160px"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#fdf9f3_0_3px,transparent_4px),linear-gradient(145deg,#e8d9ca,#cbb8a5)] bg-[length:22px_22px,auto]" />
+            )}
+          </div>
+          <div className="flex flex-col justify-center px-5 py-4">
+            <p className="ui-display text-xl leading-tight">{category.name}</p>
+            <p className="mt-1 line-clamp-2 text-xs leading-5 text-[var(--color-text-secondary)]">
+              {category.homeDescription ??
+                `Diseños ${category.name.toLowerCase()} para cada paseo.`}
+            </p>
+            <p className="mt-3 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--color-gold-dark)] uppercase">
+              Explorar <Arrow />
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
+const trustItems = [
+  { icon: HeartIcon, title: 'Hecho a mano en Chile', text: 'Apoyamos el talento local' },
+  { icon: SparkIcon, title: 'Diseños exclusivos', text: 'Colecciones únicas' },
+  { icon: SwapIcon, title: 'Cambios fáciles', text: 'Sin complicaciones' },
+  { icon: LockIcon, title: 'Pago seguro', text: 'Tus datos protegidos' },
+  { icon: ChatIcon, title: 'Atención personalizada', text: 'Estamos para ayudarte' },
+]
+
+export function StoreTrustStrip() {
+  return (
+    <ul className="mb-8 grid gap-x-6 gap-y-4 rounded-[1.35rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/70 px-6 py-4 sm:grid-cols-2 lg:grid-cols-5">
+      {trustItems.map(({ icon: Icon, title, text }) => (
+        <li key={title} className="flex items-center gap-3">
+          <Icon className="h-4 w-4 shrink-0 text-[var(--color-gold-dark)]" />
+          <div className="min-w-0">
+            <p className="truncate text-[11px] font-semibold text-[var(--color-text-primary)]">
+              {title}
+            </p>
+            <p className="truncate text-[10px] text-[var(--color-text-muted)]">{text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }

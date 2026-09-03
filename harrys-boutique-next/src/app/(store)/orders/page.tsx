@@ -27,11 +27,12 @@ export default async function OrdersPage() {
   const orders = serialize(raw) as unknown as OrderWithItems[]
 
   return (
-    <div className="py-10 border-t">
+    <div className="py-10">
+      <p className="ui-eyebrow">Tu cuenta</p>
+      <h1 className="ui-display mb-8 mt-3 text-3xl">Mis Pedidos</h1>
       <Suspense>
         <PaymentFeedback />
       </Suspense>
-      <h1 className="text-3xl font-medium mb-8">Mis Pedidos</h1>
       <OrdersList orders={orders} />
     </div>
   )

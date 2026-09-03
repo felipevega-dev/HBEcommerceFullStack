@@ -144,16 +144,11 @@ export function LoginPageClient() {
 
   return (
     <div className="min-h-[calc(100vh-200px)] px-4 py-10 sm:py-14">
-      <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] shadow-lg lg:grid-cols-[0.9fr_1.1fr]">
-        <aside className="hidden bg-[var(--color-surface)] p-10 lg:flex lg:flex-col lg:justify-between">
+      <div className="ui-editorial-panel ui-editorial-panel-cream mx-auto grid w-full max-w-5xl overflow-hidden lg:grid-cols-[0.9fr_1.1fr]">
+        <aside className="hidden bg-[var(--color-panel)] p-10 lg:flex lg:flex-col lg:justify-between">
           <div>
-            <p className="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
-              Harry&apos;s Boutique
-            </p>
-            <h1
-              className="mt-4 max-w-sm text-4xl font-medium leading-tight text-[var(--color-text-primary)]"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <p className="ui-eyebrow">Harry&apos;s Boutique</p>
+            <h1 className="ui-display mt-4 max-w-sm text-4xl leading-tight">
               Tu cuenta, compras y favoritos en un solo lugar.
             </h1>
           </div>
@@ -162,16 +157,16 @@ export function LoginPageClient() {
             <div className="flex items-start gap-3">
               <BrandIcon
                 name="shopping-bag"
-                className="mt-0.5 h-5 w-5 text-[var(--color-accent)]"
+                className="mt-0.5 h-5 w-5 text-[var(--color-gold-dark)]"
               />
               <p>Continúa compras pendientes y revisa el historial de pedidos.</p>
             </div>
             <div className="flex items-start gap-3">
-              <BrandIcon name="heart" className="mt-0.5 h-5 w-5 text-[var(--color-accent)]" />
+              <BrandIcon name="heart" className="mt-0.5 h-5 w-5 text-[var(--color-gold-dark)]" />
               <p>Guarda favoritos para encontrar rápido las prendas de tu mascota.</p>
             </div>
             <div className="flex items-start gap-3">
-              <BrandIcon name="shipping" className="mt-0.5 h-5 w-5 text-[var(--color-accent)]" />
+              <BrandIcon name="shipping" className="mt-0.5 h-5 w-5 text-[var(--color-gold-dark)]" />
               <p>Agiliza el checkout con tus datos listos para la próxima compra.</p>
             </div>
           </div>
@@ -179,10 +174,7 @@ export function LoginPageClient() {
 
         <section className="p-6 sm:p-8 lg:p-10">
           <div className="mb-7 text-center">
-            <h2
-              className="text-3xl font-medium text-[var(--color-text-primary)]"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <h2 className="ui-display text-3xl">
               {mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
             </h2>
             <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
@@ -202,7 +194,7 @@ export function LoginPageClient() {
                 onClick={() => switchMode(tab)}
                 className={`rounded-md px-4 py-2.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]/30 ${
                   mode === tab
-                    ? 'bg-white text-[var(--color-text-primary)] shadow-sm'
+                    ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-sm'
                     : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                 }`}
               >
@@ -319,7 +311,7 @@ export function LoginPageClient() {
               <button
                 type="submit"
                 disabled={loading || redirecting}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="ui-button ui-button-primary w-full"
               >
                 {loading || redirecting ? (
                   <>
