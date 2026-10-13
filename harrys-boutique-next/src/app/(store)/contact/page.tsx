@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import ContactForm from '@/components/store/contact-form'
 import { BrandIcon } from '@/components/ui/brand-icon'
@@ -35,36 +34,11 @@ export default function ContactPage() {
   return (
     <main>
       <section className="ui-container py-10 sm:py-16 lg:py-20">
-        <div className="grid overflow-hidden rounded-[1.5rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)] lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="flex flex-col justify-center px-7 py-12 sm:px-12 lg:px-16">
-            <p className="ui-eyebrow">Hablemos</p>
-            <h1 className="ui-display mt-5 text-5xl leading-none sm:text-6xl">
-              Estamos aquí para ayudarte.
-            </h1>
-            <p className="mt-6 max-w-lg text-base leading-8 text-[var(--color-text-secondary)]">
-              ¿Tienes dudas sobre una talla, un pedido o una personalización? Escríbenos y te
-              responderemos con la atención cercana de siempre.
-            </p>
-          </div>
-          <div className="relative min-h-[300px] lg:min-h-[390px]">
-            <Image
-              src="/nancyharry.png"
-              alt="Harry's Boutique y sus mascotas"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="ui-container pb-16 sm:pb-24">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <div className="ui-card p-6 sm:p-9">
             <div className="mb-8">
               <p className="ui-eyebrow">Mensaje directo</p>
-              <h2 className="ui-display mt-3 text-3xl sm:text-4xl">Cuéntanos qué necesitas</h2>
+              <h1 className="ui-display mt-3 text-3xl sm:text-4xl">Cuéntanos qué necesitas</h1>
               <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
                 Completa el formulario y revisaremos tu mensaje lo antes posible.
               </p>

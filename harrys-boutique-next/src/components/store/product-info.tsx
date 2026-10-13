@@ -12,6 +12,7 @@ import { BrandIcon } from '@/components/ui/brand-icon'
 import { trackAnalyticsEvent } from '@/lib/analytics'
 import { resolveMercadoLibreListing, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
 import { MercadoLibreLink } from './mercado-libre-link'
+import { EditorialArrow } from './editorial'
 
 interface Product {
   id: string
@@ -206,30 +207,27 @@ export function ProductInfo({
 
       <p className="leading-relaxed text-[var(--color-text-secondary)]">{description}</p>
 
-      <div className="ui-editorial-panel ui-editorial-panel-cream grid gap-3 p-5 sm:grid-cols-2">
-        <div className="relative">
-          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
-            <BrandIcon name="ruler" className="h-4 w-4 text-[var(--color-gold-dark)]" />
-            Fit Lab
-          </div>
-          <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
-            Si dudas entre tallas, mide cuello, pecho y largo. Elige la talla que deje movimiento
-            comodo antes que un calce apretado.
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-[1.25rem] border border-[var(--color-stitch-line)] bg-[var(--color-panel)] px-5 py-4">
+          <p className="ui-eyebrow">Guía de talla</p>
+          <p className="ui-display mt-1.5 text-xl leading-none">Fit Lab</p>
+          <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
+            Si dudas entre tallas, mide cuello, pecho y largo. Elige la talla que deje movimiento c
+            {'\u00F3'}modo antes que un calce apretado.
           </p>
         </div>
-        <div className="relative">
-          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
-            <BrandIcon name="design" className="h-4 w-4 text-[var(--color-gold-dark)]" />
-            Harry&apos;s Atelier
-          </div>
-          <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
+        <div className="rounded-[1.25rem] border border-[var(--color-stitch-line)] bg-[var(--color-panel)] px-5 py-4">
+          <p className="ui-eyebrow">Personalizaci{'\u00F3'}n</p>
+          <p className="ui-display mt-1.5 text-xl leading-none">Harry&apos;s Atelier</p>
+          <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
             Para un nombre bordado, un conjunto coordinado o un regalo especial, revisa el Atelier.
           </p>
           <Link
             href="/experiencias#atelier"
-            className="mt-3 inline-flex text-xs font-semibold text-[var(--color-gold-dark)] hover:text-[var(--color-ink)]"
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-gold-dark)] hover:text-[var(--color-ink)]"
           >
-            Ver opciones custom
+            Ver el Atelier
+            <EditorialArrow className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>

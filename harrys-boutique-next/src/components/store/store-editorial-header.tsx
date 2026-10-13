@@ -189,6 +189,7 @@ export function StoreCategoryRow({ categories }: { categories: EditorialCategory
         <Link
           key={category.id}
           href={`/tienda?category=${encodeURIComponent(category.name)}`}
+          scroll={false}
           className="group grid grid-cols-[7.5rem_1fr] items-stretch overflow-hidden rounded-[1.35rem] border border-[var(--color-stitch-line)] bg-[var(--color-surface)]/80 shadow-[var(--shadow-editorial)] transition-colors hover:border-[var(--color-gold-soft)] sm:grid-cols-[8.5rem_1fr]"
         >
           <div className="relative min-h-[6.5rem] bg-[var(--color-surface-2)]">

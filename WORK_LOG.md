@@ -1163,3 +1163,39 @@ pm run test: 309/309 tests pasando (29 archivos).
 - Pendientes: correr prettier --write sobre el resto del repo (admin y
   lib) en una fase de limpieza aparte, ya que no esta relacionado con la
   regularizacion visual del storefront.
+
+## 2026-10-13 - Skills de diseno para Claude Code + ajustes storefront
+
+- Rama usada: feature/storefront-style-regularization.
+- Objetivo: incorporar skills de diseno curadas para Claude Code a nivel de
+  proyecto y cerrar los ajustes pendientes del storefront (contacto, ficha de
+  producto, fondo de producto).
+- Archivos modificados:
+  - `harrys-boutique-next/.claude/skills/` (nuevo, 21 skills).
+  - `harrys-boutique-next/skills-lock.json`, `.prettierignore`.
+  - `src/app/(store)/contact/page.tsx`, `src/app/(store)/product/layout.tsx`
+    (nuevo), `src/app/globals.css`, `src/components/store/product-info.tsx`,
+    `src/components/store/store-editorial-header.tsx`.
+- Cambios realizados:
+  - Skills instaladas con `npx skills add ... -a claude-code --copy`:
+    jakubkrehel/skills (better-*, interface-review, state-machine, break),
+    emilkowalski/skills (mobile-native, animate, animation-performance,
+    review/improve-animations, find-animation-opportunities, emil-design-eng),
+    MengTo/Skills (no-ai-design-slop, audit-ai-design-slop) y Supabase
+    reinstalada para Claude (antes solo existia en `.agents/` para Codex).
+  - Se revisaron 7 repos (~330 skills); se descartaron Owl-Listener,
+    garden-skills, tastemaker, landing-page-design y el resto de MengTo por
+    bajo encaje, solapamiento o conflicto con AGENTS.md.
+  - `.claude/` agregado a `.prettierignore` (contenido de terceros).
+  - Contacto: se elimina el hero con imagen; el formulario pasa a ser el h1.
+  - Ficha de producto: Fit Lab / Atelier como paneles editoriales con eyebrow
+    y flecha; nuevo token `--color-canvas` y layout de producto con fondo
+    canvas full-bleed.
+  - Filas de categoria de Tienda navegan con `scroll={false}`.
+- Validaciones: `npm run type-check` OK, `npm run test` 309/309, `npm run
+  build` OK, Prettier OK en archivos tocados. Lint global conserva 94
+  warnings preexistentes (CRLF por `core.autocrlf`, ya registrados).
+- Pendientes: aplicar las skills sobre el storefront por fases (auditoria
+  mobile-native, estados de carrito/checkout, revision de motion).
+- Riesgos: las skills de terceros corren con permisos completos del agente;
+  revisar diffs al actualizarlas con `npx skills update`.

@@ -37,6 +37,7 @@
   /* Neutros cálidos */
   --color-background: var(--color-bg);
   --color-surface: #fffdf8;
+  --color-canvas: #fffefc;
   --color-surface-2: var(--color-surface-warm);
   --color-border: var(--color-stitch-line);
   --color-border-strong: #cfbda9;
