@@ -1243,3 +1243,28 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
   a cubrir los tests.
 - Pendientes: ninguno en esta fase.
 - Riesgos: ninguno detectado; el snapshot de seed sigue parseando como JSON.
+
+## 2026-10-18 - Archivos .env de ejemplo y README
+
+- Rama usada: `docs/env-examples`.
+- Objetivo: recrear `.env.example` y `.env.production.example`, citados por
+  README, checklist y `.gitignore` pero ausentes del repo, y corregir el README.
+- Archivos modificados:
+  - `harrys-boutique-next/.env.example` (nuevo).
+  - `harrys-boutique-next/.env.production.example` (nuevo).
+  - `README.md`.
+- Cambios realizados:
+  - Los ejemplos listan todas las variables leídas por `src/`, `scripts/`,
+    `next.config.ts`, Sentry y Docker, con valores placeholder y comentarios.
+  - README: se elimina `legacy/` (ya no existe), el setup local indica que
+    `npm run dev` exige Supabase (no Docker local) y se retira la prioridad
+    abierta sobre `legacy/`.
+- Validaciones: Prettier sobre README; los `.env*.example` no se formatean.
+- Resultado: setup local documentado y reproducible.
+- Pendientes: `src/lib/env.ts` valida variables pero ningún módulo lo importa;
+  conectarlo al arranque en una fase posterior.
+- Riesgos detectados: las versiones anteriores de ambos archivos (borradas en
+  `147c1d3`, 2026-07-13) contenían valores opacos que parecen credenciales
+  reales y siguen en el historial de Git. Rotar NEXTAUTH_SECRET, Vercel Blob,
+  MercadoPago, Resend, Upstash, Supabase y la contraseña de Postgres, y evaluar
+  purgar el historial si el repositorio es público.

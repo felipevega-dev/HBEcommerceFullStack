@@ -5,8 +5,7 @@ Proyecto e-commerce en `Next.js 16 + Prisma + PostgreSQL + NextAuth + MercadoPag
 ## Estructura activa
 
 ```text
-harrys-boutique-next/   aplicación activa
-legacy/                 código histórico, pendiente de retiro definitivo
+harrys-boutique-next/   aplicación activa (Next.js 16 + Prisma)
 ```
 
 ## Setup local
@@ -15,8 +14,10 @@ legacy/                 código histórico, pendiente de retiro definitivo
 cd harrys-boutique-next
 npm install
 cp .env.example .env.local
-# Docker Postgres local: postgres / password
-npx prisma migrate dev
+# Completa DATABASE_URL y DIRECT_URL con un proyecto o branch de Supabase que NO sea producción.
+# `npm run dev` valida esas URLs antes de arrancar; no soporta Postgres local por Docker.
+npm run db:generate
+npm run db:migrate:deploy
 npm run dev
 ```
 
@@ -40,6 +41,8 @@ npm run db:studio
 Base: `harrys-boutique-next/.env.example`
 
 Producción: `harrys-boutique-next/.env.production.example`
+
+Ambos archivos listan todas las variables que usa el código; las marcadas como obligatorias se requieren en `vercel.json`/CI y en runtime.
 
 VM Ubuntu con Docker: `harrys-boutique-next/VM_DEPLOY.md`
 
@@ -122,7 +125,6 @@ Cambios ya aplicados en esta fase:
 2. sacar `auth()` de páginas públicas cacheables
 3. unificar wizard/form clásico de productos
 4. centralizar settings de negocio como envío y moneda
-5. retirar `legacy/` y dependencias residuales no usadas
 
 ## Canal de compra y Mercado Libre
 
