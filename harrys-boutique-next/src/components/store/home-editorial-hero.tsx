@@ -40,7 +40,12 @@ function AssuranceIcon({ type }: { type: AssuranceIconType }) {
 
   if (type === 'hand') {
     return (
-      <svg aria-hidden="true" className="h-12 w-12 shrink-0" viewBox="0 0 48 48" {...common}>
+      <svg
+        aria-hidden="true"
+        className="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
+        viewBox="0 0 48 48"
+        {...common}
+      >
         <path d="M5 33.5c4.7 0 7.2-3.4 10.1-3.4 3.8 0 5.6 4.9 9.7 4.9 3.9 0 5.5-3.3 8.7-3.3 3.8 0 5.6 3.3 9.5 3.3" />
         <path d="M8.5 38.5c4.1 0 6.6-2.8 10.4-2.8 4.1 0 6.3 3.9 10.3 3.9 4.2 0 6.4-2.9 10.3-2.9" />
         <path d="M17.8 26.2c-2.5-3-2-7.9 1.5-10.1 2.3-1.5 4.1.3 4.7 1.8.7-1.5 2.5-3.3 4.8-1.8 3.5 2.2 4 7.1 1.5 10.1L24 32.6l-6.2-6.4z" />
@@ -50,7 +55,12 @@ function AssuranceIcon({ type }: { type: AssuranceIconType }) {
 
   if (type === 'tape') {
     return (
-      <svg aria-hidden="true" className="h-12 w-12 shrink-0" viewBox="0 0 48 48" {...common}>
+      <svg
+        aria-hidden="true"
+        className="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
+        viewBox="0 0 48 48"
+        {...common}
+      >
         <path d="M9 14.5c0-3.6 2.9-6.5 6.5-6.5h17c3.6 0 6.5 2.9 6.5 6.5v17c0 3.6-2.9 6.5-6.5 6.5h-17C11.9 38 9 35.1 9 31.5v-17z" />
         <circle cx="24" cy="23" r="7" />
         <path d="M16 8v5M22 8v3M28 8v5M34 8v3M39 19h-5M39 25h-3M39 31h-5" />
@@ -60,7 +70,12 @@ function AssuranceIcon({ type }: { type: AssuranceIconType }) {
 
   if (type === 'flower') {
     return (
-      <svg aria-hidden="true" className="h-12 w-12 shrink-0" viewBox="0 0 48 48" {...common}>
+      <svg
+        aria-hidden="true"
+        className="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
+        viewBox="0 0 48 48"
+        {...common}
+      >
         <path d="M24 26v14M24 34c-3.7-4.8-7.3-5.9-10-5.5M24 37c3.7-4.8 7.3-5.9 10-5.5" />
         <circle cx="24" cy="18" r="3.2" />
         <path d="M24 14.8c-3.1-6.4-9.8-6.4-10.8-2.4-.7 3.2 2.2 6.2 7.6 5.6-5.4.6-7.3 4.9-4.6 7.1 3.3 2.7 7.8-.3 7.8-6.3 0 6 4.5 9 7.8 6.3 2.7-2.2.8-6.5-4.6-7.1 5.4.6 8.3-2.4 7.6-5.6-1-4-7.7-4-10.8 2.4z" />
@@ -69,7 +84,12 @@ function AssuranceIcon({ type }: { type: AssuranceIconType }) {
   }
 
   return (
-    <svg aria-hidden="true" className="h-12 w-12 shrink-0" viewBox="0 0 48 48" {...common}>
+    <svg
+      aria-hidden="true"
+      className="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
+      viewBox="0 0 48 48"
+      {...common}
+    >
       <path d="M12 18h24v22H12zM16.5 18v-4.5a7.5 7.5 0 0115 0V18" />
       <path d="M20 28.5h8M20 33.5h5" />
       <path d="M32.5 27.4c0 3.5-4.5 6-4.5 6s-4.5-2.5-4.5-6a2.6 2.6 0 014.5-1.8 2.6 2.6 0 014.5 1.8z" />
@@ -103,7 +123,7 @@ const assurances: Array<{ icon: AssuranceIconType; title: string; description: s
 export function HomeEditorialHero() {
   return (
     <section className="w-full bg-[var(--color-background)]">
-      <div className="relative isolate h-auto min-h-[82dvh] overflow-hidden bg-[var(--color-background)] md:min-h-[88dvh] lg:h-[min(85vh,920px)] lg:min-h-[680px]">
+      <div className="relative isolate h-auto min-h-[82svh] overflow-hidden bg-[var(--color-background)] md:min-h-[88svh] lg:h-[min(85svh,920px)] lg:min-h-[680px]">
         <Image
           src="/hero.png"
           alt="Perro usando una prenda de Harry's Boutique"
@@ -145,18 +165,15 @@ export function HomeEditorialHero() {
             Diseños cómodos, tallas cuidadas y detalles únicos para cada mascota.
           </p>
 
-          <div className="mt-6 flex flex-col items-start gap-3 sm:gap-4 lg:mt-8 lg:flex-row lg:flex-wrap">
-            <Link href="/tienda" className="ui-button ui-button-craft max-lg:w-[180px]">
-              <span>
+          <div className="mt-6 flex w-full max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-4 lg:mt-8">
+            <Link href="/tienda" className="ui-button ui-button-craft">
+              <span className="w-full justify-center whitespace-nowrap">
                 Ver prendas
                 <PawIcon className="h-5 w-5" />
               </span>
             </Link>
-            <Link
-              href="/experiencias#atelier"
-              className="ui-button ui-button-ghost-gold max-lg:w-[200px]"
-            >
-              <span>
+            <Link href="/experiencias#atelier" className="ui-button ui-button-ghost-gold">
+              <span className="w-full justify-center whitespace-nowrap">
                 Conoce el taller
                 <Arrow />
               </span>
@@ -169,13 +186,13 @@ export function HomeEditorialHero() {
         {assurances.map((assurance, index) => (
           <div
             key={assurance.title}
-            className={`flex items-center gap-3 px-4 py-6 sm:gap-5 sm:px-10 sm:py-8 lg:px-12 xl:px-16 ${index > 0 ? 'lg:border-l lg:border-dashed lg:border-[var(--color-dashed)]' : ''} ${index % 2 === 1 ? 'max-lg:border-l max-lg:border-dashed max-lg:border-[var(--color-dashed)]' : ''} ${index > 1 ? 'max-lg:border-t max-lg:border-[var(--color-stitch-line)]' : ''}`}
+            className={`flex flex-col items-start gap-3 px-4 py-6 sm:flex-row sm:items-center sm:gap-5 sm:px-10 sm:py-8 lg:px-12 xl:px-16 ${index > 0 ? 'lg:border-l lg:border-dashed lg:border-[var(--color-dashed)]' : ''} ${index % 2 === 1 ? 'max-lg:border-l max-lg:border-dashed max-lg:border-[var(--color-dashed)]' : ''} ${index > 1 ? 'max-lg:border-t max-lg:border-[var(--color-stitch-line)]' : ''}`}
           >
             <span className="mt-0.5 text-[var(--color-gold-dark)]">
               <AssuranceIcon type={assurance.icon} />
             </span>
             <div>
-              <p className="ui-display text-xl leading-6">{assurance.title}</p>
+              <p className="ui-display text-lg leading-6 sm:text-xl">{assurance.title}</p>
               <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
                 {assurance.description}
               </p>

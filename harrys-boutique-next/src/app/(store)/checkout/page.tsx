@@ -5,7 +5,7 @@ import { CheckoutPageClient } from '@/components/store/checkout-page-client'
 import { getPricingSettings, isCashOnDeliveryEnabled } from '@/lib/commerce-settings'
 
 export const metadata: Metadata = {
-  title: "Checkout — Harry's Boutique",
+  title: "Finalizar compra — Harry's Boutique",
   robots: { index: false },
 }
 

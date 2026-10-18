@@ -144,7 +144,7 @@ export function LoginPageClient() {
   const inputBase = 'ui-field w-full'
 
   return (
-    <div className="min-h-[calc(100vh-200px)] px-4 py-10 sm:py-14">
+    <div className="min-h-[calc(100svh-200px)] px-4 py-10 sm:py-14">
       <div className="ui-editorial-panel ui-editorial-panel-cream mx-auto grid w-full max-w-5xl overflow-hidden lg:grid-cols-[0.9fr_1.1fr]">
         <aside className="hidden bg-[var(--color-panel)] p-10 lg:flex lg:flex-col lg:justify-between">
           <div>

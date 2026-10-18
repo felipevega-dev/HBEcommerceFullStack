@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import type { CheckoutAddressField } from '@/lib/validations/checkout-address'
 
 interface AddressFormData {
   firstname: string
@@ -19,37 +20,54 @@ interface AddressFormProps {
   onChange: (data: Partial<AddressFormData>) => void
   showEmail?: boolean
   emailReadOnly?: boolean
+  /** Inline messages per field; the form marks those inputs as invalid. */
+  errors?: Partial<Record<CheckoutAddressField, string>>
+  /** Prefix for input ids so the parent can move focus to a field (`${idPrefix}-${field}`). */
+  idPrefix?: string
 }
 
 const COUNTRY = 'Chile'
 
 const CHILE_REGIONS = [
   { name: 'Arica y Parinacota', cities: ['Arica', 'Putre', 'Camarones'] },
-  { name: 'Tarapaca', cities: ['Iquique', 'Alto Hospicio', 'Pozo Almonte'] },
+  { name: 'Tarapacá', cities: ['Iquique', 'Alto Hospicio', 'Pozo Almonte'] },
   { name: 'Antofagasta', cities: ['Antofagasta', 'Calama', 'Tocopilla'] },
-  { name: 'Atacama', cities: ['Copiapo', 'Caldera', 'Vallenar'] },
+  { name: 'Atacama', cities: ['Copiapó', 'Caldera', 'Vallenar'] },
   { name: 'Coquimbo', cities: ['La Serena', 'Coquimbo', 'Ovalle'] },
-  { name: 'Valparaiso', cities: ['Valparaiso', 'Vina del Mar', 'Quilpue', 'Villa Alemana'] },
+  { name: 'Valparaíso', cities: ['Valparaíso', 'Viña del Mar', 'Quilpué', 'Villa Alemana'] },
   {
     name: 'Metropolitana de Santiago',
-    cities: ['Santiago', 'Providencia', 'Las Condes', 'Nunoa', 'Maipu', 'La Florida'],
+    cities: ['Santiago', 'Providencia', 'Las Condes', 'Ñuñoa', 'Maipú', 'La Florida'],
   },
-  { name: 'O Higgins', cities: ['Rancagua', 'San Fernando', 'Rengo'] },
-  { name: 'Maule', cities: ['Talca', 'Curico', 'Linares'] },
-  { name: 'Nuble', cities: ['Chillan', 'San Carlos', 'Bulnes'] },
-  { name: 'Biobio', cities: ['Concepcion', 'Talcahuano', 'Los Angeles'] },
-  { name: 'La Araucania', cities: ['Temuco', 'Villarrica', 'Angol'] },
-  { name: 'Los Rios', cities: ['Valdivia', 'La Union', 'Rio Bueno'] },
+  { name: "O'Higgins", cities: ['Rancagua', 'San Fernando', 'Rengo'] },
+  { name: 'Maule', cities: ['Talca', 'Curicó', 'Linares'] },
+  { name: 'Ñuble', cities: ['Chillán', 'San Carlos', 'Bulnes'] },
+  { name: 'Biobío', cities: ['Concepción', 'Talcahuano', 'Los Ángeles'] },
+  { name: 'La Araucanía', cities: ['Temuco', 'Villarrica', 'Angol'] },
+  { name: 'Los Ríos', cities: ['Valdivia', 'La Unión', 'Río Bueno'] },
   { name: 'Los Lagos', cities: ['Puerto Montt', 'Osorno', 'Castro'] },
-  { name: 'Aysen', cities: ['Coyhaique', 'Puerto Aysen', 'Chile Chico'] },
+  { name: 'Aysén', cities: ['Coyhaique', 'Puerto Aysén', 'Chile Chico'] },
   { name: 'Magallanes', cities: ['Punta Arenas', 'Puerto Natales', 'Porvenir'] },
 ]
+
+/** Saved addresses predate the accented names ("Valparaiso", "O Higgins"); compare loosely. */
+function normalizePlace(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+}
+
+const OTHER_CITY = '__other__'
 
 export function AddressForm({
   formData,
   onChange,
   showEmail = true,
   emailReadOnly = false,
+  errors = {},
+  idPrefix = 'address',
 }: AddressFormProps) {
   const [useCustomCity, setUseCustomCity] = useState(false)
 
@@ -59,120 +77,158 @@ export function AddressForm({
     }
   }, [formData.country, onChange])
 
-  const selectedRegion = useMemo(
-    () => CHILE_REGIONS.find((region) => region.name === formData.region),
-    [formData.region],
-  )
+  const selectedRegion = useMemo(() => {
+    const wanted = normalizePlace(formData.region)
+    return wanted
+      ? CHILE_REGIONS.find((region) => normalizePlace(region.name) === wanted)
+      : undefined
+  }, [formData.region])
+
+  const matchedCity = useMemo(() => {
+    const wanted = normalizePlace(formData.city)
+    return wanted
+      ? selectedRegion?.cities.find((city) => normalizePlace(city) === wanted)
+      : undefined
+  }, [formData.city, selectedRegion])
 
   useEffect(() => {
-    if (selectedRegion && formData.city && !selectedRegion.cities.includes(formData.city)) {
+    if (selectedRegion && formData.city && !matchedCity) {
       setUseCustomCity(true)
     }
-  }, [formData.city, selectedRegion])
+  }, [formData.city, matchedCity, selectedRegion])
 
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setUseCustomCity(false)
-    onChange({
-      region: e.target.value,
-      city: '',
-      country: COUNTRY,
-    })
+    onChange({ region: e.target.value, city: '', country: COUNTRY })
   }
 
-  const inputClass =
-    'border border-[var(--color-border)] rounded-lg px-3.5 py-2.5 w-full text-sm bg-[var(--color-background)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-colors placeholder:text-[var(--color-text-muted)]'
+  const fieldId = (field: CheckoutAddressField) => `${idPrefix}-${field}`
+  const errorId = (field: CheckoutAddressField) => `${idPrefix}-${field}-error`
 
-  const selectClass = `${inputClass} cursor-pointer`
+  const fieldProps = (field: CheckoutAddressField) => ({
+    id: fieldId(field),
+    name: field,
+    'aria-invalid': errors[field] ? (true as const) : undefined,
+    'aria-describedby': errors[field] ? errorId(field) : undefined,
+    className: 'ui-field w-full',
+  })
+
+  const label = (field: CheckoutAddressField, text: string, required = false) => (
+    <label
+      htmlFor={fieldId(field)}
+      className="mb-1.5 block text-sm font-medium text-[var(--color-text-secondary)]"
+    >
+      {text}
+      {required ? (
+        <span aria-hidden="true" className="ml-0.5 text-[var(--color-error)]">
+          *
+        </span>
+      ) : (
+        <span className="ml-1 font-normal text-[var(--color-text-muted)]">(opcional)</span>
+      )}
+    </label>
+  )
+
+  const errorText = (field: CheckoutAddressField) =>
+    errors[field] ? (
+      <p id={errorId(field)} className="mt-1.5 text-sm text-[var(--color-error)]">
+        {errors[field]}
+      </p>
+    ) : null
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Nombre <span className="text-red-500">*</span>
-        </label>
+        {label('firstname', 'Nombre', true)}
         <input
+          {...fieldProps('firstname')}
           required
           type="text"
+          autoComplete="given-name"
           value={formData.firstname}
           onChange={(e) => onChange({ firstname: e.target.value })}
-          className={inputClass}
           placeholder="Tu nombre"
         />
+        {errorText('firstname')}
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Apellido
-        </label>
+        {label('lastname', 'Apellido')}
         <input
+          {...fieldProps('lastname')}
           type="text"
+          autoComplete="family-name"
           value={formData.lastname}
           onChange={(e) => onChange({ lastname: e.target.value })}
-          className={inputClass}
           placeholder="Tu apellido"
         />
+        {errorText('lastname')}
       </div>
 
       {showEmail && (
         <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Email <span className="text-red-500">*</span>
-          </label>
+          {label('email', 'Email', true)}
           <input
+            {...fieldProps('email')}
             required
             type="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
             value={formData.email}
             onChange={(e) => onChange({ email: e.target.value })}
-            className={inputClass}
             placeholder="tu@email.com"
             readOnly={emailReadOnly}
           />
+          {errorText('email')}
         </div>
       )}
 
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Telefono <span className="text-red-500">*</span>
-        </label>
+        {label('phone', 'Teléfono', true)}
         <input
+          {...fieldProps('phone')}
           required
           type="tel"
+          inputMode="tel"
+          autoComplete="tel"
           value={formData.phone}
           onChange={(e) => onChange({ phone: e.target.value })}
-          className={inputClass}
           placeholder="+56 9 1234 5678"
         />
+        {errorText('phone')}
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Region <span className="text-red-500">*</span>
-        </label>
+        {label('region', 'Región', true)}
         <select
+          {...fieldProps('region')}
           required
-          value={formData.region}
+          autoComplete="address-level1"
+          value={selectedRegion?.name ?? formData.region}
           onChange={handleRegionChange}
-          className={selectClass}
+          className="ui-field w-full cursor-pointer"
         >
-          <option value="">Selecciona una region</option>
+          <option value="">Selecciona una región</option>
           {CHILE_REGIONS.map((region) => (
             <option key={region.name} value={region.name}>
               {region.name}
             </option>
           ))}
         </select>
+        {errorText('region')}
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Ciudad / Comuna <span className="text-red-500">*</span>
-        </label>
+        {label('city', 'Comuna', true)}
         {selectedRegion ? (
           <select
+            {...fieldProps('city')}
             required
-            value={useCustomCity ? 'Otra' : formData.city}
+            autoComplete="address-level2"
+            value={useCustomCity ? OTHER_CITY : (matchedCity ?? formData.city)}
             onChange={(e) => {
-              if (e.target.value === 'Otra') {
+              if (e.target.value === OTHER_CITY) {
                 setUseCustomCity(true)
                 onChange({ city: '' })
                 return
@@ -181,76 +237,101 @@ export function AddressForm({
               setUseCustomCity(false)
               onChange({ city: e.target.value })
             }}
-            className={selectClass}
+            className="ui-field w-full cursor-pointer"
           >
-            <option value="">Selecciona una ciudad</option>
+            <option value="">Selecciona una comuna</option>
             {selectedRegion.cities.map((city) => (
               <option key={city} value={city}>
                 {city}
               </option>
             ))}
-            <option value="Otra">Otra</option>
+            <option value={OTHER_CITY}>Otra comuna</option>
           </select>
         ) : (
           <input
+            {...fieldProps('city')}
             required
             type="text"
+            autoComplete="address-level2"
             value={formData.city}
             onChange={(e) => onChange({ city: e.target.value })}
-            className={inputClass}
-            placeholder="Ciudad o comuna"
+            placeholder="Selecciona primero la región"
           />
         )}
+        {!useCustomCity && errorText('city')}
       </div>
 
       {useCustomCity && (
         <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Especifica tu comuna
+          <label
+            htmlFor={`${fieldId('city')}-custom`}
+            className="mb-1.5 block text-sm font-medium text-[var(--color-text-secondary)]"
+          >
+            Escribe tu comuna
+            <span aria-hidden="true" className="ml-0.5 text-[var(--color-error)]">
+              *
+            </span>
           </label>
           <input
+            id={`${fieldId('city')}-custom`}
+            name="city-custom"
             required
             type="text"
-            value={selectedRegion?.cities.includes(formData.city) ? '' : formData.city}
+            autoComplete="address-level2"
+            aria-invalid={errors.city ? true : undefined}
+            aria-describedby={errors.city ? errorId('city') : undefined}
+            value={matchedCity ? '' : formData.city}
             onChange={(e) => onChange({ city: e.target.value })}
-            className={inputClass}
+            className="ui-field w-full"
             placeholder="Comuna"
           />
+          {errorText('city')}
         </div>
       )}
 
       <div className="md:col-span-2">
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Direccion <span className="text-red-500">*</span>
-        </label>
+        {label('street', 'Dirección', true)}
         <input
+          {...fieldProps('street')}
           required
           type="text"
+          autoComplete="street-address"
           value={formData.street}
           onChange={(e) => onChange({ street: e.target.value })}
-          className={inputClass}
-          placeholder="Calle, numero, depto o referencia"
+          placeholder="Calle, número, depto. o referencia"
         />
+        {errorText('street')}
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Codigo postal
-        </label>
+        {label('postalCode', 'Código postal')}
         <input
+          {...fieldProps('postalCode')}
           type="text"
+          inputMode="numeric"
+          autoComplete="postal-code"
           value={formData.postalCode}
           onChange={(e) => onChange({ postalCode: e.target.value })}
-          className={inputClass}
-          placeholder="Opcional"
+          placeholder="Ej: 1000000"
         />
+        {errorText('postalCode')}
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-          Pais
+        <label
+          htmlFor={fieldId('country')}
+          className="mb-1.5 block text-sm font-medium text-[var(--color-text-secondary)]"
+        >
+          País
         </label>
-        <input readOnly value={COUNTRY} className={`${inputClass} bg-[var(--color-surface)]`} />
+        <input
+          id={fieldId('country')}
+          name="country"
+          readOnly
+          autoComplete="country-name"
+          value={COUNTRY}
+          className="ui-field w-full bg-[var(--color-surface-2)] text-[var(--color-text-secondary)]"
+        />
       </div>
     </div>
   )

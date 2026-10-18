@@ -6,6 +6,7 @@ import { WishlistButton } from '@/components/store/wishlist-button'
 import { StarRating } from '@/components/ui/star-rating'
 import { formatPrice } from '@/lib/utils'
 import { resolveProductPurchaseChannel, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
+import { ArrowUpRight } from 'lucide-react'
 import { MercadoLibreLink } from './mercado-libre-link'
 
 interface Product {
@@ -146,14 +147,15 @@ export function ProductCard({ product }: { product: Product }) {
           productName={product.name}
           productSlug={product.slug}
           location="product_card"
-          className="ui-button ui-button-ml ui-button-sm w-full justify-center"
+          className="ui-button ui-button-ml ui-button-sm w-full justify-center whitespace-nowrap"
         >
-          Comprar en Mercado Libre
+          <span className="sr-only">Comprar en</span> Mercado Libre
+          <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
         </MercadoLibreLink>
       ) : (
         <Link
           href={href}
-          className="ui-button ui-button-primary ui-button-sm w-full justify-center"
+          className="ui-button ui-button-primary ui-button-sm w-full justify-center whitespace-nowrap"
         >
           Comprar en Harry&apos;s
         </Link>
