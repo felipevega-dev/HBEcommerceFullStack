@@ -1218,3 +1218,28 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Riesgos detectados: `npm run check` y `npm run ci` nunca ejecutan tests
   porque `lint` corta la cadena; faltan `.env.example` y
   `.env.production.example` citados por README y checklist.
+
+## 2026-10-18 - Formato global y finales de línea
+
+- Rama usada: `chore/format-and-eol`.
+- Objetivo: dejar `npm run lint` (Prettier) en verde para que `npm run check`
+  y `npm run ci` vuelvan a ejecutar los tests, y evitar que Windows vuelva a
+  introducir CRLF.
+- Archivos modificados:
+  - `.gitattributes` (nuevo): `* text=auto eol=lf`, `.bat/.cmd` en CRLF y
+    binarios declarados.
+  - `harrys-boutique-next/scripts/seed-snapshot.json`: único archivo con
+    cambios reales de formato Prettier.
+- Cambios realizados:
+  - Diagnóstico: el índice ya estaba en LF; los 94 avisos de Prettier venían
+    de archivos con CRLF en el working copy por `core.autocrlf=true`.
+  - Se normalizaron 398 archivos del working copy a LF (sin cambios de
+    contenido para Git) y se ejecutó `prettier --write .` desde la app.
+  - Clones existentes en Windows deben ejecutar `git add --renormalize .` o
+    volver a hacer checkout tras este commit para que Prettier pase en local.
+- Validaciones: `npm run check` (type-check + lint + test 309/309) OK,
+  `npm run build` OK.
+- Resultado: `npm run lint` pasa en todo el repositorio; `check` y `ci` vuelven
+  a cubrir los tests.
+- Pendientes: ninguno en esta fase.
+- Riesgos: ninguno detectado; el snapshot de seed sigue parseando como JSON.
