@@ -117,6 +117,8 @@ const getCachedCollectionListing = unstable_cache(
           mercadoLibreUrl: true,
           mercadoLibreItemId: true,
           mercadoLibreStatus: true,
+          mercadoLibreAvailable: true,
+          mercadoLibreSyncedAt: true,
           colors: true,
           sizes: true,
         },
@@ -142,6 +144,8 @@ const getCachedCollectionListing = unstable_cache(
         mercadoLibreUrl: product.mercadoLibreUrl,
         mercadoLibreItemId: product.mercadoLibreItemId,
         mercadoLibreStatus: product.mercadoLibreStatus,
+        mercadoLibreAvailable: product.mercadoLibreAvailable,
+        mercadoLibreSyncedAt: product.mercadoLibreSyncedAt?.toISOString() ?? null,
       })),
     }
   },

@@ -19,6 +19,8 @@ export type HomeProduct = {
   price: number
   mercadoLibreUrl: string | null
   mercadoLibreItemId: string | null
+  mercadoLibreAvailable: boolean | null
+  mercadoLibreSyncedAt: string | null
 }
 
 export type HomeInstagramPost = {
@@ -68,6 +70,8 @@ function productToHomeProduct(product: {
   createdAt: Date
   mercadoLibreUrl: string | null
   mercadoLibreItemId: string | null
+  mercadoLibreAvailable: boolean | null
+  mercadoLibreSyncedAt: Date | null
 }) {
   return {
     id: product.id,
@@ -78,6 +82,8 @@ function productToHomeProduct(product: {
     price: Number(product.price),
     mercadoLibreUrl: product.mercadoLibreUrl,
     mercadoLibreItemId: product.mercadoLibreItemId,
+    mercadoLibreAvailable: product.mercadoLibreAvailable,
+    mercadoLibreSyncedAt: product.mercadoLibreSyncedAt?.toISOString() ?? null,
   }
 }
 
@@ -113,6 +119,8 @@ export async function getHomeContent(): Promise<HomeContent> {
               createdAt: true,
               mercadoLibreUrl: true,
               mercadoLibreItemId: true,
+              mercadoLibreAvailable: true,
+              mercadoLibreSyncedAt: true,
             },
           },
         },
@@ -154,6 +162,8 @@ export async function getHomeContent(): Promise<HomeContent> {
                   createdAt: true,
                   mercadoLibreUrl: true,
                   mercadoLibreItemId: true,
+                  mercadoLibreAvailable: true,
+                  mercadoLibreSyncedAt: true,
                 },
               },
             },
@@ -179,6 +189,8 @@ export async function getHomeContent(): Promise<HomeContent> {
                   createdAt: true,
                   mercadoLibreUrl: true,
                   mercadoLibreItemId: true,
+                  mercadoLibreAvailable: true,
+                  mercadoLibreSyncedAt: true,
                 },
               },
             },
@@ -208,6 +220,8 @@ export async function getHomeContent(): Promise<HomeContent> {
               createdAt: true,
               mercadoLibreUrl: true,
               mercadoLibreItemId: true,
+              mercadoLibreAvailable: true,
+              mercadoLibreSyncedAt: true,
             },
           })
         ).map(productToHomeProduct)

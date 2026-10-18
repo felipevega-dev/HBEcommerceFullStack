@@ -132,4 +132,38 @@ describe('ProductCard — tests de ejemplo', () => {
     )
     expect(screen.queryByText('Disponible en Mercado Libre')).not.toBeInTheDocument()
   })
+
+  it('deja de enlazar una publicación pausada y muestra su estado', () => {
+    render(
+      <ProductCard
+        product={{
+          ...baseProduct,
+          mercadoLibreUrl: 'https://articulo.mercadolibre.cl/MLC-4144018020-collar-bordado-_JM',
+          mercadoLibreStatus: 'PAUSED',
+          mercadoLibreSyncedAt: '2026-10-18T12:00:00.000Z',
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole('link', { name: /Mercado Libre/ })).not.toBeInTheDocument()
+    expect(screen.getByText('Pausado')).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByText('Publicación pausada')).toBeInTheDocument()
+  })
+
+  it('muestra agotado cuando Mercado Libre informa cero unidades', () => {
+    render(
+      <ProductCard
+        product={{
+          ...baseProduct,
+          mercadoLibreUrl: 'https://articulo.mercadolibre.cl/MLC-4144018020-collar-bordado-_JM',
+          mercadoLibreStatus: 'ACTIVE',
+          mercadoLibreAvailable: false,
+          mercadoLibreSyncedAt: '2026-10-18T12:00:00.000Z',
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Agotado')).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByText('Agotado en Mercado Libre')).toBeInTheDocument()
+  })
 })

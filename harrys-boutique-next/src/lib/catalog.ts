@@ -14,6 +14,8 @@ export const getProductByIdOrSlug = cache(async (idOrSlug: string) => {
       mercadoLibreUrl: true,
       mercadoLibreItemId: true,
       mercadoLibreStatus: true,
+      mercadoLibreAvailable: true,
+      mercadoLibreSyncedAt: true,
       price: true,
       originalPrice: true,
       images: true,

@@ -137,7 +137,19 @@ En Admin, la URL se configura desde las opciones del producto. El item ID queda 
 
 La fase actual no crea carritos externos ni transfiere talla, color o varios productos hacia Mercado Libre. Mientras no exista OAuth, la ficha no muestra stock, variantes ni cantidad locales para esos productos; el precio se presenta como referencial y la disponibilidad se confirma en la publicación. El stock de los recursos públicos de Mercado Libre es referencial por rangos, por lo que no debe utilizarse como stock exacto.
 
-La fase 2 podrá consultar publicación, precio, stock exacto, variaciones, imágenes, preguntas y órdenes mediante OAuth y caché local. La creación o actualización de publicaciones queda para una fase 3.
+### Sincronización con Mercado Libre (fase 2)
+
+Con la cuenta vendedora conectada por OAuth, la tienda sincroniza precio, estado (activa, pausada, finalizada) y disponibilidad de cada publicación vinculada:
+
+- Conexión: `/admin/settings` → panel "Mercado Libre" → "Conectar con Mercado Libre". Los tokens se guardan cifrados (AES-256-GCM con `MERCADOLIBRE_TOKEN_SECRET` o, en su defecto, `NEXTAUTH_SECRET`) y se refrescan solos.
+- Sincronización manual: botón "Sincronizar ahora" (`POST /api/admin/mercadolibre/sync`).
+- Sincronización automática: `GET /api/cron/mercadolibre-sync` programado en `vercel.json` (diario, 08:00 UTC) y protegido con `CRON_SECRET`.
+- Efecto en la tienda: el precio local se reemplaza por el de Mercado Libre; una publicación pausada, finalizada o agotada deja de enlazar a Mercado Libre y muestra su estado en cards y ficha; el JSON-LD expone `availability` solo cuando hay sincronización.
+- El stock exacto de Mercado Libre nunca se copia al stock local: solo se guarda si hay o no unidades.
+
+Requisitos: crear la aplicación en el portal de desarrolladores de Mercado Libre Chile con `offline_access`, registrar como redirect URI `https://<dominio>/api/admin/mercadolibre/callback`, y definir `MERCADOLIBRE_CLIENT_ID`, `MERCADOLIBRE_CLIENT_SECRET` y `CRON_SECRET` (ver `.env.production.example`). Antes de desplegar, aplicar la migración `20261018120000_add_mercado_libre_sync` con `npm run db:migrate:deploy`.
+
+La fase 3 podrá importar órdenes y preguntas, y crear o actualizar publicaciones.
 
 Antes de desplegar esta fase, ejecutar fuera del proceso web:
 

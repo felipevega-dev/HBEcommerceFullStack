@@ -61,6 +61,8 @@ export default async function ProductPage({ params }: Props) {
     mercadoLibreUrl: rawProduct.mercadoLibreUrl,
     mercadoLibreItemId: rawProduct.mercadoLibreItemId,
     mercadoLibreStatus: rawProduct.mercadoLibreStatus,
+    mercadoLibreAvailable: rawProduct.mercadoLibreAvailable,
+    mercadoLibreSyncedAt: rawProduct.mercadoLibreSyncedAt?.toISOString() ?? null,
     price: Number(rawProduct.price),
     originalPrice: rawProduct.originalPrice ? Number(rawProduct.originalPrice) : null,
     images: rawProduct.images,
@@ -104,6 +106,8 @@ export default async function ProductPage({ params }: Props) {
     mercadoLibreUrl: product.mercadoLibreUrl,
     mercadoLibreItemId: product.mercadoLibreItemId,
     mercadoLibreStatus: product.mercadoLibreStatus,
+    mercadoLibreAvailable: product.mercadoLibreAvailable,
+    mercadoLibreSyncedAt: product.mercadoLibreSyncedAt,
     url: productUrl,
   })
 

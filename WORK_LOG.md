@@ -1300,6 +1300,56 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Pendientes: ninguno en esta fase.
 - Riesgos: ninguno; no se tocó código de producción.
 
+## 2026-10-18 - Mercado Libre: OAuth y sincronización de publicaciones
+
+- Rama usada: `feature/mercadolibre-oauth-sync` (sin mergear: requiere
+  migración en producción antes del deploy).
+- Objetivo: dejar de tratar Mercado Libre como un enlace ciego; sincronizar
+  precio, estado y disponibilidad de cada publicación vinculada.
+- Archivos principales:
+  - `prisma/schema.prisma` y migración `20261018120000_add_mercado_libre_sync`
+    (campos `mercadoLibreAvailable`, `mercadoLibreSyncedAt`,
+    `mercadoLibreSyncError` en `products`; tabla
+    `mercado_libre_connections`).
+  - `src/lib/mercado-libre-auth.ts` (OAuth con PKCE, intercambio y refresh de
+    tokens, cifrado AES-256-GCM, persistencia) y
+    `src/lib/mercado-libre-sync.ts` (multiget de 20 ítems, mapeo de estados,
+    resumen y estado de integración).
+  - Rutas admin `api/admin/mercadolibre/{connect,callback,connection,sync}` y
+    cron `api/cron/mercadolibre-sync`; `vercel.json` con cron diario.
+  - `src/lib/mercado-libre.ts`: disponibilidad derivada
+    (`available/sold_out/paused/closed/unknown`) y mapeo de estados de ítems.
+  - Tienda: `product-card`, `product-info`, `structured-data`, `catalog`,
+    `collection-data`, `home-content`, `best-seller`, `related-products`,
+    página de producto.
+  - Admin: `mercado-libre-connection-panel.tsx` y página de configuración.
+  - `.env.example`, `.env.production.example`, README, PRODUCTION_CHECKLIST,
+    ECOMMERCE_IMPROVEMENT_PLAN.
+- Cambios realizados:
+  - El precio local de un producto vinculado se reemplaza por el de Mercado
+    Libre en cada sync; el stock local nunca se deriva de
+    `available_quantity`, solo se guarda si hay unidades.
+  - Publicaciones pausadas, finalizadas o agotadas muestran su estado y dejan
+    de enlazar; las no sincronizadas conservan el comportamiento anterior.
+  - JSON-LD expone `availability` para productos de Mercado Libre solo cuando
+    existe sincronización.
+  - Tokens cifrados con `MERCADOLIBRE_TOKEN_SECRET` o `NEXTAUTH_SECRET`; rotar
+    `NEXTAUTH_SECRET` sin definir el primero obliga a reconectar.
+- Validaciones: `npm run type-check`, Prettier, `npm run test` (36 archivos,
+  ~400 tests, 65 nuevos de Mercado Libre) y `npm run build`.
+- Pendientes (manuales):
+  1. Crear la app en developers.mercadolibre.cl con `offline_access` y
+     redirect URI `https://<dominio>/api/admin/mercadolibre/callback`.
+  2. Definir `MERCADOLIBRE_CLIENT_ID`, `MERCADOLIBRE_CLIENT_SECRET`,
+     `CRON_SECRET` (y opcional `MERCADOLIBRE_TOKEN_SECRET`) en Vercel.
+  3. Aplicar `npm run db:migrate:deploy` contra producción y recién entonces
+     mergear la rama a `main`.
+  4. Conectar la cuenta desde `/admin/settings` y ejecutar "Sincronizar ahora".
+- Riesgos: desplegar la rama sin la migración rompe las consultas de productos
+  (columnas nuevas). El plan Hobby de Vercel limita el cron a una vez al día;
+  el botón manual cubre cambios urgentes. No se probó contra la API real por
+  falta de credenciales; la cobertura es con `fetch` mockeado.
+
 ## 2026-10-18 - ISR en Home y páginas de ayuda con revalidación desde el admin
 
 - Rama usada: `feature/home-isr-revalidate`.
@@ -1430,3 +1480,12 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Riesgos: desplegar sin la migración rompe todas las consultas de pedidos.
   Rotar `NEXTAUTH_SECRET` sin `GUEST_ORDER_SECRET` invalida los enlaces de
   seguimiento ya enviados a invitados.
+
+### Nota 2026-10-18 (tras integrar `main` con ISR)
+
+- Desde que la Home se prerenderiza en el build, `npm run build` de esta rama
+  falla con `P2022` (`products.mercadoLibreAvailable` no existe) mientras la
+  migración `20261018120000_add_mercado_libre_sync` no esté aplicada en la
+  base a la que apunta el build. En Vercel el deploy fallaría y la versión
+  anterior seguiría activa. Aplicar la migración primero y luego mergear.
+- `npm run check` (type-check, Prettier y 413 tests) pasa en esta rama.

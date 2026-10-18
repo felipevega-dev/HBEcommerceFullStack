@@ -5,7 +5,13 @@ import Image from 'next/image'
 import { WishlistButton } from '@/components/store/wishlist-button'
 import { StarRating } from '@/components/ui/star-rating'
 import { formatPrice } from '@/lib/utils'
-import { resolveProductPurchaseChannel, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
+import {
+  MERCADO_LIBRE_AVAILABILITY_LABELS,
+  isMercadoLibreListingPurchasable,
+  resolveProductPurchaseChannel,
+  type MercadoLibreListingAvailability,
+  type MercadoLibreListingStatus,
+} from '@/lib/mercado-libre'
 import { ArrowUpRight } from 'lucide-react'
 import { MercadoLibreLink } from './mercado-libre-link'
 
@@ -25,6 +31,15 @@ interface Product {
   mercadoLibreUrl?: string | null
   mercadoLibreItemId?: string | null
   mercadoLibreStatus?: MercadoLibreListingStatus
+  mercadoLibreAvailable?: boolean | null
+  mercadoLibreSyncedAt?: string | Date | null
+}
+
+// The image badge carries the full status; the button needs a label that fits a two-column grid.
+const UNAVAILABLE_CTA_LABELS: Partial<Record<MercadoLibreListingAvailability, string>> = {
+  sold_out: 'Agotado',
+  paused: 'Pausado',
+  closed: 'No disponible',
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -34,6 +49,10 @@ export function ProductCard({ product }: { product: Product }) {
   const isValidSlug = product.slug && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(product.slug)
   const href = isValidSlug ? `/product/${product.slug}` : `/product/${product.id}`
   const purchaseChannel = resolveProductPurchaseChannel(product)
+  const mercadoLibreAvailability =
+    purchaseChannel.type === 'mercadolibre' ? purchaseChannel.listing.availability : null
+  const mercadoLibrePurchasable =
+    mercadoLibreAvailability !== null && isMercadoLibreListingPurchasable(mercadoLibreAvailability)
 
   return (
     <article className="group flex h-full flex-col gap-2.5 rounded-[1.35rem] border border-transparent p-1.5 transition-all duration-300 hover:border-[var(--color-stitch-line)] hover:bg-[var(--color-surface)]/70 hover:shadow-[var(--shadow-editorial)]">
@@ -51,7 +70,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
           {purchaseChannel.type === 'mercadolibre' && (
             <span className="absolute bottom-2 left-2 right-2 z-10 truncate rounded-full border border-[var(--color-ml-border)] bg-[var(--color-ml-bg)]/95 px-2 py-1 text-center text-[9px] font-semibold text-[var(--color-ml-text)] shadow-sm">
-              Disponible en Mercado Libre
+              {MERCADO_LIBRE_AVAILABILITY_LABELS[purchaseChannel.listing.availability]}
             </span>
           )}
 
@@ -140,18 +159,27 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {purchaseChannel.type === 'mercadolibre' ? (
-        <MercadoLibreLink
-          href={purchaseChannel.listing.url}
-          itemId={purchaseChannel.listing.itemId}
-          productId={product.id}
-          productName={product.name}
-          productSlug={product.slug}
-          location="product_card"
-          className="ui-button ui-button-ml ui-button-sm w-full justify-center whitespace-nowrap"
-        >
-          <span className="sr-only">Comprar en</span> Mercado Libre
-          <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
-        </MercadoLibreLink>
+        !mercadoLibrePurchasable ? (
+          <span
+            aria-disabled="true"
+            className="ui-button ui-button-ml ui-button-sm w-full cursor-not-allowed justify-center whitespace-nowrap opacity-60"
+          >
+            {UNAVAILABLE_CTA_LABELS[purchaseChannel.listing.availability] ?? 'No disponible'}
+          </span>
+        ) : (
+          <MercadoLibreLink
+            href={purchaseChannel.listing.url}
+            itemId={purchaseChannel.listing.itemId}
+            productId={product.id}
+            productName={product.name}
+            productSlug={product.slug}
+            location="product_card"
+            className="ui-button ui-button-ml ui-button-sm w-full justify-center whitespace-nowrap"
+          >
+            <span className="sr-only">Comprar en</span> Mercado Libre
+            <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
+          </MercadoLibreLink>
+        )
       ) : (
         <Link
           href={href}

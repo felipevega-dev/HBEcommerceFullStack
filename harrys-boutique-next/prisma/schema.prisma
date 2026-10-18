@@ -139,30 +139,33 @@ model Category {
 }
 
 model Product {
-  id                 String                    @id @default(uuid())
-  slug               String                    @unique @default("")
-  sku                String?                   @unique
-  name               String
-  description        String
-  seoTitle           String?
-  seoDescription     String?
-  mercadoLibreUrl    String?
-  mercadoLibreItemId String?                   @unique
-  mercadoLibreStatus MercadoLibreListingStatus @default(INACTIVE)
-  price              Decimal                   @db.Decimal(10, 2)
-  originalPrice      Decimal?                  @db.Decimal(10, 2)
-  images             String[]
-  categoryId         String
-  subCategory        String
-  colors             String[]
-  sizes              Json
-  bestSeller         Boolean                   @default(false)
-  active             Boolean                   @default(true)
-  stock              Int                       @default(0)
-  ratingAverage      Float                     @default(0)
-  ratingCount        Int                       @default(0)
-  createdAt          DateTime                  @default(now())
-  updatedAt          DateTime                  @updatedAt
+  id                    String                    @id @default(uuid())
+  slug                  String                    @unique @default("")
+  sku                   String?                   @unique
+  name                  String
+  description           String
+  seoTitle              String?
+  seoDescription        String?
+  mercadoLibreUrl       String?
+  mercadoLibreItemId    String?                   @unique
+  mercadoLibreStatus    MercadoLibreListingStatus @default(INACTIVE)
+  mercadoLibreAvailable Boolean?
+  mercadoLibreSyncedAt  DateTime?
+  mercadoLibreSyncError String?
+  price                 Decimal                   @db.Decimal(10, 2)
+  originalPrice         Decimal?                  @db.Decimal(10, 2)
+  images                String[]
+  categoryId            String
+  subCategory           String
+  colors                String[]
+  sizes                 Json
+  bestSeller            Boolean                   @default(false)
+  active                Boolean                   @default(true)
+  stock                 Int                       @default(0)
+  ratingAverage         Float                     @default(0)
+  ratingCount           Int                       @default(0)
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
 
   category          Category               @relation(fields: [categoryId], references: [id])
   reviews           Review[]
@@ -492,6 +495,25 @@ model Settings {
   updatedAt   DateTime @updatedAt
 
   @@map("settings")
+}
+
+// ─── Mercado Libre ────────────────────────────────────────────────────────────
+
+model MercadoLibreConnection {
+  id            String    @id @default(uuid())
+  mlUserId      String    @unique
+  nickname      String?
+  accessToken   String
+  refreshToken  String
+  expiresAt     DateTime
+  scope         String?
+  connectedById String?
+  lastSyncAt    DateTime?
+  lastSyncError String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("mercado_libre_connections")
 }
 
 // ─── Hero Slides ──────────────────────────────────────────────────────────────

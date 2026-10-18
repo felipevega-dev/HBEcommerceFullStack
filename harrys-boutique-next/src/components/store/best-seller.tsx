@@ -16,6 +16,8 @@ type BestSellerProduct = {
   mercadoLibreUrl: string | null
   mercadoLibreItemId: string | null
   mercadoLibreStatus: MercadoLibreListingStatus
+  mercadoLibreAvailable: boolean | null
+  mercadoLibreSyncedAt: Date | null
 }
 
 export async function BestSeller() {
@@ -37,6 +39,8 @@ export async function BestSeller() {
         mercadoLibreUrl: true,
         mercadoLibreItemId: true,
         mercadoLibreStatus: true,
+        mercadoLibreAvailable: true,
+        mercadoLibreSyncedAt: true,
       },
     })
   } catch (error) {
@@ -54,6 +58,8 @@ export async function BestSeller() {
     mercadoLibreUrl: p.mercadoLibreUrl,
     mercadoLibreItemId: p.mercadoLibreItemId,
     mercadoLibreStatus: p.mercadoLibreStatus,
+    mercadoLibreAvailable: p.mercadoLibreAvailable,
+    mercadoLibreSyncedAt: p.mercadoLibreSyncedAt?.toISOString() ?? null,
   }))
 
   return (
