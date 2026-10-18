@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "mercadolibre-devsite-mcp": {
+      "type": "http",
+      "url": "https://mcp.mercadolibre.com/devsite/v1/mcp"
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"],
+      "env": {}
+    }
+  }
+}
