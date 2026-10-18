@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Playfair_Display } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import { getSiteOrigin } from '@/lib/site'
@@ -11,6 +11,15 @@ const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-display',
 })
+
+// Matches the header surface so the mobile browser chrome blends with the page.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  interactiveWidget: 'resizes-content',
+  themeColor: '#fffdf8',
+  colorScheme: 'light',
+}
 
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin(),

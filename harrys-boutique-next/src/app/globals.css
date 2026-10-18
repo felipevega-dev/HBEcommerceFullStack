@@ -114,12 +114,37 @@
     letter-spacing: -0.015em;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   button,
   a,
   input,
   select,
   textarea {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Controls fire on the first tap (no double-tap-zoom wait) and never select their own label. */
+  button,
+  a,
+  summary,
+  label,
+  [role='button'],
+  [role='radio'],
+  [role='tab'] {
+    touch-action: manipulation;
+  }
+
+  button,
+  [role='button'],
+  [role='radio'],
+  [role='tab'],
+  .ui-button {
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   button {
@@ -289,9 +314,11 @@
     color: white;
   }
 
-  .ui-button-primary:hover:not(:disabled) {
-    background: var(--color-primary-hover);
-    box-shadow: var(--shadow-sm);
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-primary:hover:not(:disabled) {
+      background: var(--color-primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
   }
 
   .ui-button-secondary {
@@ -300,9 +327,11 @@
     color: var(--color-text-primary);
   }
 
-  .ui-button-secondary:hover:not(:disabled) {
-    border-color: var(--color-accent);
-    background: var(--color-accent-light);
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-secondary:hover:not(:disabled) {
+      border-color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
   }
 
   .ui-button-ghost {
@@ -311,9 +340,11 @@
     color: var(--color-text-secondary);
   }
 
-  .ui-button-ghost:hover:not(:disabled) {
-    background: var(--color-surface-2);
-    color: var(--color-text-primary);
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-ghost:hover:not(:disabled) {
+      background: var(--color-surface-2);
+      color: var(--color-text-primary);
+    }
   }
 
   .ui-button-danger {
@@ -322,8 +353,10 @@
     color: var(--color-error);
   }
 
-  .ui-button-danger:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--color-error) 14%, var(--color-surface));
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-danger:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-error) 14%, var(--color-surface));
+    }
   }
 
   .ui-button-craft {
@@ -350,9 +383,11 @@
     padding: 0.625rem 1.75rem;
   }
 
-  .ui-button-craft:hover:not(:disabled) {
-    filter: brightness(0.95);
-    transform: translateY(-2px);
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-craft:hover:not(:disabled) {
+      filter: brightness(0.95);
+      transform: translateY(-2px);
+    }
   }
 
   .ui-button-ghost-gold {
@@ -379,8 +414,10 @@
     padding: 0.625rem 1.75rem;
   }
 
-  .ui-button-ghost-gold:hover:not(:disabled) {
-    background: white;
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-ghost-gold:hover:not(:disabled) {
+      background: white;
+    }
   }
 
   .ui-button-ml {
@@ -389,8 +426,10 @@
     color: var(--color-ml-text);
   }
 
-  .ui-button-ml:hover:not(:disabled) {
-    background: #ffefc5;
+  @media (hover: hover) and (pointer: fine) {
+    .ui-button-ml:hover:not(:disabled) {
+      background: #ffefc5;
+    }
   }
 
   .ui-field {
@@ -411,8 +450,10 @@
     color: var(--color-text-muted);
   }
 
-  .ui-field:hover {
-    border-color: var(--color-accent);
+  @media (hover: hover) and (pointer: fine) {
+    .ui-field:hover {
+      border-color: var(--color-accent);
+    }
   }
 
   .ui-field:focus {
@@ -483,8 +524,10 @@
     transition: background-color var(--transition-fast);
   }
 
-  .ui-table tbody tr:hover {
-    background: var(--color-background);
+  @media (hover: hover) and (pointer: fine) {
+    .ui-table tbody tr:hover {
+      background: var(--color-background);
+    }
   }
 }
 
@@ -497,8 +540,10 @@
   .bg-gray-900 {
     background-color: var(--color-primary) !important;
   }
-  .hover\:bg-gray-800:hover {
-    background-color: var(--color-primary-hover) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .hover\:bg-gray-800:hover {
+      background-color: var(--color-primary-hover) !important;
+    }
   }
   .bg-white {
     background-color: var(--color-surface) !important;
@@ -508,10 +553,12 @@
   .bg-gray-200 {
     background-color: var(--color-surface-2) !important;
   }
-  .hover\:bg-gray-50:hover,
-  .hover\:bg-gray-100:hover,
-  .hover\:bg-gray-200:hover {
-    background-color: var(--color-accent-light) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .hover\:bg-gray-50:hover,
+    .hover\:bg-gray-100:hover,
+    .hover\:bg-gray-200:hover {
+      background-color: var(--color-accent-light) !important;
+    }
   }
   .text-black,
   .text-gray-800,
@@ -538,9 +585,11 @@
   .text-blue-800 {
     color: var(--color-accent-dark) !important;
   }
-  .hover\:text-blue-800:hover,
-  .hover\:text-blue-600:hover {
-    color: var(--color-accent-dark) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .hover\:text-blue-800:hover,
+    .hover\:text-blue-600:hover {
+      color: var(--color-accent-dark) !important;
+    }
   }
   .bg-blue-50,
   .bg-blue-100 {
@@ -597,11 +646,15 @@
   .to-pink-600 {
     --tw-gradient-to: var(--color-accent-dark) var(--tw-gradient-to-position) !important;
   }
-  .hover\:from-purple-700:hover {
-    --tw-gradient-from: var(--color-accent-dark) var(--tw-gradient-from-position) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .hover\:from-purple-700:hover {
+      --tw-gradient-from: var(--color-accent-dark) var(--tw-gradient-from-position) !important;
+    }
   }
-  .hover\:to-pink-700:hover {
-    --tw-gradient-to: var(--color-accent) var(--tw-gradient-to-position) !important;
+  @media (hover: hover) and (pointer: fine) {
+    .hover\:to-pink-700:hover {
+      --tw-gradient-to: var(--color-accent) var(--tw-gradient-to-position) !important;
+    }
   }
   .animate-pulse,
   .animate-ping {
@@ -623,4 +676,15 @@
 
 .animate-fade-in {
   animation: fade-in 200ms ease-out;
+}
+
+/* iOS Safari zooms into fields under 16px and never zooms back out; keep touch fields at 16px. */
+@layer utilities {
+  @media (pointer: coarse) {
+    input:not([type='checkbox']):not([type='radio']):not([type='range']),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
 }

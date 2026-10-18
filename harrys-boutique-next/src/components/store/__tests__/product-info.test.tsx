@@ -51,7 +51,7 @@ describe('ProductInfo purchase channel', () => {
     expect(screen.getByRole('link', { name: 'Comprar en Mercado Libre' })).toBeInTheDocument()
     expect(screen.getByText(/Precio referencial/)).toBeInTheDocument()
     expect(screen.queryByText(/5 unidades/)).not.toBeInTheDocument()
-    expect(screen.queryByText('Selecciona Talla')).not.toBeInTheDocument()
+    expect(screen.queryByText('Selecciona una talla')).not.toBeInTheDocument()
     expect(screen.queryByText('Cantidad')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Añadir al carrito' })).not.toBeInTheDocument()
   })
@@ -60,7 +60,7 @@ describe('ProductInfo purchase channel', () => {
     render(<ProductInfo product={product} />)
 
     expect(screen.getByText(/5 unidades/)).toBeInTheDocument()
-    expect(screen.getByText('Selecciona Talla')).toBeInTheDocument()
+    expect(screen.getByText('Selecciona una talla')).toBeInTheDocument()
     expect(screen.getByText('Cantidad')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Añadir al carrito' })).toBeInTheDocument()
   })

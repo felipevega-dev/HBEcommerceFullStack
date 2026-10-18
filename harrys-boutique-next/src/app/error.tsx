@@ -15,7 +15,7 @@ export default function GlobalError({
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--color-background)]">
+    <div className="min-h-svh flex items-center justify-center px-4 bg-[var(--color-background)]">
       <div className="text-center space-y-6 max-w-md">
         <p
           className="text-8xl font-light text-[var(--color-accent)]"

@@ -1364,3 +1364,32 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Pendientes: verificar en un teléfono real el autocompletado y el teclado.
 - Riesgos: ninguno detectado; los cambios de API solo relajan campos que el
   formulario ya presentaba como opcionales.
+
+## 2026-10-18 - Modernización móvil del storefront
+
+- Rama usada: `feature/storefront-modernization`.
+- Objetivo: aplicar la skill `mobile-native` y corregir defectos visibles en
+  capturas a 390 px y 1440 px (Playwright).
+- Archivos principales: `src/app/layout.tsx`, `src/app/globals.css`,
+  `home-editorial-hero.tsx`, `product-card.tsx`, `product-info.tsx`, layouts
+  y páginas que usaban `100vh`.
+- Cambios realizados:
+  - `viewport` con `theme-color` del header, `color-scheme: light` e
+    `interactive-widget=resizes-content`; sin `user-scalable=no`.
+  - Las 14 reglas `:hover` propias quedan bajo
+    `@media (hover: hover) and (pointer: fine)`: en móvil ya no se "pegan"
+    tras un toque (por ejemplo, el botón dorado que se elevaba).
+  - Campos a 16 px en pantallas táctiles para que iOS no haga zoom al
+    enfocar; `touch-action: manipulation` y `user-select: none` en controles;
+    `text-size-adjust` fijo.
+  - `svh` en lugar de `vh`/`dvh` en el hero y los contenedores de página.
+  - Hero móvil: los botones ya no parten el texto ("Ver / prendas") y tienen
+    ancho uniforme; las garantías apilan icono y texto en dos columnas.
+  - Tarjetas: el CTA de Mercado Libre cabe en una línea ("Mercado Libre ↗",
+    con "Comprar en" para lectores de pantalla).
+  - Ficha: "Selecciona una talla", tallas con `aria-pressed`, controles de
+    cantidad de 44 px con "−" real y cantidad anunciada.
+- Validaciones: `npm run check` y `npm run build`; capturas antes/después.
+- Pendientes: confirmar en un teléfono real (hover, zoom de inputs, teclado).
+- Riesgos: `viewport-fit=cover` no se activó a propósito; la tienda no pinta
+  UI de borde a borde y así evita contenido bajo el notch en horizontal.

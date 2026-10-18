@@ -67,7 +67,7 @@ export function ResetPasswordPageClient() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-200px)] px-4 py-10 sm:py-14">
+    <div className="min-h-[calc(100svh-200px)] px-4 py-10 sm:py-14">
       <div className="ui-editorial-panel ui-editorial-panel-cream mx-auto w-full max-w-md p-6 sm:p-8">
         <div className="relative mb-7 text-center">
           <h1 className="ui-display text-3xl">Restablecer contraseña</h1>
