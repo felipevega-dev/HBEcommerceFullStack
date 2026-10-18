@@ -1268,3 +1268,34 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
   reales y siguen en el historial de Git. Rotar NEXTAUTH_SECRET, Vercel Blob,
   MercadoPago, Resend, Upstash, Supabase y la contraseña de Postgres, y evaluar
   purgar el historial si el repositorio es público.
+
+## 2026-10-18 - Tests del webhook y create-preference de MercadoPago
+
+- Rama usada: `test/mercadopago-routes`.
+- Objetivo: cubrir con tests las dos rutas con más lógica de dinero, que no
+  tenían ninguna prueba.
+- Archivos nuevos:
+  - `harrys-boutique-next/src/app/api/mercadopago/__tests__/webhook.test.ts`
+    (17 casos).
+  - `harrys-boutique-next/src/app/api/mercadopago/__tests__/create-preference.test.ts`
+    (16 casos).
+- Cambios realizados:
+  - Webhook: firma HMAC inválida o secreto ausente, notificaciones no de pago,
+    orden inexistente, aprobación (PROCESSING, carrito borrado, email),
+    reserva de cupón, idempotencia, monto y moneda distintos, pagos
+    pendientes, rechazo y reembolso con liberación de stock y cupón, doble
+    liberación, pago aprobado tras liberar stock, fallo de email y fallo de
+    MercadoPago (500 para reintento).
+  - create-preference: 401, origen no confiable, rate limit, body inválido,
+    MercadoPago no configurado, 404 por orden ajena, orden pagada, reserva
+    liberada o expirada, método distinto, preferencia creada con monto del
+    servidor y URLs correctas, email del comprador, limpieza fallida y error
+    del SDK.
+  - Los tests corren en entorno `node` (`// @vitest-environment node`) con
+    Prisma, MercadoPago, auth y rate limiter mockeados; `order-lifecycle` se
+    ejecuta real contra el `tx` mockeado.
+- Validaciones: `npm run check` OK (type-check, Prettier, 342 tests en 31
+  archivos).
+- Resultado: el flujo de pago queda protegido ante regresiones.
+- Pendientes: ninguno en esta fase.
+- Riesgos: ninguno; no se tocó código de producción.
