@@ -1443,3 +1443,12 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Pendientes: confirmar en un teléfono real (hover, zoom de inputs, teclado).
 - Riesgos: `viewport-fit=cover` no se activó a propósito; la tienda no pinta
   UI de borde a borde y así evita contenido bajo el notch en horizontal.
+
+### Nota 2026-10-18 (tras integrar `main` con ISR)
+
+- Desde que la Home se prerenderiza en el build, `npm run build` de esta rama
+  falla con `P2022` (`products.mercadoLibreAvailable` no existe) mientras la
+  migración `20261018120000_add_mercado_libre_sync` no esté aplicada en la
+  base a la que apunta el build. En Vercel el deploy fallaría y la versión
+  anterior seguiría activa. Aplicar la migración primero y luego mergear.
+- `npm run check` (type-check, Prettier y 413 tests) pasa en esta rama.
