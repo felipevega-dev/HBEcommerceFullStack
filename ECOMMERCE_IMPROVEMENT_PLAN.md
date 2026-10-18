@@ -22,6 +22,24 @@ Validado en esta fecha: `type-check` OK, `test` 309/309 (29 archivos),
 
 ## 2. Qué falta (ordenado por impacto)
 
+### 2.0 URGENTE: credenciales en el historial de Git (repositorio público)
+
+- El repositorio `felipevega-dev/HBEcommerceFullStack` es público: la API de
+  GitHub responde 200 sin autenticación.
+- Entre abril y julio de 2026 se commitearon `.env.example` y
+  `.env.production.example` con valores opacos que parecen credenciales reales
+  (commits `9a5192c`, `3e90e28`, `3961584`, `919e649`; borrados en
+  `147c1d3` el 2026-07-13). Siguen visibles en el historial.
+- Acción inmediata y manual: rotar `NEXTAUTH_SECRET`, `BLOB_READ_WRITE_TOKEN`,
+  `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET`, `RESEND_API_KEY`,
+  `UPSTASH_REDIS_REST_TOKEN`, la contraseña de Postgres en Supabase
+  (`DATABASE_URL` y `DIRECT_URL`), la clave publishable de Supabase,
+  `INSTAGRAM_ACCESS_TOKEN` y el DSN de Sentry. Actualizar Vercel y
+  `.env.local`.
+- Después de rotar: purgar el historial con `git filter-repo` y forzar push, o
+  hacer privado el repositorio. Es destructivo (todos los clones deben
+  volver a clonarse) y solo se hace con aprobación explícita.
+
 ### 2.1 Mercado Libre: hoy es solo un enlace
 
 - No hay OAuth ni app registrada en Mercado Libre. Precio, stock y estado de
