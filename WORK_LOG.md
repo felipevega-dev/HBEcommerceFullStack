@@ -1148,18 +1148,15 @@ en `harrys-boutique-next/`.
     codigo adicionales.
 - Validaciones ejecutadas sobre archivos modificados en la fase de
   regularizacion visual (navbar, footer, cart-drawer, product-card,
-  product-grid, collection-filters, tienda/page, home-editorial-*, paginas
+  product-grid, collection-filters, tienda/page, home-editorial-\*, paginas
   de ayuda/pago/perfil, etc.):
-  - 
-pm run type-check: OK.
-  - 
-pm run lint: OK para todos los archivos tocados (se corrio
+  - pm run type-check: OK.
+  - pm run lint: OK para todos los archivos tocados (se corrio
     prettier --write solo sobre esos archivos; persisten warnings de
     Prettier preexistentes en ~95 archivos no tocados en esta rama, como
-    src/lib/*.ts y src/components/admin/*, fuera de alcance de esta
+    src/lib/_.ts y src/components/admin/_, fuera de alcance de esta
     fase).
-  - 
-pm run test: 309/309 tests pasando (29 archivos).
+  - pm run test: 309/309 tests pasando (29 archivos).
 - Pendientes: correr prettier --write sobre el resto del repo (admin y
   lib) en una fase de limpieza aparte, ya que no esta relacionado con la
   regularizacion visual del storefront.
@@ -1178,7 +1175,7 @@ pm run test: 309/309 tests pasando (29 archivos).
     `src/components/store/store-editorial-header.tsx`.
 - Cambios realizados:
   - Skills instaladas con `npx skills add ... -a claude-code --copy`:
-    jakubkrehel/skills (better-*, interface-review, state-machine, break),
+    jakubkrehel/skills (better-\*, interface-review, state-machine, break),
     emilkowalski/skills (mobile-native, animate, animation-performance,
     review/improve-animations, find-animation-opportunities, emil-design-eng),
     MengTo/Skills (no-ai-design-slop, audit-ai-design-slop) y Supabase
@@ -1193,9 +1190,31 @@ pm run test: 309/309 tests pasando (29 archivos).
     canvas full-bleed.
   - Filas de categoria de Tienda navegan con `scroll={false}`.
 - Validaciones: `npm run type-check` OK, `npm run test` 309/309, `npm run
-  build` OK, Prettier OK en archivos tocados. Lint global conserva 94
+build` OK, Prettier OK en archivos tocados. Lint global conserva 94
   warnings preexistentes (CRLF por `core.autocrlf`, ya registrados).
 - Pendientes: aplicar las skills sobre el storefront por fases (auditoria
   mobile-native, estados de carrito/checkout, revision de motion).
 - Riesgos: las skills de terceros corren con permisos completos del agente;
   revisar diffs al actualizarlas con `npx skills update`.
+
+## 2026-10-18 - Consolidación de ramas y auditoría del ecommerce
+
+- Rama usada: `chore/repo-consolidation-audit` (solo documentación).
+- Objetivo: dejar un único `main`, inventariar skills/MCP y auditar lo que
+  existe y falta en la tienda.
+- Cambios en Git:
+  - `main` avanzó por fast-forward a `94e03ea` (contenido de
+    `feature/storefront-style-regularization`), validado con `type-check`,
+    `test` 309/309 y `build` OK antes de publicar.
+  - Se borraron local y remotamente las 9 ramas `codex/*` ya mergeadas y las
+    dos ramas `feature/*`.
+  - `feature/conversion-redesign` (julio 2026, un commit "ok", 20 archivos en
+    conflicto con `main`, diseño ya superado) no se mergeó; quedó respaldada
+    en la tag `archive/conversion-redesign-2026-07` en origin.
+- Archivos: `ECOMMERCE_IMPROVEMENT_PLAN.md` (nuevo), `WORK_LOG.md`.
+- Resultado: la auditoría y el plan por fases viven en
+  `ECOMMERCE_IMPROVEMENT_PLAN.md`.
+- Pendientes: ejecutar las fases 1 a 7 del plan; decidir checkout invitado.
+- Riesgos detectados: `npm run check` y `npm run ci` nunca ejecutan tests
+  porque `lint` corta la cadena; faltan `.env.example` y
+  `.env.production.example` citados por README y checklist.
