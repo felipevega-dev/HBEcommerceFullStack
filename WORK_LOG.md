@@ -1393,3 +1393,40 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Pendientes: confirmar en un teléfono real (hover, zoom de inputs, teclado).
 - Riesgos: `viewport-fit=cover` no se activó a propósito; la tienda no pinta
   UI de borde a borde y así evita contenido bajo el notch en horizontal.
+
+## 2026-10-18 - Checkout como invitado
+
+- Rama usada: `feature/guest-checkout` (sin mergear: requiere migración en
+  producción antes del deploy).
+- Objetivo: permitir comprar sin crear cuenta, decisión aprobada por el dueño
+  el 2026-10-18.
+- Archivos principales:
+  - `prisma/schema.prisma` y migración `20261018140000_guest_checkout`
+    (`orders.userId` y `coupon_redemptions.userId` opcionales, columnas
+    `customerEmail`/`customerName` con backfill desde `users`; la FK de
+    pedidos sigue en `RESTRICT`).
+  - `src/lib/guest-orders.ts` (token HMAC por pedido, cookie firmada).
+  - `src/app/api/orders/route.ts`, `api/mercadopago/create-preference`,
+    `api/mercadopago/webhook`, `api/orders/[id]` y `resend-email`.
+  - `src/app/(store)/orders/[id]/page.tsx` (nuevo), `checkout/page.tsx`,
+    `checkout-page-client.tsx`, `login-page-client.tsx`, `src/proxy.ts`,
+    vistas admin de pedidos y búsqueda.
+- Cambios realizados:
+  - El invitado paga con MercadoPago; el pago contra entrega sigue exigiendo
+    cuenta y ahora respeta el ajuste `cash_on_delivery_enabled` en el
+    servidor.
+  - Al crear el pedido se guarda una cookie httpOnly firmada; el retorno de
+    MercadoPago va a `/orders/[id]`, que valida cookie o el token del enlace
+    enviado por email ("Ver mi pedido").
+  - Emails de confirmación y estado usan el snapshot del cliente cuando no
+    hay usuario; el admin muestra "Invitado" y busca por nombre o email.
+  - Login en flujo de compra ofrece "Continuar como invitado".
+- Validaciones: `npm run check` (376 tests, 16 nuevos para invitados),
+  `npm run build`; checkout revisado en capturas a 390 y 1440 px con las
+  peticiones de escritura bloqueadas.
+- Pendientes (manuales): aplicar la migración con `npm run db:migrate:deploy`
+  en producción y recién entonces mergear la rama. Opcional: definir
+  `GUEST_ORDER_SECRET` para no depender de `NEXTAUTH_SECRET`.
+- Riesgos: desplegar sin la migración rompe todas las consultas de pedidos.
+  Rotar `NEXTAUTH_SECRET` sin `GUEST_ORDER_SECRET` invalida los enlaces de
+  seguimiento ya enviados a invitados.

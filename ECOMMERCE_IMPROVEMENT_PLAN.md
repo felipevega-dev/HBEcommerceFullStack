@@ -141,5 +141,5 @@ ya tiene primitives propios), MCP comunitarios de ML (usar el oficial).
 3. `test/mercadopago-webhook`: tests del webhook y de create-preference. Hecho (en `main`).
 4. `feature/mercadolibre-oauth-sync`: fases 2.1.1 y 2.1.2.
 5. `feature/home-isr-revalidate`: ISR + revalidación desde admin. Hecho.
-6. `feature/guest-checkout` (decisión de negocio previa).
+6. `feature/guest-checkout`: aprobado e implementado el 2026-10-18; pendiente de migración y merge.
 7. `feature/storefront-mobile-audit`: aplicar `mobile-native` y `better-*`.
