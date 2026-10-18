@@ -55,8 +55,14 @@ export interface OrderWithItems {
   items: OrderItem[]
 }
 
-export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
-  const [expanded, setExpanded] = useState<string | null>(null)
+export function OrdersList({
+  orders,
+  defaultExpandedId = null,
+}: {
+  orders: OrderWithItems[]
+  defaultExpandedId?: string | null
+}) {
+  const [expanded, setExpanded] = useState<string | null>(defaultExpandedId)
 
   if (orders.length === 0) {
     return (
@@ -121,6 +127,11 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                   </div>
 
                   <button
+                    type="button"
+                    aria-expanded={isExpanded}
+                    aria-label={
+                      isExpanded ? 'Ocultar detalle del pedido' : 'Ver detalle del pedido'
+                    }
                     onClick={() => setExpanded(isExpanded ? null : order.id)}
                     className="rounded-full p-2 transition-colors hover:bg-[var(--color-panel-soft)]"
                   >

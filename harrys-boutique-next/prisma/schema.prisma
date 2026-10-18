@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -118,18 +118,18 @@ model Address {
 // ─── Catalog ──────────────────────────────────────────────────────────────────
 
 model Category {
-  id            String   @id @default(uuid())
-  name          String   @unique
-  slug          String?  @unique
-  subcategories String[]
-  homeImage     String?
-  homeDescription String? @db.Text
-  homeHref      String?
-  active        Boolean  @default(true)
-  homeVisible   Boolean  @default(false)
-  homeOrder     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String   @id @default(uuid())
+  name            String   @unique
+  slug            String?  @unique
+  subcategories   String[]
+  homeImage       String?
+  homeDescription String?  @db.Text
+  homeHref        String?
+  active          Boolean  @default(true)
+  homeVisible     Boolean  @default(false)
+  homeOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   products          Product[]
   homeCategoryBlock HomeCategoryBlock?
@@ -139,40 +139,40 @@ model Category {
 }
 
 model Product {
-  id             String   @id @default(uuid())
-  slug           String   @unique @default("")
-  sku            String?  @unique
-  name           String
-  description    String
-  seoTitle       String?
-  seoDescription String?
-  mercadoLibreUrl String?
-  mercadoLibreItemId String? @unique
+  id                 String                    @id @default(uuid())
+  slug               String                    @unique @default("")
+  sku                String?                   @unique
+  name               String
+  description        String
+  seoTitle           String?
+  seoDescription     String?
+  mercadoLibreUrl    String?
+  mercadoLibreItemId String?                   @unique
   mercadoLibreStatus MercadoLibreListingStatus @default(INACTIVE)
-  price          Decimal  @db.Decimal(10, 2)
-  originalPrice  Decimal? @db.Decimal(10, 2)
-  images         String[]
-  categoryId     String
-  subCategory    String
-  colors         String[]
-  sizes          Json
-  bestSeller     Boolean  @default(false)
-  active         Boolean  @default(true)
-  stock          Int      @default(0)
-  ratingAverage  Float    @default(0)
-  ratingCount    Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  price              Decimal                   @db.Decimal(10, 2)
+  originalPrice      Decimal?                  @db.Decimal(10, 2)
+  images             String[]
+  categoryId         String
+  subCategory        String
+  colors             String[]
+  sizes              Json
+  bestSeller         Boolean                   @default(false)
+  active             Boolean                   @default(true)
+  stock              Int                       @default(0)
+  ratingAverage      Float                     @default(0)
+  ratingCount        Int                       @default(0)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
 
-  category       Category         @relation(fields: [categoryId], references: [id])
-  reviews        Review[]
-  orderItems     OrderItem[]
-  wishlist       Wishlist[]
-  heroSlides     HeroSlide[]
-  cartItems      CartItem[]
-  variants       ProductVariant[]
-  instagramPosts InstagramPost[]
-  homeSelections HomeProductSelection[]
+  category          Category               @relation(fields: [categoryId], references: [id])
+  reviews           Review[]
+  orderItems        OrderItem[]
+  wishlist          Wishlist[]
+  heroSlides        HeroSlide[]
+  cartItems         CartItem[]
+  variants          ProductVariant[]
+  instagramPosts    InstagramPost[]
+  homeSelections    HomeProductSelection[]
   homeCategoryItems HomeCategoryProduct[]
 
   @@index([slug])
@@ -210,7 +210,7 @@ model HomeCategoryBlock {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  category Category               @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category Category              @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   items    HomeCategoryProduct[]
 
   @@index([visible, order])
@@ -227,7 +227,7 @@ model HomeCategoryProduct {
   updatedAt DateTime @updatedAt
 
   block   HomeCategoryBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
-  product Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([blockId, productId])
   @@index([blockId, visible, order])
@@ -290,38 +290,41 @@ model CartItem {
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 model Order {
-  id              String      @id @default(uuid())
-  userId          String
-  amount          Decimal     @db.Decimal(10, 2)
-  addressSnapshot Json
-  status          OrderStatus @default(PENDING)
-  paymentMethod   String
-  payment         Boolean     @default(false)
-  paymentStatus   PaymentStatus @default(PENDING)
-  paidAt          DateTime?
-  paymentProvider String?
-  paymentProviderId String?   @unique
-  stockReservedAt DateTime?
+  id                        String        @id @default(uuid())
+  userId                    String?
+  customerEmail             String?
+  customerName              String?
+  amount                    Decimal       @db.Decimal(10, 2)
+  addressSnapshot           Json
+  status                    OrderStatus   @default(PENDING)
+  paymentMethod             String
+  payment                   Boolean       @default(false)
+  paymentStatus             PaymentStatus @default(PENDING)
+  paidAt                    DateTime?
+  paymentProvider           String?
+  paymentProviderId         String?       @unique
+  stockReservedAt           DateTime?
   stockReservationExpiresAt DateTime?
-  stockReleasedAt DateTime?
-  couponCode      String?
-  discountAmount  Decimal?    @db.Decimal(10, 2)
-  internalNotes   String      @default("") @db.Text
-  courier         String?
-  trackingNumber  String?
-  shippedAt       DateTime?
-  deliveredAt     DateTime?
-  cancelReason    String?
-  refundReason    String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  stockReleasedAt           DateTime?
+  couponCode                String?
+  discountAmount            Decimal?      @db.Decimal(10, 2)
+  internalNotes             String        @default("") @db.Text
+  courier                   String?
+  trackingNumber            String?
+  shippedAt                 DateTime?
+  deliveredAt               DateTime?
+  cancelReason              String?
+  refundReason              String?
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
 
-  user              User                 @relation(fields: [userId], references: [id])
+  user              User?                @relation(fields: [userId], references: [id], onDelete: Restrict)
   items             OrderItem[]
   statusHistory     OrderStatusHistory[]
   couponRedemptions CouponRedemption[]
 
   @@index([userId, createdAt(sort: Desc)])
+  @@index([customerEmail])
   @@index([status])
   @@index([status, createdAt(sort: Desc)])
   @@index([payment, createdAt(sort: Desc)])
@@ -352,12 +355,12 @@ model OrderItem {
 }
 
 model OrderStatusHistory {
-  id             String      @id @default(uuid())
+  id             String       @id @default(uuid())
   orderId        String
   previousStatus OrderStatus?
   status         OrderStatus
-  note           String?     @db.Text
-  createdAt      DateTime    @default(now())
+  note           String?      @db.Text
+  createdAt      DateTime     @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -424,7 +427,7 @@ model Coupon {
 model CouponRedemption {
   id            String    @id @default(uuid())
   couponId      String
-  userId        String
+  userId        String?
   orderId       String    @unique
   amount        Decimal   @default(0) @db.Decimal(10, 2)
   createdAt     DateTime  @default(now())
@@ -432,7 +435,7 @@ model CouponRedemption {
   releaseReason String?
 
   coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([couponId, createdAt(sort: Desc)])

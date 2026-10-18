@@ -52,11 +52,23 @@ const EMPTY_FORM: FormData = {
   country: 'Chile',
 }
 
+export interface CheckoutViewer {
+  email: string
+  name: string
+}
+
 export function CheckoutPageClient({
   pricingSettings = DEFAULT_PRICING_SETTINGS,
+  viewer = null,
+  codEnabled = true,
 }: {
   pricingSettings?: PricingSettings
+  viewer?: CheckoutViewer | null
+  codEnabled?: boolean
 }) {
+  const isGuest = viewer === null
+  const codAvailable = codEnabled && !isGuest
+  const userEmail = viewer?.email ?? ''
   const { items, getTotal, clearCart } = useCartStore()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -66,11 +78,10 @@ export function CheckoutPageClient({
   const [method, setMethod] = useState<'cod' | 'mercadopago'>('mercadopago')
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
-  const [showNewAddressForm, setShowNewAddressForm] = useState(false)
+  const [showNewAddressForm, setShowNewAddressForm] = useState(isGuest)
   const [saveAddress, setSaveAddress] = useState(true)
   const [mpInitUrl, setMpInitUrl] = useState<string | null>(null)
-  const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
-  const [userEmail, setUserEmail] = useState('')
+  const [formData, setFormData] = useState<FormData>({ ...EMPTY_FORM, email: userEmail })
   const [currentStep, setCurrentStep] = useState(1) // 1: Dirección, 2: Pago, 3: Confirmación
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -96,7 +107,7 @@ export function CheckoutPageClient({
         // Only restore if less than 24 hours old
         if (hoursSince < 24 && data.formData && !selectedAddressId) {
           setFormData(data.formData)
-          setMethod(data.method || 'mercadopago')
+          setMethod(data.method === 'cod' && codAvailable ? 'cod' : 'mercadopago')
           toast.info('Recuperamos tu progreso anterior', { autoClose: 2000 })
         } else if (hoursSince >= 24) {
           localStorage.removeItem('checkout-progress')
@@ -105,7 +116,7 @@ export function CheckoutPageClient({
         localStorage.removeItem('checkout-progress')
       }
     }
-  }, [selectedAddressId])
+  }, [selectedAddressId, codAvailable])
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -139,17 +150,11 @@ export function CheckoutPageClient({
   useEffect(() => {
     abortControllerRef.current = new AbortController()
 
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch('/api/user/profile', {
-          signal: abortControllerRef.current?.signal,
-        })
-        const data = await res.json()
-        if (data.success && data.user?.email) {
-          setUserEmail(data.user.email)
-          setFormData((prev) => ({ ...prev, email: data.user.email }))
-        }
-      } catch {}
+    const fetchAddresses = async () => {
+      if (!viewer) {
+        setShowNewAddressForm(true)
+        return
+      }
 
       try {
         const res = await fetch('/api/user/addresses', {
@@ -181,7 +186,7 @@ export function CheckoutPageClient({
       }
     }
 
-    fetchProfile()
+    fetchAddresses()
 
     return () => {
       abortControllerRef.current?.abort()
@@ -284,7 +289,7 @@ export function CheckoutPageClient({
     setLoading(true)
     try {
       // Save address if checkbox is checked and it's a new address
-      if (saveAddress && !selectedAddressId && savedAddresses.length < 2) {
+      if (viewer && saveAddress && !selectedAddressId && savedAddresses.length < 2) {
         try {
           const addressRes = await fetch('/api/user/addresses', {
             method: 'POST',
@@ -325,7 +330,7 @@ export function CheckoutPageClient({
             image: i.image,
           })),
           address: formData,
-          paymentMethod: method === 'mercadopago' ? 'mercadopago' : 'COD',
+          paymentMethod: method === 'cod' && codAvailable ? 'COD' : 'mercadopago',
         }),
       })
       const orderData = await orderRes.json()
@@ -338,11 +343,11 @@ export function CheckoutPageClient({
       const orderId: string = orderData.order.id
 
       // Step 2a: COD — done
-      if (method === 'cod') {
+      if (method === 'cod' && codAvailable) {
         clearCart()
         localStorage.removeItem('checkout-progress') // Clear saved progress
         toast.success('¡Pedido realizado! Te contactaremos para coordinar la entrega.')
-        router.push('/orders')
+        router.push(`/orders/${orderId}`)
         return
       }
 
@@ -411,6 +416,21 @@ export function CheckoutPageClient({
 
       {/* Trust Badges */}
       <TrustBadges />
+
+      {isGuest && (
+        <div className="mb-6 flex flex-col gap-2 rounded-[1.25rem] border border-[var(--color-stitch-line)] bg-[var(--color-panel)] px-5 py-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[var(--color-text-secondary)]">
+            Estás comprando como invitado. Te enviaremos la confirmación y el seguimiento a tu
+            email.
+          </p>
+          <Link
+            href="/login?callbackUrl=%2Fcheckout"
+            className="font-semibold text-[var(--color-text-primary)] underline-offset-4 hover:underline"
+          >
+            Iniciar sesión
+          </Link>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
         {/* Left: Shipping info */}
@@ -547,11 +567,11 @@ export function CheckoutPageClient({
                 formData={formData}
                 onChange={onChange}
                 showEmail={true}
-                emailReadOnly={!!userEmail}
+                emailReadOnly={!isGuest}
               />
 
               {/* Save address checkbox */}
-              {!selectedAddressId && savedAddresses.length < 2 && (
+              {viewer && !selectedAddressId && savedAddresses.length < 2 && (
                 <div className="flex items-start gap-2 p-3 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)]">
                   <input
                     type="checkbox"
@@ -657,52 +677,65 @@ export function CheckoutPageClient({
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={() => setMethod('cod')}
-                className={`w-full p-4 border rounded-xl flex items-center gap-3 transition-all text-left ${
-                  method === 'cod'
-                    ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]'
-                    : 'border-[var(--color-border)] hover:border-[var(--color-accent)] bg-[var(--color-surface)]'
-                }`}
-              >
-                <div className="w-8 h-8 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-4 h-4 text-[var(--color-text-secondary)]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              {codAvailable ? (
+                <button
+                  type="button"
+                  onClick={() => setMethod('cod')}
+                  className={`w-full p-4 border rounded-xl flex items-center gap-3 transition-all text-left ${
+                    method === 'cod'
+                      ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]'
+                      : 'border-[var(--color-border)] hover:border-[var(--color-accent)] bg-[var(--color-surface)]'
+                  }`}
+                >
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center flex-shrink-0">
+                    <svg
+                      className="w-4 h-4 text-[var(--color-text-secondary)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                      Pago contra entrega
+                    </p>
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      Pagás al recibir el pedido
+                    </p>
+                  </div>
+                  {method === 'cod' && (
+                    <svg
+                      className="w-4 h-4 text-[var(--color-accent)] ml-auto"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </button>
+              ) : codEnabled ? (
+                <p className="px-1 text-xs text-[var(--color-text-muted)]">
+                  ¿Prefieres pagar contra entrega?{' '}
+                  <Link
+                    href="/login?callbackUrl=%2Fcheckout"
+                    className="font-semibold text-[var(--color-text-primary)] underline-offset-4 hover:underline"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                    Pago contra entrega
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    Pagás al recibir el pedido
-                  </p>
-                </div>
-                {method === 'cod' && (
-                  <svg
-                    className="w-4 h-4 text-[var(--color-accent)] ml-auto"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                )}
-              </button>
+                    Inicia sesión
+                  </Link>{' '}
+                  para usar esa opción.
+                </p>
+              ) : null}
             </div>
           </div>
 

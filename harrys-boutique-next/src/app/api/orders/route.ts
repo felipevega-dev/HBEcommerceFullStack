@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
 import { z } from 'zod'
 import type { Coupon } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
@@ -16,7 +17,9 @@ import {
   resolveCheckoutItems,
   validateCouponForSubtotal,
 } from '@/lib/checkout'
-import { getPricingSettings } from '@/lib/commerce-settings'
+import { getPricingSettings, isCashOnDeliveryEnabled } from '@/lib/commerce-settings'
+import { GUEST_ORDER_COOKIE, appendGuestOrder, guestOrderCookieOptions } from '@/lib/guest-orders'
+import { getClientIp } from '@/lib/rate-limiter'
 import {
   getStockReservationExpiresAt,
   releaseExpiredStockReservations,
@@ -125,14 +128,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { error, session } = await requireAuth(req)
-  if (error) return error
+  const session = await auth()
+  const viewer = session?.user ?? null
 
   const protectionError = await protectMutation(req, {
     keyPrefix: 'orders:create',
     maxRequests: 10,
     windowMs: 10 * 60 * 1000,
-    keySuffix: session!.user.id,
+    keySuffix: viewer?.id ?? `guest:${getClientIp(req)}`,
   })
   if (protectionError) return protectionError
 
@@ -145,6 +148,31 @@ export async function POST(req: NextRequest) {
     })
 
     const { items, address, paymentMethod, couponCode } = data!
+
+    if (paymentMethod === 'COD') {
+      if (!viewer) {
+        return NextResponse.json(
+          {
+            success: false,
+            code: 'COD_REQUIRES_ACCOUNT',
+            message:
+              'El pago contra entrega requiere una cuenta. Inicia sesión o paga con MercadoPago.',
+          },
+          { status: 403 },
+        )
+      }
+
+      if (!(await isCashOnDeliveryEnabled())) {
+        return NextResponse.json(
+          {
+            success: false,
+            code: 'COD_DISABLED',
+            message: 'El pago contra entrega no está disponible por ahora.',
+          },
+          { status: 400 },
+        )
+      }
+    }
 
     const productIds = [...new Set(items.map((item) => item.productId))]
     const products = await prisma.product.findMany({
@@ -255,7 +283,9 @@ export async function POST(req: NextRequest) {
 
       const createdOrder = await tx.order.create({
         data: {
-          userId: session!.user.id,
+          userId: viewer?.id ?? null,
+          customerEmail: address.email.trim().toLowerCase(),
+          customerName: `${address.firstname} ${address.lastname}`.trim(),
           amount: totals.total,
           addressSnapshot: address,
           paymentMethod,
@@ -284,20 +314,31 @@ export async function POST(req: NextRequest) {
       if (appliedCouponId) {
         await reserveCouponForOrder(tx, {
           couponId: appliedCouponId,
-          userId: session!.user.id,
+          userId: viewer?.id ?? null,
           orderId: createdOrder.id,
           amount: totals.discountAmount,
         })
       }
 
-      if (paymentMethod === 'COD') {
-        await tx.cart.deleteMany({ where: { userId: session!.user.id } })
+      if (paymentMethod === 'COD' && viewer) {
+        await tx.cart.deleteMany({ where: { userId: viewer.id } })
       }
 
       return createdOrder
     })
 
-    return NextResponse.json({ success: true, order }, { status: 201 })
+    const response = NextResponse.json({ success: true, order, guest: !viewer }, { status: 201 })
+
+    if (!viewer) {
+      // Lets the guest open /orders/[id] (payment return page) from this browser.
+      response.cookies.set({
+        name: GUEST_ORDER_COOKIE,
+        value: appendGuestOrder(req.cookies.get(GUEST_ORDER_COOKIE)?.value, order.id),
+        ...guestOrderCookieOptions(),
+      })
+    }
+
+    return response
   } catch (e) {
     if (e instanceof Error) {
       if (e.message.startsWith('STOCK_INSUFFICIENT:')) {

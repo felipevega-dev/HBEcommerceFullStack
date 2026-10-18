@@ -26,6 +26,7 @@ vi.mock('mercadopago', () => ({
 }))
 
 import { POST } from '../create-preference/route'
+import { GUEST_ORDER_COOKIE, appendGuestOrder } from '@/lib/guest-orders'
 
 const SITE_URL = 'http://localhost:3000'
 const ORDER_ID = '0b6f8d7e-5c1a-4d3b-9e2f-1a2b3c4d5e6f'
@@ -52,9 +53,13 @@ const validBody = {
   address: { firstname: 'Cliente', lastname: 'Prueba', street: 'Calle 1', city: 'Santiago' },
 }
 
-function request(body: unknown, { origin = SITE_URL }: { origin?: string | null } = {}) {
+function request(
+  body: unknown,
+  { origin = SITE_URL, cookie }: { origin?: string | null; cookie?: string } = {},
+) {
   const headers: Record<string, string> = { 'content-type': 'application/json' }
   if (origin) headers.origin = origin
+  if (cookie) headers.cookie = cookie
 
   return new NextRequest(`${SITE_URL}/api/mercadopago/create-preference`, {
     method: 'POST',
@@ -68,6 +73,7 @@ describe('POST /api/mercadopago/create-preference', () => {
     vi.resetAllMocks()
     vi.stubEnv('MERCADOPAGO_ACCESS_TOKEN', 'test-access-token')
     vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', SITE_URL)
+    vi.stubEnv('NEXTAUTH_SECRET', 'test-secret-with-at-least-32-characters')
     vi.spyOn(console, 'error').mockImplementation(() => {})
 
     auth.mockResolvedValue(session)
@@ -86,13 +92,67 @@ describe('POST /api/mercadopago/create-preference', () => {
     vi.restoreAllMocks()
   })
 
-  it('rejects unauthenticated requests', async () => {
+  it('hides account orders from anonymous visitors', async () => {
     auth.mockResolvedValue(null)
 
     const res = await POST(request(validBody))
 
-    expect(res.status).toBe(401)
+    expect(res.status).toBe(404)
     expect(preferenceCreate).not.toHaveBeenCalled()
+  })
+
+  describe('guest orders', () => {
+    const guestOrder = { ...payableOrder, userId: null, customerEmail: 'invitado@example.com' }
+    const guestCookie = () => `${GUEST_ORDER_COOKIE}=${appendGuestOrder(undefined, ORDER_ID)}`
+
+    beforeEach(() => {
+      auth.mockResolvedValue(null)
+      prisma.order.findUnique.mockResolvedValue(guestOrder)
+    })
+
+    it('lets the browser that created the guest order pay for it', async () => {
+      const res = await POST(
+        request({ orderId: ORDER_ID, address: { firstname: 'Ana' } }, { cookie: guestCookie() }),
+      )
+
+      expect(res.status).toBe(200)
+      expect(getRateLimitState).toHaveBeenCalledWith(
+        'payments:create-preference:guest:127.0.0.1',
+        10,
+        10 * 60 * 1000,
+      )
+      expect(preferenceCreate).toHaveBeenCalledWith({
+        body: expect.objectContaining({
+          payer: expect.objectContaining({ email: 'invitado@example.com' }),
+          back_urls: expect.objectContaining({
+            success: `${SITE_URL}/orders/${ORDER_ID}?payment=success`,
+          }),
+        }),
+      })
+    })
+
+    it('rejects guest orders without the access cookie', async () => {
+      const res = await POST(request(validBody))
+
+      expect(res.status).toBe(404)
+      expect(preferenceCreate).not.toHaveBeenCalled()
+    })
+
+    it('rejects a forged guest cookie', async () => {
+      const res = await POST(
+        request(validBody, { cookie: `${GUEST_ORDER_COOKIE}=${ORDER_ID}:forged-token` }),
+      )
+
+      expect(res.status).toBe(404)
+    })
+
+    it('does not let a signed-in customer pay a guest order from another browser', async () => {
+      auth.mockResolvedValue(session)
+
+      const res = await POST(request(validBody))
+
+      expect(res.status).toBe(404)
+    })
   })
 
   it('rejects requests without a trusted origin', async () => {
@@ -228,9 +288,9 @@ describe('POST /api/mercadopago/create-preference', () => {
         ],
         payer: { name: 'Cliente', surname: 'Prueba', email: 'cliente@example.com' },
         back_urls: {
-          success: `${SITE_URL}/orders?payment=success`,
+          success: `${SITE_URL}/orders/${ORDER_ID}?payment=success`,
           failure: `${SITE_URL}/checkout?payment=failure`,
-          pending: `${SITE_URL}/orders?payment=pending`,
+          pending: `${SITE_URL}/orders/${ORDER_ID}?payment=pending`,
         },
         notification_url: `${SITE_URL}/api/mercadopago/webhook`,
         auto_return: 'approved',

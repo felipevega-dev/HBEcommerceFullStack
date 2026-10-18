@@ -44,6 +44,8 @@ export async function GET(req: NextRequest) {
                 { id: { contains: query, mode: 'insensitive' } },
                 { user: { name: { contains: query, mode: 'insensitive' } } },
                 { user: { email: { contains: query, mode: 'insensitive' } } },
+                { customerName: { contains: query, mode: 'insensitive' } },
+                { customerEmail: { contains: query, mode: 'insensitive' } },
               ],
             },
             select: {
@@ -51,6 +53,8 @@ export async function GET(req: NextRequest) {
               status: true,
               amount: true,
               createdAt: true,
+              customerName: true,
+              customerEmail: true,
               user: { select: { name: true, email: true } },
             },
             take: 10,
@@ -86,7 +90,10 @@ export async function GET(req: NextRequest) {
         status: o.status,
         amount: Number(o.amount),
         createdAt: o.createdAt.toISOString(),
-        customer: { name: o.user.name, email: o.user.email },
+        customer: {
+          name: o.user?.name ?? o.customerName ?? 'Invitado',
+          email: o.user?.email ?? o.customerEmail ?? '',
+        },
       })),
       users: users.map((u) => ({
         id: u.id,

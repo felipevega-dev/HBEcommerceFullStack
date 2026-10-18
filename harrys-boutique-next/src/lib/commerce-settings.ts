@@ -33,6 +33,20 @@ export async function getPricingSettings(): Promise<PricingSettings> {
   }
 }
 
+/** Reads the admin toggle for cash on delivery; defaults to enabled when unset or unreachable. */
+export async function isCashOnDeliveryEnabled() {
+  try {
+    const setting = await prisma.settings.findUnique({
+      where: { key: 'cash_on_delivery_enabled' },
+      select: { value: true },
+    })
+    return setting ? setting.value === 'true' : true
+  } catch (error) {
+    console.warn('[CommerceSettings] Could not read cash_on_delivery_enabled', error)
+    return true
+  }
+}
+
 export async function ensureDefaultStoreSettings() {
   const existing = await prisma.settings.findMany({
     where: { key: { in: STORE_SETTING_DEFINITIONS.map((setting) => setting.key) } },

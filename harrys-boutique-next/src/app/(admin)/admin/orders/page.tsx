@@ -42,6 +42,8 @@ export default async function AdminOrdersPage({
       { id: { contains: search, mode: 'insensitive' } },
       { user: { name: { contains: search, mode: 'insensitive' } } },
       { user: { email: { contains: search, mode: 'insensitive' } } },
+      { customerName: { contains: search, mode: 'insensitive' } },
+      { customerEmail: { contains: search, mode: 'insensitive' } },
     ]
   }
 
@@ -101,7 +103,10 @@ export default async function AdminOrdersPage({
           deliveredAt: o.deliveredAt?.toISOString() ?? null,
           cancelReason: o.cancelReason,
           refundReason: o.refundReason,
-          user: { name: o.user.name, email: o.user.email },
+          user: {
+            name: o.user?.name ?? o.customerName ?? 'Invitado',
+            email: o.user?.email ?? o.customerEmail ?? '',
+          },
           items: o.items.map((i) => ({
             id: i.id,
             name: i.name,

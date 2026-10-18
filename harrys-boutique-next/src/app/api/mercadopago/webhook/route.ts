@@ -6,6 +6,7 @@ import { sendEmail } from '@/lib/email'
 import OrderConfirmation from '@/lib/email/templates/order-confirmation'
 import { CURRENCY_CODE } from '@/lib/commerce'
 import { toPaymentMinorUnits } from '@/lib/checkout'
+import { getOrderTrackingUrl } from '@/lib/guest-orders'
 import {
   releaseCouponRedemption,
   releaseOrderStockReservation,
@@ -243,7 +244,9 @@ export async function POST(req: NextRequest) {
         },
       })
 
-      await tx.cart.deleteMany({ where: { userId: existingOrder.userId } })
+      if (existingOrder.userId) {
+        await tx.cart.deleteMany({ where: { userId: existingOrder.userId } })
+      }
       return true
     })
 
@@ -260,7 +263,10 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    if (orderWithDetails?.user?.email) {
+    const recipientEmail = orderWithDetails?.user?.email ?? orderWithDetails?.customerEmail
+    const recipientName = orderWithDetails?.user?.name ?? orderWithDetails?.customerName ?? ''
+
+    if (orderWithDetails && recipientEmail) {
       const total = Number(orderWithDetails.amount)
       const subtotal = orderWithDetails.items.reduce(
         (sum, item) => sum + Number(item.price) * item.quantity,
@@ -270,11 +276,12 @@ export async function POST(req: NextRequest) {
       const shippingFee = Math.max(0, total + discountAmount - subtotal)
 
       sendEmail({
-        to: orderWithDetails.user.email,
+        to: recipientEmail,
         subject: `Confirmación de tu pedido #${orderId.slice(-8).toUpperCase()} — Harry's Boutique`,
         react: OrderConfirmation({
           orderId: orderId.slice(-8).toUpperCase(),
-          customerName: orderWithDetails.user.name ?? '',
+          customerName: recipientName,
+          orderUrl: getOrderTrackingUrl(orderWithDetails),
           items: orderWithDetails.items.map((item) => ({
             name: item.name,
             price: Number(item.price),

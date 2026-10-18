@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { protectMutation, requireAuth, handleApiError, validateBody } from '@/lib/api-utils'
+import { auth } from '@/auth'
+import { protectMutation, handleApiError, validateBody } from '@/lib/api-utils'
+import { GUEST_ORDER_COOKIE, hasGuestOrderAccess } from '@/lib/guest-orders'
+import { getClientIp } from '@/lib/rate-limiter'
 import { z } from 'zod'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 import { prisma } from '@/lib/prisma'
@@ -21,14 +24,14 @@ const preferenceSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  const { error, session } = await requireAuth(req)
-  if (error) return error
+  const session = await auth()
+  const viewer = session?.user ?? null
 
   const protectionError = await protectMutation(req, {
     keyPrefix: 'payments:create-preference',
     maxRequests: 10,
     windowMs: 10 * 60 * 1000,
-    keySuffix: session!.user.id,
+    keySuffix: viewer?.id ?? `guest:${getClientIp(req)}`,
   })
   if (protectionError) return protectionError
 
@@ -53,7 +56,13 @@ export async function POST(req: NextRequest) {
       include: { items: true },
     })
 
-    if (!order || order.userId !== session!.user.id) {
+    const canAccessOrder = order
+      ? order.userId
+        ? viewer?.id === order.userId
+        : hasGuestOrderAccess(req.cookies.get(GUEST_ORDER_COOKIE)?.value, order.id)
+      : false
+
+    if (!order || !canAccessOrder) {
       return NextResponse.json({ success: false, message: 'Pedido no encontrado' }, { status: 404 })
     }
 
@@ -112,12 +121,12 @@ export async function POST(req: NextRequest) {
         payer: {
           name: data!.address.firstname,
           surname: data!.address.lastname,
-          email: data!.address.email ?? session!.user.email,
+          email: data!.address.email ?? viewer?.email ?? order.customerEmail ?? undefined,
         },
         back_urls: {
-          success: `${siteUrl}/orders?payment=success`,
+          success: `${siteUrl}/orders/${order.id}?payment=success`,
           failure: `${siteUrl}/checkout?payment=failure`,
-          pending: `${siteUrl}/orders?payment=pending`,
+          pending: `${siteUrl}/orders/${order.id}?payment=pending`,
         },
         notification_url: `${siteUrl}/api/mercadopago/webhook`,
         auto_return: 'approved',

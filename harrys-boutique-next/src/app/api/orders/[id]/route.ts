@@ -160,14 +160,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return updatedOrder
     })
 
-    if (data!.status && data!.status !== previousStatus && order.user?.email) {
+    const recipientEmail = order.user?.email ?? order.customerEmail
+    if (data!.status && data!.status !== previousStatus && recipientEmail) {
       try {
         await sendEmail({
-          to: order.user.email,
+          to: recipientEmail,
           subject: `Actualización de tu pedido #${id}`,
           react: OrderStatusUpdate({
             orderId: id,
-            customerName: order.user.name ?? '',
+            customerName: order.user?.name ?? order.customerName ?? '',
             previousStatus: previousStatus as string,
             newStatus: data!.status,
             frontendUrl: getSiteUrl(),

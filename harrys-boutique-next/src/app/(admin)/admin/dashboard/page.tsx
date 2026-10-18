@@ -183,7 +183,10 @@ export default async function AdminDashboardPage() {
             amount: Number(o.amount),
             status: o.status,
             createdAt: o.createdAt.toISOString(),
-            user: { name: o.user.name, email: o.user.email },
+            user: {
+              name: o.user?.name ?? o.customerName ?? 'Invitado',
+              email: o.user?.email ?? o.customerEmail ?? '',
+            },
           }))}
         />
       </div>

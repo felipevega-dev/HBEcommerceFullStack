@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
 import { CheckoutPageClient } from '@/components/store/checkout-page-client'
-import { getPricingSettings } from '@/lib/commerce-settings'
+import { getPricingSettings, isCashOnDeliveryEnabled } from '@/lib/commerce-settings'
 
 export const metadata: Metadata = {
   title: "Checkout — Harry's Boutique",
@@ -13,15 +12,21 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function CheckoutPage() {
-  const session = await auth()
-  if (!session?.user) {
-    redirect('/login?callbackUrl=/checkout')
-  }
-  const pricingSettings = await getPricingSettings()
+  const [session, pricingSettings, codEnabled] = await Promise.all([
+    auth(),
+    getPricingSettings(),
+    isCashOnDeliveryEnabled(),
+  ])
+
+  const viewer = session?.user ? { email: session.user.email, name: session.user.name } : null
 
   return (
     <Suspense>
-      <CheckoutPageClient pricingSettings={pricingSettings} />
+      <CheckoutPageClient
+        pricingSettings={pricingSettings}
+        viewer={viewer}
+        codEnabled={codEnabled}
+      />
     </Suspense>
   )
 }

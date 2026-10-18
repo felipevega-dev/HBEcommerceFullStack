@@ -2,6 +2,7 @@
 
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { BrandIcon } from '@/components/ui/brand-icon'
@@ -331,6 +332,18 @@ export function LoginPageClient() {
               </p>
             </div>
           </form>
+
+          {isCheckoutFlow && (
+            <p className="mt-5 text-center text-sm text-[var(--color-text-secondary)]">
+              ¿Prefieres no crear una cuenta?{' '}
+              <Link
+                href="/checkout"
+                className="font-semibold text-[var(--color-text-primary)] underline-offset-4 hover:underline"
+              >
+                Continuar como invitado
+              </Link>
+            </p>
+          )}
         </section>
       </div>
     </div>

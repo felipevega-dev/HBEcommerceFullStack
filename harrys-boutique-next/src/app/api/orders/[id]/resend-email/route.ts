@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { sendEmail } from '@/lib/email'
+import { getOrderTrackingUrl } from '@/lib/guest-orders'
 import OrderConfirmation from '@/lib/email/templates/order-confirmation'
 import OrderStatusUpdate from '@/lib/email/templates/order-status-update'
 import { getSiteUrl } from '@/lib/site'
@@ -45,7 +46,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ success: false, message: 'Orden no encontrada' }, { status: 404 })
     }
 
-    if (!order.user.email) {
+    const recipientEmail = order.user?.email ?? order.customerEmail
+    const recipientName = order.user?.name ?? order.customerName ?? ''
+
+    if (!recipientEmail) {
       return NextResponse.json(
         { success: false, message: 'La orden no tiene email de cliente' },
         { status: 400 },
@@ -54,11 +58,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (data!.type === 'status') {
       await sendEmail({
-        to: order.user.email,
+        to: recipientEmail,
         subject: `Actualización de tu pedido #${id}`,
         react: OrderStatusUpdate({
           orderId: id,
-          customerName: order.user.name ?? '',
+          customerName: recipientName,
           previousStatus: order.status,
           newStatus: order.status,
           frontendUrl: getSiteUrl(),
@@ -74,11 +78,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const shippingFee = Math.max(0, total + discountAmount - subtotal)
 
       await sendEmail({
-        to: order.user.email,
+        to: recipientEmail,
         subject: `Confirmación de tu pedido #${id}`,
         react: OrderConfirmation({
           orderId: id,
-          customerName: order.user.name ?? '',
+          customerName: recipientName,
           items: order.items.map((item) => ({
             name: item.name,
             price: Number(item.price),
@@ -90,6 +94,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           shippingFee,
           total,
           address: formatAddress(order.addressSnapshot),
+          orderUrl: getOrderTrackingUrl(order),
         }),
       })
     }

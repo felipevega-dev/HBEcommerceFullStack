@@ -40,7 +40,9 @@ const PAYMENT_ID = '123456789'
 
 const baseOrder = {
   id: ORDER_ID,
-  userId: 'user-1',
+  userId: 'user-1' as string | null,
+  customerEmail: 'cliente@example.com' as string | null,
+  customerName: 'Cliente' as string | null,
   amount: 25990,
   status: 'PENDING',
   payment: false,
@@ -375,6 +377,37 @@ describe('POST /api/mercadopago/webhook', () => {
     expect(tx.order.updateMany).not.toHaveBeenCalled()
     expect(tx.cart.deleteMany).not.toHaveBeenCalled()
     expect(sendEmail).not.toHaveBeenCalled()
+  })
+
+  it('confirms guest orders, emails the checkout address and links the order with a token', async () => {
+    vi.stubEnv('NEXTAUTH_SECRET', 'test-secret-with-at-least-32-characters')
+    vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', 'https://harrys.test')
+    const guestOrder = {
+      ...baseOrder,
+      userId: null,
+      customerEmail: 'invitado@example.com',
+      customerName: 'Ana Invitada',
+    }
+    primeMocks(guestOrder)
+    prisma.order.findUnique.mockImplementation(async (args?: FindUniqueArgs) =>
+      args?.include?.user ? { ...orderWithDetails, ...guestOrder, user: null } : guestOrder,
+    )
+
+    const res = await POST(signedRequest())
+
+    expect(await res.json()).toEqual({ received: true, processed: true })
+    expect(tx.cart.deleteMany).not.toHaveBeenCalled()
+    expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'invitado@example.com' }))
+
+    const { default: OrderConfirmation } = await import('@/lib/email/templates/order-confirmation')
+    const props = vi.mocked(OrderConfirmation).mock.calls[0][0] as {
+      customerName: string
+      orderUrl: string
+    }
+    expect(props.customerName).toBe('Ana Invitada')
+    const orderUrl = new URL(props.orderUrl)
+    expect(orderUrl.origin + orderUrl.pathname).toBe('https://harrys.test/orders/' + ORDER_ID)
+    expect(orderUrl.searchParams.get('token')).toMatch(/^[A-Za-z0-9_-]{20,}$/)
   })
 
   it('still confirms the order when the confirmation email fails', async () => {

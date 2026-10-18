@@ -11,6 +11,7 @@ import {
   Row,
   Section,
   Text,
+  Button,
 } from '@react-email/components'
 import * as React from 'react'
 
@@ -28,6 +29,7 @@ export interface OrderConfirmationProps {
   shippingFee: number
   total: number
   address: string
+  orderUrl?: string
 }
 
 export default function OrderConfirmation({
@@ -38,6 +40,7 @@ export default function OrderConfirmation({
   shippingFee,
   total,
   address,
+  orderUrl,
 }: OrderConfirmationProps) {
   const formatPrice = (amount: number) =>
     new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount)
@@ -63,6 +66,11 @@ export default function OrderConfirmation({
               de tu compra.
             </Text>
             <Text style={orderIdStyle}>Número de pedido: #{orderId}</Text>
+            {orderUrl && (
+              <Button href={orderUrl} style={buttonStyle}>
+                Ver mi pedido
+              </Button>
+            )}
           </Section>
 
           <Hr style={hrStyle} />
@@ -329,4 +337,16 @@ const footerTextStyle: React.CSSProperties = {
   fontSize: '12px',
   lineHeight: '1.5',
   margin: '0 0 4px',
+}
+
+const buttonStyle: React.CSSProperties = {
+  display: 'inline-block',
+  marginTop: '12px',
+  padding: '12px 22px',
+  borderRadius: '999px',
+  backgroundColor: '#1f1a17',
+  color: '#ffffff',
+  fontSize: '14px',
+  fontWeight: 600,
+  textDecoration: 'none',
 }

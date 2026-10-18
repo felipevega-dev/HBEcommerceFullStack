@@ -66,7 +66,7 @@ export async function reserveCouponForOrder(
     amount,
   }: {
     couponId: string
-    userId: string
+    userId: string | null
     orderId: string
     amount: number
   },
