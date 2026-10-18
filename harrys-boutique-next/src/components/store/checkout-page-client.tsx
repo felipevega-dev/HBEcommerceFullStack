@@ -394,7 +394,7 @@ export function CheckoutPageClient({
       <p className="ui-eyebrow">Compra directa</p>
       <h1 className="ui-display mb-8 mt-3 text-3xl sm:text-4xl">Finalizar compra</h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
         {/* Left: Shipping info */}
         <div className="flex-1 space-y-6">
           <h2 className="text-2xl font-medium text-[var(--color-text-primary)]">Datos de envío</h2>
