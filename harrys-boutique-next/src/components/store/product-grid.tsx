@@ -24,6 +24,8 @@ interface Product {
   mercadoLibreUrl?: string | null
   mercadoLibreItemId?: string | null
   mercadoLibreStatus?: MercadoLibreListingStatus
+  mercadoLibreAvailable?: boolean | null
+  mercadoLibreSyncedAt?: string | Date | null
 }
 
 interface Props {

@@ -5,7 +5,12 @@ import Image from 'next/image'
 import { WishlistButton } from '@/components/store/wishlist-button'
 import { StarRating } from '@/components/ui/star-rating'
 import { formatPrice } from '@/lib/utils'
-import { resolveProductPurchaseChannel, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
+import {
+  MERCADO_LIBRE_AVAILABILITY_LABELS,
+  isMercadoLibreListingPurchasable,
+  resolveProductPurchaseChannel,
+  type MercadoLibreListingStatus,
+} from '@/lib/mercado-libre'
 import { MercadoLibreLink } from './mercado-libre-link'
 
 interface Product {
@@ -24,6 +29,8 @@ interface Product {
   mercadoLibreUrl?: string | null
   mercadoLibreItemId?: string | null
   mercadoLibreStatus?: MercadoLibreListingStatus
+  mercadoLibreAvailable?: boolean | null
+  mercadoLibreSyncedAt?: string | Date | null
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -33,6 +40,10 @@ export function ProductCard({ product }: { product: Product }) {
   const isValidSlug = product.slug && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(product.slug)
   const href = isValidSlug ? `/product/${product.slug}` : `/product/${product.id}`
   const purchaseChannel = resolveProductPurchaseChannel(product)
+  const mercadoLibreAvailability =
+    purchaseChannel.type === 'mercadolibre' ? purchaseChannel.listing.availability : null
+  const mercadoLibrePurchasable =
+    mercadoLibreAvailability !== null && isMercadoLibreListingPurchasable(mercadoLibreAvailability)
 
   return (
     <article className="group flex h-full flex-col gap-2.5 rounded-[1.35rem] border border-transparent p-1.5 transition-all duration-300 hover:border-[var(--color-stitch-line)] hover:bg-[var(--color-surface)]/70 hover:shadow-[var(--shadow-editorial)]">
@@ -50,7 +61,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
           {purchaseChannel.type === 'mercadolibre' && (
             <span className="absolute bottom-2 left-2 right-2 z-10 truncate rounded-full border border-[var(--color-ml-border)] bg-[var(--color-ml-bg)]/95 px-2 py-1 text-center text-[9px] font-semibold text-[var(--color-ml-text)] shadow-sm">
-              Disponible en Mercado Libre
+              {MERCADO_LIBRE_AVAILABILITY_LABELS[purchaseChannel.listing.availability]}
             </span>
           )}
 
@@ -139,17 +150,26 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {purchaseChannel.type === 'mercadolibre' ? (
-        <MercadoLibreLink
-          href={purchaseChannel.listing.url}
-          itemId={purchaseChannel.listing.itemId}
-          productId={product.id}
-          productName={product.name}
-          productSlug={product.slug}
-          location="product_card"
-          className="ui-button ui-button-ml ui-button-sm w-full justify-center"
-        >
-          Comprar en Mercado Libre
-        </MercadoLibreLink>
+        !mercadoLibrePurchasable ? (
+          <span
+            aria-disabled="true"
+            className="ui-button ui-button-ml ui-button-sm w-full cursor-not-allowed justify-center opacity-60"
+          >
+            {MERCADO_LIBRE_AVAILABILITY_LABELS[purchaseChannel.listing.availability]}
+          </span>
+        ) : (
+          <MercadoLibreLink
+            href={purchaseChannel.listing.url}
+            itemId={purchaseChannel.listing.itemId}
+            productId={product.id}
+            productName={product.name}
+            productSlug={product.slug}
+            location="product_card"
+            className="ui-button ui-button-ml ui-button-sm w-full justify-center"
+          >
+            Comprar en Mercado Libre
+          </MercadoLibreLink>
+        )
       ) : (
         <Link
           href={href}

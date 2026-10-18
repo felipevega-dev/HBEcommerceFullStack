@@ -10,7 +10,12 @@ import { colorToHex } from '@/lib/utils'
 import { ButtonWithFeedback } from '@/components/ui/button-with-feedback'
 import { BrandIcon } from '@/components/ui/brand-icon'
 import { trackAnalyticsEvent } from '@/lib/analytics'
-import { resolveMercadoLibreListing, type MercadoLibreListingStatus } from '@/lib/mercado-libre'
+import {
+  MERCADO_LIBRE_AVAILABILITY_LABELS,
+  isMercadoLibreListingPurchasable,
+  resolveMercadoLibreListing,
+  type MercadoLibreListingStatus,
+} from '@/lib/mercado-libre'
 import { MercadoLibreLink } from './mercado-libre-link'
 import { EditorialArrow } from './editorial'
 
@@ -24,6 +29,8 @@ interface Product {
   mercadoLibreUrl?: string | null
   mercadoLibreItemId?: string | null
   mercadoLibreStatus?: MercadoLibreListingStatus
+  mercadoLibreAvailable?: boolean | null
+  mercadoLibreSyncedAt?: string | null
   sizes: unknown
   colors: string[]
   images: string[]
@@ -32,6 +39,14 @@ interface Product {
   ratingAverage: number
   ratingCount: number
 }
+
+const syncedAtFormatter = new Intl.DateTimeFormat('es-CL', {
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'America/Santiago',
+})
+
+const formatSyncedAt = (value: string) => syncedAtFormatter.format(new Date(value))
 
 const stripEmoji = (text: string) =>
   text.replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
@@ -50,6 +65,9 @@ export function ProductInfo({
   const [showModal, setShowModal] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const mercadoLibreListing = resolveMercadoLibreListing(product)
+  const mercadoLibrePurchasable =
+    mercadoLibreListing !== null &&
+    isMercadoLibreListingPurchasable(mercadoLibreListing.availability)
 
   const sizes = Array.isArray(product.sizes) ? (product.sizes as string[]) : []
   const activeVariants = product.variants?.filter((variant) => variant.active) ?? []
@@ -183,7 +201,9 @@ export function ProductInfo({
       </div>
       {mercadoLibreListing && (
         <p className="-mt-2 text-xs text-[var(--color-text-muted)]">
-          Precio referencial. Confirma el precio vigente en la publicación oficial.
+          {mercadoLibreListing.syncedAt
+            ? `Precio sincronizado con Mercado Libre el ${formatSyncedAt(mercadoLibreListing.syncedAt)}.`
+            : 'Precio referencial. Confirma el precio vigente en la publicación oficial.'}
         </p>
       )}
 
@@ -339,20 +359,38 @@ export function ProductInfo({
             Precio, disponibilidad, talla, color, cantidad, protección y despacho se confirman
             directamente en la publicación oficial.
           </p>
-          <MercadoLibreLink
-            href={mercadoLibreListing.url}
-            itemId={mercadoLibreListing.itemId}
-            productId={product.id}
-            productName={product.name}
-            productSlug={product.slug}
-            location="product_page"
-            className="ui-button ui-button-ml mt-3 w-full justify-center"
-          >
-            Comprar en Mercado Libre
-          </MercadoLibreLink>
-          <p className="mt-2 text-center text-[11px] text-[var(--color-text-muted)]">
-            Selecciona las variantes disponibles directamente en Mercado Libre.
-          </p>
+          {mercadoLibrePurchasable ? (
+            <>
+              <MercadoLibreLink
+                href={mercadoLibreListing.url}
+                itemId={mercadoLibreListing.itemId}
+                productId={product.id}
+                productName={product.name}
+                productSlug={product.slug}
+                location="product_page"
+                className="ui-button ui-button-ml mt-3 w-full justify-center"
+              >
+                Comprar en Mercado Libre
+              </MercadoLibreLink>
+              <p className="mt-2 text-center text-[11px] text-[var(--color-text-muted)]">
+                Selecciona las variantes disponibles directamente en Mercado Libre.
+              </p>
+            </>
+          ) : (
+            <>
+              <span
+                aria-disabled="true"
+                className="ui-button ui-button-ml mt-3 w-full cursor-not-allowed justify-center opacity-60"
+              >
+                {MERCADO_LIBRE_AVAILABILITY_LABELS[mercadoLibreListing.availability]}
+              </span>
+              <p className="mt-2 text-center text-[11px] text-[var(--color-text-muted)]">
+                {mercadoLibreListing.availability === 'sold_out'
+                  ? 'Sin stock en Mercado Libre por ahora. Escríbenos si quieres que te avisemos.'
+                  : 'La publicación no está activa en Mercado Libre por ahora. Escríbenos si te interesa este producto.'}
+              </p>
+            </>
+          )}
         </div>
       )}
 

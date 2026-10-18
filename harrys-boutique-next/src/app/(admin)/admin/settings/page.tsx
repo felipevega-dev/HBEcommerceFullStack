@@ -1,11 +1,21 @@
 import type { Metadata } from 'next'
 import { AdminSettingsClient } from '@/components/admin/settings-client'
+import { MercadoLibreConnectionPanel } from '@/components/admin/mercado-libre-connection-panel'
 import { getSettingsMap } from '@/lib/commerce-settings'
+import { getMercadoLibreIntegrationStatus } from '@/lib/mercado-libre-sync'
 
 export const metadata: Metadata = { title: "Configuracion - Admin Harry's Boutique" }
 
-export default async function AdminSettingsPage() {
-  const settingsMap = await getSettingsMap()
+interface Props {
+  searchParams: Promise<{ mercadolibre?: string }>
+}
+
+export default async function AdminSettingsPage({ searchParams }: Props) {
+  const [{ mercadolibre }, settingsMap, mercadoLibreStatus] = await Promise.all([
+    searchParams,
+    getSettingsMap(),
+    getMercadoLibreIntegrationStatus(),
+  ])
 
   return (
     <div className="space-y-6">
@@ -15,6 +25,7 @@ export default async function AdminSettingsPage() {
           Ajustes operativos de tienda, envio, contacto e integraciones.
         </p>
       </div>
+      <MercadoLibreConnectionPanel status={mercadoLibreStatus} notice={mercadolibre} />
       <AdminSettingsClient settings={settingsMap} />
     </div>
   )

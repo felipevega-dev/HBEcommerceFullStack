@@ -47,6 +47,11 @@ Validado en esta fecha: `type-check` OK, `test` 309/309 (29 archivos),
 - No se importan órdenes de ML, ni preguntas, ni se detecta cuando una
   publicación se pausa o se agota (el CTA seguiría mandando tráfico a una
   publicación muerta).
+- Estado 2026-10-18: fases 1 y 2 implementadas en la rama
+  `feature/mercadolibre-oauth-sync` (OAuth con PKCE, tokens cifrados, cron
+  diario, sync manual, estados en tienda). Falta: registrar la app en Mercado
+  Libre, cargar las variables en Vercel, aplicar la migración y conectar la
+  cuenta.
 - Propuesta por fases:
   1. Registrar app en ML, guardar `ML_CLIENT_ID`/`ML_CLIENT_SECRET` en Vercel,
      flujo OAuth desde `/admin/settings` y tokens cifrados en `Settings`.
@@ -135,7 +140,7 @@ ya tiene primitives propios), MCP comunitarios de ML (usar el oficial).
 2. `docs/env-examples`: recrear `.env.example` y `.env.production.example`,
    corregir README.
 3. `test/mercadopago-webhook`: tests del webhook y de create-preference.
-4. `feature/mercadolibre-oauth-sync`: fases 2.1.1 y 2.1.2.
+4. `feature/mercadolibre-oauth-sync`: fases 2.1.1 y 2.1.2 (hecho, pendiente de migración y merge).
 5. `feature/home-isr-revalidate`: ISR + `revalidateTag` desde admin.
 6. `feature/guest-checkout` (decisión de negocio previa).
 7. `feature/storefront-mobile-audit`: aplicar `mobile-native` y `better-*`.

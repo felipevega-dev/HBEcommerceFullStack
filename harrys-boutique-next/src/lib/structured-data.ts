@@ -1,6 +1,10 @@
 import { getSiteUrl } from '@/lib/site'
 import { CURRENCY_CODE } from '@/lib/commerce'
-import { resolveProductPurchaseChannel, type MercadoLibreListingInput } from '@/lib/mercado-libre'
+import {
+  resolveProductPurchaseChannel,
+  type MercadoLibreListingInput,
+  type ProductPurchaseChannel,
+} from '@/lib/mercado-libre'
 
 const STORE_NAME = "Harry's Boutique"
 const INSTAGRAM_URL = 'https://www.instagram.com/harrysboutique.CL'
@@ -85,6 +89,27 @@ interface ProductStructuredDataInput extends MercadoLibreListingInput {
   url: string
 }
 
+const IN_STOCK = 'https://schema.org/InStock'
+const OUT_OF_STOCK = 'https://schema.org/OutOfStock'
+
+/** Mercado Libre listings only expose availability once they have been synced. */
+function getOfferAvailability(channel: ProductPurchaseChannel, stock: number) {
+  if (channel.type === 'direct') {
+    return { availability: stock > 0 ? IN_STOCK : OUT_OF_STOCK }
+  }
+
+  switch (channel.listing.availability) {
+    case 'available':
+      return { availability: IN_STOCK }
+    case 'sold_out':
+    case 'paused':
+    case 'closed':
+      return { availability: OUT_OF_STOCK }
+    default:
+      return {}
+  }
+}
+
 export function getProductStructuredData(product: ProductStructuredDataInput) {
   const purchaseChannel = resolveProductPurchaseChannel(product)
 
@@ -106,10 +131,7 @@ export function getProductStructuredData(product: ProductStructuredDataInput) {
       price: product.price,
       priceCurrency: CURRENCY_CODE,
       itemCondition: 'https://schema.org/NewCondition',
-      ...(purchaseChannel.type === 'direct' && {
-        availability:
-          product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      }),
+      ...getOfferAvailability(purchaseChannel, product.stock),
     },
     ...(product.ratingCount > 0 && {
       aggregateRating: {

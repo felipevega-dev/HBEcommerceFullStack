@@ -6,6 +6,10 @@ export interface MercadoLibreListingInput {
   mercadoLibreUrl?: string | null
   mercadoLibreItemId?: string | null
   mercadoLibreStatus?: MercadoLibreListingStatus | null
+  /** Mirrors "available_quantity > 0" from the last sync; null when unknown. */
+  mercadoLibreAvailable?: boolean | null
+  /** Timestamp of the last successful sync with Mercado Libre; null when never synced. */
+  mercadoLibreSyncedAt?: Date | string | null
 }
 
 export interface NormalizedMercadoLibreListingInput {
@@ -14,9 +18,18 @@ export interface NormalizedMercadoLibreListingInput {
   mercadoLibreStatus?: MercadoLibreListingStatus
 }
 
+export type MercadoLibreListingAvailability =
+  | 'available'
+  | 'sold_out'
+  | 'paused'
+  | 'closed'
+  | 'unknown'
+
 export interface ValidMercadoLibreListing {
   url: string
   itemId?: string
+  availability: MercadoLibreListingAvailability
+  syncedAt: string | null
 }
 
 export type ProductPurchaseChannel =
@@ -71,7 +84,12 @@ export function resolveMercadoLibreListing(
   const urlItemId = extractMercadoLibreItemId(url)
   if (storedItemId && urlItemId && storedItemId !== urlItemId) return null
 
-  return { url: url.toString(), itemId: storedItemId ?? urlItemId }
+  return {
+    url: url.toString(),
+    itemId: storedItemId ?? urlItemId,
+    availability: getMercadoLibreListingAvailability(input),
+    syncedAt: normalizeSyncedAt(input.mercadoLibreSyncedAt),
+  }
 }
 
 export function resolveProductPurchaseChannel(
@@ -120,4 +138,60 @@ export function getMercadoLibreValidationError(input: MercadoLibreListingInput):
   }
 
   return null
+}
+
+// ─── Sync state helpers ───────────────────────────────────────────────────────
+
+const ML_ITEM_STATUS_MAP: Record<string, MercadoLibreListingStatus> = {
+  active: 'ACTIVE',
+  paused: 'PAUSED',
+  under_review: 'PAUSED',
+  payment_required: 'PAUSED',
+  not_yet_active: 'PAUSED',
+  closed: 'INACTIVE',
+  inactive: 'INACTIVE',
+}
+
+/** Maps the "status" of a Mercado Libre item to the local listing status. */
+export function mapMercadoLibreItemStatus(
+  status: string | null | undefined,
+): MercadoLibreListingStatus {
+  if (!status) return 'INACTIVE'
+  return ML_ITEM_STATUS_MAP[status.toLowerCase()] ?? 'INACTIVE'
+}
+
+function normalizeSyncedAt(value: Date | string | null | undefined): string | null {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date.toISOString()
+}
+
+export function getMercadoLibreListingAvailability(
+  input: MercadoLibreListingInput,
+): MercadoLibreListingAvailability {
+  if (!normalizeSyncedAt(input.mercadoLibreSyncedAt)) return 'unknown'
+
+  switch (input.mercadoLibreStatus) {
+    case 'ACTIVE':
+      return input.mercadoLibreAvailable === false ? 'sold_out' : 'available'
+    case 'PAUSED':
+      return 'paused'
+    case 'INACTIVE':
+      return 'closed'
+    default:
+      return 'unknown'
+  }
+}
+
+/** Unknown listings keep the historical behaviour: the CTA links to Mercado Libre. */
+export function isMercadoLibreListingPurchasable(availability: MercadoLibreListingAvailability) {
+  return availability === 'available' || availability === 'unknown'
+}
+
+export const MERCADO_LIBRE_AVAILABILITY_LABELS: Record<MercadoLibreListingAvailability, string> = {
+  available: 'Disponible en Mercado Libre',
+  unknown: 'Disponible en Mercado Libre',
+  sold_out: 'Agotado en Mercado Libre',
+  paused: 'Publicación pausada',
+  closed: 'Publicación finalizada',
 }

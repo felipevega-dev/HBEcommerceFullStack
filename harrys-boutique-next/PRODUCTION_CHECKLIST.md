@@ -13,6 +13,7 @@
 - Run migrations in staging with `npm run db:migrate:deploy`.
 - For Supabase migrations, keep runtime on the transaction pooler URL and let Prisma use `DIRECT_URL`.
 - Create and verify the initial `OWNER` user with `npm run admin:create`.
+- Mercado Libre sync: register the app (redirect URI `https://<domain>/api/admin/mercadolibre/callback`), set `MERCADOLIBRE_CLIENT_ID`, `MERCADOLIBRE_CLIENT_SECRET` and `CRON_SECRET`, apply migration `20261018120000_add_mercado_libre_sync`, then connect the seller account from `/admin/settings`.
 
 ## Release Gate
 
@@ -32,6 +33,7 @@
 - Order confirmation email arrives from the verified sender.
 - Admin can create/edit products and upload images.
 - Sitemap and robots are available at `/sitemap.xml` and `/robots.txt`.
+- `/admin/settings` shows the Mercado Libre account as connected and "Sincronizar ahora" updates linked products; `GET /api/cron/mercadolibre-sync` with the bearer token returns `success: true`.
 
 ## Monitoring
 

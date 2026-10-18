@@ -18,6 +18,8 @@ function HomeProductCard({ product }: { product: HomeProduct }) {
         isNew: product.isNew,
         mercadoLibreUrl: product.mercadoLibreUrl,
         mercadoLibreItemId: product.mercadoLibreItemId,
+        mercadoLibreAvailable: product.mercadoLibreAvailable,
+        mercadoLibreSyncedAt: product.mercadoLibreSyncedAt,
       }}
     />
   )
