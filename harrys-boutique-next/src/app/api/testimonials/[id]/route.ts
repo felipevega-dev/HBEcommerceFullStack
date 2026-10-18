@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateHomePage } from '@/lib/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
@@ -30,6 +31,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const { id } = await params
     const testimonial = await prisma.testimonial.update({ where: { id }, data: data! })
+    revalidateHomePage()
     return NextResponse.json({ success: true, testimonial })
   } catch (e) {
     return handleApiError(e)
@@ -50,6 +52,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   try {
     const { id } = await params
     await prisma.testimonial.delete({ where: { id } })
+    revalidateHomePage()
     return NextResponse.json({ success: true })
   } catch (e) {
     return handleApiError(e)

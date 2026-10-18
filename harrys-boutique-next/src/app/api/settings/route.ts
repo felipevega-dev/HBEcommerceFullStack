@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateStoreContentPages } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAdminAuth } from '@/lib/api-utils'
 import { getSettingsMap } from '@/lib/commerce-settings'
@@ -71,6 +72,8 @@ export async function PUT(req: NextRequest) {
         })
       }
     })
+
+    revalidateStoreContentPages()
 
     const map = await getSettingsMap()
     return NextResponse.json({ success: true, settings: map })

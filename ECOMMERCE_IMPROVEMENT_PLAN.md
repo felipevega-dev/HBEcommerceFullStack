@@ -95,8 +95,12 @@ Validado en esta fecha: `type-check` OK, `test` 309/309 (29 archivos),
 - Home, Nosotros, FAQ, Envíos y Devoluciones usan `force-dynamic` y pegan a la
   base en cada visita. Pasar a ISR con `revalidateTag` disparado desde el
   admin cuando se guarda contenido.
-- 15 `<img>` crudos frente a 26 usos de `next/image`. Migrarlos donde sean
-  imágenes de producto o hero.
+- 15 `<img>` crudos frente a 26 usos de `next/image`. Revisado el
+  2026-10-18: 4 son mocks de tests, 9 son previsualizaciones del admin (blob y
+  data URLs, sin beneficio real) y 2 son los logos Visa/Mastercard del checkout,
+  que apuntan a `/visa.svg` y `/mastercard.svg` inexistentes y se ocultan
+  por `onError`. Pendiente menor: eliminar esos dos `<img>` o agregar los
+  SVG en `public/`.
 - Pendientes ya anotados en `WORK_LOG.md`: auditoría mobile-native, estados de
   carrito/checkout y revisión de motion usando las skills instaladas.
 
@@ -136,11 +140,11 @@ ya tiene primitives propios), MCP comunitarios de ML (usar el oficial).
 
 ## 4. Orden sugerido de fases
 
-1. `chore/format-and-eol`: Prettier masivo + `.gitattributes`, `check` en verde.
+1. `chore/format-and-eol`: Prettier masivo + `.gitattributes`, `check` en verde. Hecho (en `main`).
 2. `docs/env-examples`: recrear `.env.example` y `.env.production.example`,
-   corregir README.
-3. `test/mercadopago-webhook`: tests del webhook y de create-preference.
+   corregir README. Hecho (en `main`).
+3. `test/mercadopago-webhook`: tests del webhook y de create-preference. Hecho (en `main`).
 4. `feature/mercadolibre-oauth-sync`: fases 2.1.1 y 2.1.2 (hecho, pendiente de migración y merge).
-5. `feature/home-isr-revalidate`: ISR + `revalidateTag` desde admin.
+5. `feature/home-isr-revalidate`: ISR + revalidación desde admin. Hecho.
 6. `feature/guest-checkout` (decisión de negocio previa).
 7. `feature/storefront-mobile-audit`: aplicar `mobile-native` y `better-*`.

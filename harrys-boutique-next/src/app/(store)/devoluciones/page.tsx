@@ -15,7 +15,8 @@ export const metadata: Metadata = {
     'Conoce cómo gestionar devoluciones en Mercado Libre y los derechos aplicables a compras directas de Harry’s Boutique.',
 }
 
-export const dynamic = 'force-dynamic'
+// Revalidated on a timer and on demand from the admin (see src/lib/cache.ts).
+export const revalidate = 300
 
 const directReturnSteps = [
   {

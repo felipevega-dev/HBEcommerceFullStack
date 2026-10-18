@@ -19,7 +19,8 @@ export const metadata: Metadata = {
     'Revisa cómo se gestionan los despachos de Mercado Libre y las compras directas de Harry’s Boutique.',
 }
 
-export const dynamic = 'force-dynamic'
+// Revalidated on a timer and on demand from the admin (see src/lib/cache.ts).
+export const revalidate = 300
 
 const directEstimates = [
   { zone: 'Región Metropolitana', estimate: '2 a 4 días hábiles' },
