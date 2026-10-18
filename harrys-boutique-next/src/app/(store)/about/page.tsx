@@ -9,7 +9,8 @@ export const metadata: Metadata = {
     "Conoce la historia de Harry's Boutique, tu tienda de ropa y accesorios para mascotas.",
 }
 
-export const dynamic = 'force-dynamic'
+// Revalidated on a timer and on demand from the admin (see src/lib/cache.ts).
+export const revalidate = 300
 
 export default async function AboutPage() {
   const setting = await prisma.settings.findUnique({

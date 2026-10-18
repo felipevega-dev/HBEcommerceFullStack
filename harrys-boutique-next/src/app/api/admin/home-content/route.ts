@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateHomePage } from '@/lib/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
@@ -91,6 +92,7 @@ export async function PUT(request: NextRequest) {
           prisma.category.update({ where: { id }, data: categoryData }),
         ),
       )
+      revalidateHomePage()
       return NextResponse.json({ success: true })
     }
 
@@ -100,6 +102,7 @@ export async function PUT(request: NextRequest) {
         where: { id },
         data: categoryData,
       })
+      revalidateHomePage()
       return NextResponse.json({ success: true, category })
     }
 
@@ -119,6 +122,7 @@ export async function PUT(request: NextRequest) {
           })
         }
       })
+      revalidateHomePage()
       return NextResponse.json({ success: true })
     }
 
@@ -170,11 +174,13 @@ export async function PUT(request: NextRequest) {
           })
         }
       })
+      revalidateHomePage()
       return NextResponse.json({ success: true })
     }
 
     if (data!.action === 'createCategory') {
       const category = await prisma.category.create({ data: data!.data })
+      revalidateHomePage()
       return NextResponse.json({ success: true, category }, { status: 201 })
     }
 
@@ -183,6 +189,7 @@ export async function PUT(request: NextRequest) {
       where: { id },
       data: instagramData,
     })
+    revalidateHomePage()
     return NextResponse.json({ success: true, instagram })
   } catch (apiError) {
     return handleApiError(apiError)

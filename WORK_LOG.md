@@ -1299,3 +1299,30 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
 - Resultado: el flujo de pago queda protegido ante regresiones.
 - Pendientes: ninguno en esta fase.
 - Riesgos: ninguno; no se tocó código de producción.
+
+## 2026-10-18 - ISR en Home y páginas de ayuda con revalidación desde el admin
+
+- Rama usada: `feature/home-isr-revalidate`.
+- Objetivo: dejar de renderizar Home, Nosotros, FAQ, Envíos y Devoluciones en
+  cada visita (`force-dynamic`) sin perder la frescura del contenido editado
+  en el admin.
+- Archivos modificados:
+  - `src/app/(store)/{page,about/page,faq/page,envios/page,devoluciones/page}.tsx`:
+    `export const revalidate = 300`.
+  - `src/lib/cache.ts`: `revalidateHomePage()` y
+    `revalidateStoreContentPages()`.
+  - Rutas admin que ahora revalidan: `api/admin/home-content` (Home),
+    `api/testimonials` y `api/testimonials/[id]` (Home), las cinco rutas de
+    `api/instagram/posts` (Home) y `api/settings` (Home, Nosotros, FAQ,
+    Envíos, Devoluciones, Contacto y Tienda).
+- Cambios realizados: las páginas públicas sin datos de sesión se sirven
+  desde la caché de ruta con revalidación cada 5 minutos y bajo demanda al
+  guardar contenido; productos, categorías y hero ya revalidaban `/`.
+- Verificación previa: según `prerender-manifest.json`, `/product/[id]` se
+  renderiza de forma dinámica (no había caché obsoleta de productos) y
+  `/tienda` también es dinámica por `searchParams`.
+- Validaciones: `npx next typegen`, `npm run check` y `npm run build`.
+- Pendientes: carrito y checkout siguen dinámicos por diseño (dependen de la
+  sesión).
+- Riesgos: el build de producción ahora necesita acceso a la base de datos
+  para prerenderizar la Home y las páginas de ayuda, igual que `/tienda`.

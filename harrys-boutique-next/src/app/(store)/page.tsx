@@ -13,7 +13,8 @@ export const metadata: Metadata = {
   },
 }
 
-export const dynamic = 'force-dynamic'
+// Revalidated on a timer and on demand from the admin (see src/lib/cache.ts).
+export const revalidate = 300
 
 export default async function HomePage() {
   const homeContent = await getHomeContent()

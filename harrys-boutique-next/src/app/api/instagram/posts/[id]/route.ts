@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateHomePage } from '@/lib/cache'
 import { z } from 'zod'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { updateInstagramPostDraft } from '@/lib/instagram-automation'
@@ -29,6 +30,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params
     const post = await updateInstagramPostDraft(id, data!)
+    revalidateHomePage()
     return NextResponse.json({ success: true, post })
   } catch (apiError) {
     return handleApiError(apiError)

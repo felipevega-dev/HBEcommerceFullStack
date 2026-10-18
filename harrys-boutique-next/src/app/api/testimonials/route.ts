@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateHomePage } from '@/lib/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
         status: data!.status ?? 'PENDING',
       },
     })
+    revalidateHomePage()
     return NextResponse.json({ success: true, testimonial }, { status: 201 })
   } catch (e) {
     return handleApiError(e)

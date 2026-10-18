@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateHomePage } from '@/lib/cache'
 import { z } from 'zod'
 import { handleApiError, protectMutation, requireAdminAuth, validateBody } from '@/lib/api-utils'
 import { createManualInstagramPost } from '@/lib/instagram-automation'
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const post = await createManualInstagramPost(data!)
+    revalidateHomePage()
     return NextResponse.json({ success: true, post }, { status: 201 })
   } catch (apiError) {
     return handleApiError(apiError)

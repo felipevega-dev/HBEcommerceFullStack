@@ -20,7 +20,8 @@ export const metadata: Metadata = {
     "Respuestas sobre compras en Mercado Libre, pedidos directos, envíos, devoluciones y tallas de Harry's Boutique.",
 }
 
-export const dynamic = 'force-dynamic'
+// Revalidated on a timer and on demand from the admin (see src/lib/cache.ts).
+export const revalidate = 300
 
 export default async function FaqPage() {
   const pricing = await getPricingSettings()

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateHomePage } from '@/lib/cache'
 import { handleApiError, protectMutation, requireAdminAuth } from '@/lib/api-utils'
 import { skipInstagramPost } from '@/lib/instagram-automation'
 
@@ -16,6 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id } = await params
     const post = await skipInstagramPost(id)
+    revalidateHomePage()
     return NextResponse.json({ success: true, post })
   } catch (apiError) {
     return handleApiError(apiError)
