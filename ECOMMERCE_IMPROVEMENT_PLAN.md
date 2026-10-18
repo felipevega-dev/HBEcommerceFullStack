@@ -48,7 +48,7 @@ Validado en esta fecha: `type-check` OK, `test` 309/309 (29 archivos),
   publicación se pausa o se agota (el CTA seguiría mandando tráfico a una
   publicación muerta).
 - Estado 2026-10-18: fases 1 y 2 implementadas en la rama
-  `feature/mercadolibre-oauth-sync` (OAuth con PKCE, tokens cifrados, cron
+  `release/ml-sync-guest-checkout` (OAuth con PKCE, tokens cifrados, cron
   diario, sync manual, estados en tienda). Falta: registrar la app en Mercado
   Libre, cargar las variables en Vercel, aplicar la migración y conectar la
   cuenta.
@@ -144,7 +144,7 @@ ya tiene primitives propios), MCP comunitarios de ML (usar el oficial).
 2. `docs/env-examples`: recrear `.env.example` y `.env.production.example`,
    corregir README. Hecho (en `main`).
 3. `test/mercadopago-webhook`: tests del webhook y de create-preference. Hecho (en `main`).
-4. `feature/mercadolibre-oauth-sync`: fases 2.1.1 y 2.1.2 (hecho, pendiente de migración y merge).
+4. Mercado Libre OAuth y sync (fases 2.1.1 y 2.1.2): hecho en `release/ml-sync-guest-checkout`, pendiente de migración y merge.
 5. `feature/home-isr-revalidate`: ISR + revalidación desde admin. Hecho.
-6. `feature/guest-checkout`: aprobado e implementado el 2026-10-18; pendiente de migración y merge.
-7. `feature/storefront-mobile-audit`: aplicar `mobile-native` y `better-*`.
+6. Checkout como invitado: aprobado e implementado el 2026-10-18 en `release/ml-sync-guest-checkout`, pendiente de migración y merge.
+7. Modernización móvil y pulido del checkout: hecho en `main` (2026-10-18).

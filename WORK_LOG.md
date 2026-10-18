@@ -1489,3 +1489,21 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
   base a la que apunta el build. En Vercel el deploy fallaría y la versión
   anterior seguiría activa. Aplicar la migración primero y luego mergear.
 - `npm run check` (type-check, Prettier y 413 tests) pasa en esta rama.
+
+## 2026-10-18 - Rama de release con las dos migraciones pendientes
+
+- Rama usada: `release/ml-sync-guest-checkout` (reemplaza a
+  `feature/mercadolibre-oauth-sync` y `feature/guest-checkout`, que se
+  eliminaron para dejar una sola rama pendiente).
+- Motivo: ambas features necesitan migraciones y chocaban entre sí en
+  `schema.prisma`, los `.env` de ejemplo, el checklist y este log; se
+  resolvieron aquí una sola vez.
+- Verificación: el diff de `main` contra el schema combinado coincide con
+  las migraciones `20261018120000_add_mercado_libre_sync` y
+  `20261018140000_guest_checkout`; `npm run check` pasa (429 tests). `npm run
+build` compila y solo falla al prerenderizar la Home por `P2022` mientras
+  falten las columnas nuevas en la base.
+- Despliegue: aplicar `npm run db:migrate:deploy` con la `DIRECT_URL` de
+  producción, mergear esta rama a `main` y configurar las variables de
+  Mercado Libre cuando estén. Sin credenciales de Mercado Libre la
+  sincronización queda inactiva y el checkout como invitado funciona igual.
