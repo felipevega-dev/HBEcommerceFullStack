@@ -1326,3 +1326,41 @@ build` OK, Prettier OK en archivos tocados. Lint global conserva 94
   sesión).
 - Riesgos: el build de producción ahora necesita acceso a la base de datos
   para prerenderizar la Home y las páginas de ayuda, igual que `/tienda`.
+
+## 2026-10-18 - Checkout: validación de dirección alineada y pulido de UX
+
+- Rama usada: `fix/checkout-address-validation`.
+- Objetivo: eliminar un bug que rechazaba compras válidas y modernizar el
+  checkout con las skills de diseño instaladas (`mobile-native`,
+  `no-ai-design-slop`, `better-accessibility`, `better-writing`).
+- Bug corregido: el formulario mostraba "Apellido" y "Código postal" como
+  opcionales, pero `POST /api/orders` y `POST /api/user/addresses` los exigían.
+  Cualquier compra sin esos datos fallaba con "Error al crear el pedido".
+- Archivos principales:
+  - `src/lib/validations/checkout-address.ts` (nuevo): esquema único con
+    mensajes en español para formulario y API.
+  - `src/app/api/orders/route.ts`, `src/app/api/user/addresses/route.ts`.
+  - `src/components/store/address-form.tsx`, `checkout-page-client.tsx`,
+    `src/app/(store)/checkout/page.tsx`.
+  - Eliminados `checkout-progress.tsx` y `trust-badges.tsx`.
+- Cambios realizados:
+  - Etiquetas asociadas a sus campos, `autocomplete` del navegador,
+    `inputmode` en teléfono y código postal, errores en línea con
+    `aria-invalid`/`aria-describedby` y foco al primer campo inválido.
+  - Regiones y comunas con tildes; las direcciones guardadas sin tilde se
+    siguen reconociendo.
+  - Se quitó el indicador "Paso 1 de 3" (nunca avanzaba) y el bloque de cuatro
+    insignias genéricas; en su lugar, garantías concretas junto al botón de
+    pago (MercadoPago, envío gratis desde el umbral vigente, 10 días de
+    retracto) y aviso "Agrega $X más y el envío es gratis".
+  - Resumen con miniaturas, talla y unidades; métodos de pago y direcciones
+    guardadas como `radiogroup` accesible.
+  - Textos en español de Chile ("Pagas", "aceptas", "intenta"), mayúsculas
+    de oración y título "Finalizar compra".
+  - Se eliminaron los logos Visa/Mastercard que apuntaban a archivos
+    inexistentes (dos 404 en cada visita).
+- Validaciones: `npm run check` (360 tests), `npm run build`; 18 tests nuevos
+  de validación y del formulario.
+- Pendientes: verificar en un teléfono real el autocompletado y el teclado.
+- Riesgos: ninguno detectado; los cambios de API solo relajan campos que el
+  formulario ya presentaba como opcionales.
