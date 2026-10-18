@@ -414,7 +414,7 @@ export function CheckoutPageClient({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
         {/* Left: Shipping info */}
         <div className="flex-1 space-y-6">
           <h2 className="text-2xl font-medium text-[var(--color-text-primary)]">Datos de envío</h2>
