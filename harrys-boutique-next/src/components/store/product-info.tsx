@@ -289,7 +289,7 @@ export function ProductInfo({
       {/* Sizes */}
       {!mercadoLibreListing && sizes.length > 0 && (
         <div>
-          <p className="text-sm font-medium mb-3">Selecciona Talla</p>
+          <p className="text-sm font-medium mb-3">Selecciona una talla</p>
           <div className="flex flex-wrap gap-2">
             {sizes.map((size) => {
               const sizeHasStock =
@@ -304,6 +304,8 @@ export function ProductInfo({
               return (
                 <button
                   key={size}
+                  type="button"
+                  aria-pressed={selectedSize === size}
                   onClick={() => {
                     setSelectedSize(size)
                     trackAnalyticsEvent('select_item_variant', {
@@ -314,7 +316,7 @@ export function ProductInfo({
                     })
                   }}
                   disabled={!sizeHasStock}
-                  className={`px-4 py-2 rounded-lg border text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${selectedSize === size ? 'border-[var(--color-gold)] bg-[var(--color-gold)] text-white' : 'border-[var(--color-stitch-line)] hover:border-[var(--color-dashed)]'}`}
+                  className={`min-h-11 min-w-11 px-4 py-2 rounded-lg border text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${selectedSize === size ? 'border-[var(--color-gold)] bg-[var(--color-gold)] text-white' : 'border-[var(--color-stitch-line)] hover:border-[var(--color-dashed)]'}`}
                 >
                   {size}
                 </button>
@@ -330,16 +332,21 @@ export function ProductInfo({
           <p className="text-sm font-medium mb-3">Cantidad</p>
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="flex h-8 w-8 items-center justify-center rounded border border-[var(--color-stitch-line)] text-lg hover:bg-[var(--color-panel-soft)]"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-stitch-line)] text-lg hover:bg-[var(--color-panel-soft)] disabled:opacity-40"
               aria-label="Disminuir cantidad"
+              disabled={quantity <= 1}
             >
-              -
+              −
             </button>
-            <span className="w-8 text-center font-medium">{quantity}</span>
+            <span className="w-8 text-center font-medium tabular-nums" aria-live="polite">
+              {quantity}
+            </span>
             <button
+              type="button"
               onClick={() => setQuantity((q) => Math.min(selectedStock || q + 1, q + 1))}
-              className="flex h-8 w-8 items-center justify-center rounded border border-[var(--color-stitch-line)] text-lg hover:bg-[var(--color-panel-soft)]"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-stitch-line)] text-lg hover:bg-[var(--color-panel-soft)] disabled:opacity-40"
               aria-label="Aumentar cantidad"
               disabled={selectedStock > 0 && quantity >= selectedStock}
             >

@@ -23,18 +23,7 @@ import {
   reserveCouponForOrder,
 } from '@/lib/order-lifecycle'
 import { resolveProductPurchaseChannel } from '@/lib/mercado-libre'
-
-const addressSchema = z.object({
-  firstname: z.string().min(1),
-  lastname: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().min(1),
-  street: z.string().min(1),
-  city: z.string().min(1),
-  region: z.string().min(1),
-  postalCode: z.string().min(1),
-  country: z.string().min(1),
-})
+import { checkoutAddressSchema } from '@/lib/validations/checkout-address'
 
 const orderItemSchema = z.object({
   productId: z.string().uuid(),
@@ -48,7 +37,7 @@ const orderItemSchema = z.object({
 
 const createOrderSchema = z.object({
   items: z.array(orderItemSchema).min(1),
-  address: addressSchema,
+  address: checkoutAddressSchema,
   paymentMethod: z.enum(['COD', 'mercadopago']),
   couponCode: z.string().optional(),
 })

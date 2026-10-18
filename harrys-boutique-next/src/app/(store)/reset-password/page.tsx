@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ResetPasswordPage() {
   return (
     <Suspense
-      fallback={<div className="flex min-h-screen items-center justify-center">Cargando...</div>}
+      fallback={<div className="flex min-h-svh items-center justify-center">Cargando...</div>}
     >
       <ResetPasswordPageClient />
     </Suspense>

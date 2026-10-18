@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <Suspense
-      fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}
+      fallback={<div className="min-h-svh flex items-center justify-center">Cargando...</div>}
     >
       <LoginPageClient />
     </Suspense>

@@ -5,15 +5,19 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   DEFAULT_PRICING_SETTINGS,
   calculateShippingForSubtotal,
   type PricingSettings,
 } from '@/lib/checkout'
+import {
+  getCheckoutAddressErrors,
+  getFirstInvalidAddressField,
+  type CheckoutAddressField,
+} from '@/lib/validations/checkout-address'
 import { AddressForm } from './address-form'
-import { CheckoutProgress } from './checkout-progress'
-import { TrustBadges } from './trust-badges'
-import { ShieldCheck, Truck, CreditCard, Lock, Check } from 'lucide-react'
+import { Check, Loader2, Lock, RotateCcw, Truck } from 'lucide-react'
 
 interface Address {
   id: string
@@ -71,8 +75,7 @@ export function CheckoutPageClient({
   const [mpInitUrl, setMpInitUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
   const [userEmail, setUserEmail] = useState('')
-  const [currentStep, setCurrentStep] = useState(1) // 1: Dirección, 2: Pago, 3: Confirmación
-  const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+  const [formErrors, setFormErrors] = useState<Partial<Record<CheckoutAddressField, string>>>({})
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Show payment result feedback from MP redirect
@@ -216,61 +219,36 @@ export function CheckoutPageClient({
   const onChange = (updates: Partial<FormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }))
 
-    // Real-time validation
-    const newErrors = { ...formErrors }
-    Object.keys(updates).forEach((key) => {
-      const field = key as keyof FormData
-      const value = updates[field]
+    // Re-check only the fields that are already flagged, so errors clear as the customer fixes them.
+    const flagged = (Object.keys(updates) as CheckoutAddressField[]).filter(
+      (field) => formErrors[field],
+    )
+    if (flagged.length === 0) return
 
-      if (value && typeof value === 'string') {
-        // Clear error if field is filled
-        if (value.trim()) {
-          delete newErrors[field]
-        }
-
-        // Email validation
-        if (field === 'email' && value.trim()) {
-          if (!/\S+@\S+\.\S+/.test(value)) {
-            newErrors.email = 'Email inválido'
-          } else {
-            delete newErrors.email
-          }
-        }
-
-        // Phone validation (basic)
-        if (field === 'phone' && value.trim()) {
-          if (value.length < 8) {
-            newErrors.phone = 'Teléfono muy corto'
-          } else {
-            delete newErrors.phone
-          }
-        }
+    const fresh = getCheckoutAddressErrors({ ...formData, ...updates })
+    setFormErrors((current) => {
+      const next = { ...current }
+      for (const field of flagged) {
+        if (fresh[field]) next[field] = fresh[field]
+        else delete next[field]
       }
+      return next
     })
-
-    setFormErrors(newErrors)
   }
 
   const validate = (): boolean => {
-    const required: (keyof FormData)[] = [
-      'firstname',
-      'email',
-      'phone',
-      'street',
-      'city',
-      'country',
-    ]
-    for (const field of required) {
-      if (!formData[field].trim()) {
-        toast.error(`El campo "${field}" es requerido`)
-        return false
-      }
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      toast.error('El email no es válido')
-      return false
-    }
-    return true
+    const errors = getCheckoutAddressErrors(formData)
+    setFormErrors(errors)
+
+    const firstInvalid = getFirstInvalidAddressField(errors)
+    if (!firstInvalid) return true
+
+    // A saved address can be incomplete (older records): show the form so it can be fixed.
+    if (!showNewAddressForm && savedAddresses.length > 0) setShowNewAddressForm(true)
+
+    toast.error(errors[firstInvalid] ?? 'Revisa los datos de envío')
+    requestAnimationFrame(() => document.getElementById(`checkout-${firstInvalid}`)?.focus())
+    return false
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -331,7 +309,12 @@ export function CheckoutPageClient({
       const orderData = await orderRes.json()
 
       if (!orderData.success) {
-        toast.error(orderData.message ?? 'Error al crear el pedido')
+        toast.error(
+          orderData.message ??
+            (orderData.errors
+              ? 'Revisa los datos de envío e intenta nuevamente.'
+              : 'No pudimos crear el pedido. Intenta nuevamente.'),
+        )
         return
       }
 
@@ -365,7 +348,9 @@ export function CheckoutPageClient({
       const prefData = await prefRes.json()
 
       if (!prefData.success) {
-        toast.error(prefData.message ?? 'Error al iniciar el pago con MercadoPago')
+        toast.error(
+          prefData.message ?? 'No pudimos iniciar el pago con MercadoPago. Intenta nuevamente.',
+        )
         return
       }
 
@@ -375,20 +360,22 @@ export function CheckoutPageClient({
       if (prefData.initPoint) {
         window.location.href = prefData.initPoint
       } else {
-        toast.error('No se pudo obtener el link de pago')
+        toast.error('MercadoPago no entregó el enlace de pago. Intenta nuevamente.')
       }
     } catch {
-      toast.error('Error de conexión. Por favor intentá de nuevo.')
+      toast.error('No pudimos conectar con la tienda. Revisa tu conexión e intenta nuevamente.')
     } finally {
       setLoading(false)
     }
   }
 
-  const inputClass = 'ui-field w-full'
-
   const subtotal = getTotal()
   const shippingFee = calculateShippingForSubtotal(subtotal, pricingSettings)
   const total = subtotal + shippingFee
+  const amountForFreeShipping =
+    shippingFee > 0 && pricingSettings.freeShippingThreshold > 0
+      ? Math.max(0, pricingSettings.freeShippingThreshold - subtotal)
+      : 0
 
   // Empty cart state
   if (items.length === 0 && !loading) {
@@ -405,19 +392,12 @@ export function CheckoutPageClient({
   return (
     <div className="py-8">
       <p className="ui-eyebrow">Compra directa</p>
-      <h1 className="ui-display mt-3 text-3xl sm:text-4xl">Checkout</h1>
-      {/* Progress Indicator */}
-      <CheckoutProgress currentStep={currentStep} />
+      <h1 className="ui-display mb-8 mt-3 text-3xl sm:text-4xl">Finalizar compra</h1>
 
-      {/* Trust Badges */}
-      <TrustBadges />
-
-      <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
         {/* Left: Shipping info */}
         <div className="flex-1 space-y-6">
-          <h2 className="text-2xl font-medium text-[var(--color-text-primary)]">
-            Información de Envío
-          </h2>
+          <h2 className="text-2xl font-medium text-[var(--color-text-primary)]">Datos de envío</h2>
 
           {/* Saved addresses */}
           {savedAddresses.length > 0 && (
@@ -433,12 +413,14 @@ export function CheckoutPageClient({
                   Gestionar direcciones
                 </Link>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" role="radiogroup" aria-label="Direcciones guardadas">
                 {savedAddresses.map((addr) => (
                   <button
                     key={addr.id}
                     type="button"
                     onClick={() => handleUseSavedAddress(addr)}
+                    role="radio"
+                    aria-checked={selectedAddressId === addr.id}
                     className={`w-full p-4 text-left border rounded-lg transition-all ${
                       selectedAddressId === addr.id
                         ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)] ring-2 ring-[var(--color-accent)] ring-opacity-20'
@@ -459,17 +441,10 @@ export function CheckoutPageClient({
                         <p className="text-xs text-[var(--color-text-muted)]">{addr.phone}</p>
                       </div>
                       {selectedAddressId === addr.id && (
-                        <svg
-                          className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <Check
+                          aria-hidden="true"
+                          className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]"
+                        />
                       )}
                     </div>
                     {addr.isDefault && (
@@ -548,6 +523,8 @@ export function CheckoutPageClient({
                 onChange={onChange}
                 showEmail={true}
                 emailReadOnly={!!userEmail}
+                errors={formErrors}
+                idPrefix="checkout"
               />
 
               {/* Save address checkbox */}
@@ -579,21 +556,34 @@ export function CheckoutPageClient({
             <h2 className="font-semibold text-lg text-[var(--color-text-primary)]">
               Resumen del pedido
             </h2>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <ul className="max-h-72 space-y-3 overflow-y-auto overscroll-contain pr-1">
               {items.map((item) => (
-                <div key={getCartLineKey(item)} className="flex justify-between text-sm">
-                  <span className="truncate mr-2 text-[var(--color-text-secondary)]">
-                    {item.name} × {item.quantity}
-                    {item.size && (
-                      <span className="text-[var(--color-text-muted)]"> ({item.size})</span>
-                    )}
-                  </span>
-                  <span className="font-medium text-[var(--color-text-primary)] flex-shrink-0">
+                <li key={getCartLineKey(item)} className="flex items-center gap-3 text-sm">
+                  <div className="relative h-14 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-surface-2)]">
+                    {item.image ? (
+                      <Image src={item.image} alt="" fill sizes="48px" className="object-cover" />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-[var(--color-text-primary)]">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      {[
+                        item.size && `Talla ${item.size}`,
+                        item.color,
+                        `${item.quantity} ${item.quantity === 1 ? 'unidad' : 'unidades'}`,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                  </div>
+                  <span className="flex-shrink-0 font-medium tabular-nums text-[var(--color-text-primary)]">
                     ${(item.price * item.quantity).toLocaleString('es-CL')}
                   </span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
             <div className="border-t border-[var(--color-border)] pt-3 space-y-1.5">
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text-secondary)]">Subtotal</span>
@@ -609,6 +599,11 @@ export function CheckoutPageClient({
                   )}
                 </span>
               </div>
+              {amountForFreeShipping > 0 && (
+                <p className="rounded-lg bg-[var(--color-surface-2)] px-3 py-2 text-xs text-[var(--color-text-secondary)]">
+                  Agrega ${amountForFreeShipping.toLocaleString('es-CL')} más y el envío es gratis.
+                </p>
+              )}
               <div className="flex justify-between font-semibold text-lg pt-1 border-t border-[var(--color-border)]">
                 <span>Total</span>
                 <span>${total.toLocaleString('es-CL')}</span>
@@ -618,12 +613,17 @@ export function CheckoutPageClient({
 
           {/* Payment method */}
           <div className="space-y-3">
-            <h3 className="text-base font-medium text-[var(--color-text-primary)]">
-              Método de Pago
+            <h3
+              id="checkout-payment-method"
+              className="text-base font-medium text-[var(--color-text-primary)]"
+            >
+              Método de pago
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-2" role="radiogroup" aria-labelledby="checkout-payment-method">
               <button
                 type="button"
+                role="radio"
+                aria-checked={method === 'mercadopago'}
                 onClick={() => setMethod('mercadopago')}
                 className={`w-full p-4 border rounded-xl flex items-center gap-3 transition-all text-left ${
                   method === 'mercadopago'
@@ -643,22 +643,17 @@ export function CheckoutPageClient({
                   </p>
                 </div>
                 {method === 'mercadopago' && (
-                  <svg
-                    className="w-4 h-4 text-[var(--color-accent)] ml-auto"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <Check
+                    aria-hidden="true"
+                    className="ml-auto h-4 w-4 text-[var(--color-accent)]"
+                  />
                 )}
               </button>
 
               <button
                 type="button"
+                role="radio"
+                aria-checked={method === 'cod'}
                 onClick={() => setMethod('cod')}
                 className={`w-full p-4 border rounded-xl flex items-center gap-3 transition-all text-left ${
                   method === 'cod'
@@ -686,21 +681,14 @@ export function CheckoutPageClient({
                     Pago contra entrega
                   </p>
                   <p className="text-xs text-[var(--color-text-muted)]">
-                    Pagás al recibir el pedido
+                    Pagas al recibir tu pedido
                   </p>
                 </div>
                 {method === 'cod' && (
-                  <svg
-                    className="w-4 h-4 text-[var(--color-accent)] ml-auto"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <Check
+                    aria-hidden="true"
+                    className="ml-auto h-4 w-4 text-[var(--color-accent)]"
+                  />
                 )}
               </button>
             </div>
@@ -714,61 +702,54 @@ export function CheckoutPageClient({
           >
             {loading ? (
               <>
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
+                <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
                 Procesando...
               </>
             ) : method === 'mercadopago' ? (
               'Pagar con MercadoPago'
             ) : (
-              'Confirmar Pedido'
+              'Confirmar pedido'
             )}
           </button>
 
           <p className="text-xs text-center text-[var(--color-text-muted)]">
-            Al confirmar aceptás nuestros{' '}
+            Al confirmar aceptas nuestra{' '}
             <Link href="/devoluciones" className="underline hover:text-[var(--color-text-primary)]">
-              términos de devolución
+              política de cambios y devoluciones
             </Link>
+            .
           </p>
+
+          <ul className="space-y-2.5 border-t border-[var(--color-border)] pt-5 text-xs leading-5 text-[var(--color-text-secondary)]">
+            <li className="flex items-start gap-2.5">
+              <Lock
+                aria-hidden="true"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-accent)]"
+              />
+              {method === 'mercadopago'
+                ? 'El pago se completa en MercadoPago. No guardamos los datos de tu tarjeta.'
+                : 'Pagas al recibir tu pedido. Te contactaremos para coordinar la entrega.'}
+            </li>
+            {pricingSettings.freeShippingThreshold > 0 && (
+              <li className="flex items-start gap-2.5">
+                <Truck
+                  aria-hidden="true"
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-accent)]"
+                />
+                Envío gratis en compras desde $
+                {pricingSettings.freeShippingThreshold.toLocaleString('es-CL')}.
+              </li>
+            )}
+            <li className="flex items-start gap-2.5">
+              <RotateCcw
+                aria-hidden="true"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-accent)]"
+              />
+              10 días de retracto en productos estándar.
+            </li>
+          </ul>
         </div>
       </form>
-
-      {/* Security footer */}
-      <div className="mt-8 text-center">
-        <div className="flex items-center justify-center gap-2 text-sm text-[var(--color-text-muted)]">
-          <Lock className="w-4 h-4" />
-          <span>Conexión segura SSL • Tus datos están protegidos</span>
-        </div>
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <img
-            src="/visa.svg"
-            alt="Visa"
-            className="h-6 opacity-50"
-            onError={(e) => (e.currentTarget.style.display = 'none')}
-          />
-          <img
-            src="/mastercard.svg"
-            alt="Mastercard"
-            className="h-6 opacity-50"
-            onError={(e) => (e.currentTarget.style.display = 'none')}
-          />
-          <span className="text-xs text-[var(--color-text-muted)]">MercadoPago</span>
-        </div>
-      </div>
     </div>
   )
 }

@@ -9,8 +9,10 @@ import {
   MERCADO_LIBRE_AVAILABILITY_LABELS,
   isMercadoLibreListingPurchasable,
   resolveProductPurchaseChannel,
+  type MercadoLibreListingAvailability,
   type MercadoLibreListingStatus,
 } from '@/lib/mercado-libre'
+import { ArrowUpRight } from 'lucide-react'
 import { MercadoLibreLink } from './mercado-libre-link'
 
 interface Product {
@@ -31,6 +33,13 @@ interface Product {
   mercadoLibreStatus?: MercadoLibreListingStatus
   mercadoLibreAvailable?: boolean | null
   mercadoLibreSyncedAt?: string | Date | null
+}
+
+// The image badge carries the full status; the button needs a label that fits a two-column grid.
+const UNAVAILABLE_CTA_LABELS: Partial<Record<MercadoLibreListingAvailability, string>> = {
+  sold_out: 'Agotado',
+  paused: 'Pausado',
+  closed: 'No disponible',
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -153,9 +162,9 @@ export function ProductCard({ product }: { product: Product }) {
         !mercadoLibrePurchasable ? (
           <span
             aria-disabled="true"
-            className="ui-button ui-button-ml ui-button-sm w-full cursor-not-allowed justify-center opacity-60"
+            className="ui-button ui-button-ml ui-button-sm w-full cursor-not-allowed justify-center whitespace-nowrap opacity-60"
           >
-            {MERCADO_LIBRE_AVAILABILITY_LABELS[purchaseChannel.listing.availability]}
+            {UNAVAILABLE_CTA_LABELS[purchaseChannel.listing.availability] ?? 'No disponible'}
           </span>
         ) : (
           <MercadoLibreLink
@@ -165,15 +174,16 @@ export function ProductCard({ product }: { product: Product }) {
             productName={product.name}
             productSlug={product.slug}
             location="product_card"
-            className="ui-button ui-button-ml ui-button-sm w-full justify-center"
+            className="ui-button ui-button-ml ui-button-sm w-full justify-center whitespace-nowrap"
           >
-            Comprar en Mercado Libre
+            <span className="sr-only">Comprar en</span> Mercado Libre
+            <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
           </MercadoLibreLink>
         )
       ) : (
         <Link
           href={href}
-          className="ui-button ui-button-primary ui-button-sm w-full justify-center"
+          className="ui-button ui-button-primary ui-button-sm w-full justify-center whitespace-nowrap"
         >
           Comprar en Harry&apos;s
         </Link>

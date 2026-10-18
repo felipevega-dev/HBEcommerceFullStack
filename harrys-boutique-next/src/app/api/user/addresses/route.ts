@@ -2,16 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, handleApiError, validateBody } from '@/lib/api-utils'
 import { z } from 'zod'
+import { checkoutAddressSchema } from '@/lib/validations/checkout-address'
 
-const addressSchema = z.object({
-  firstname: z.string().min(1),
-  lastname: z.string().min(1),
-  phone: z.string().min(1),
-  street: z.string().min(1),
-  city: z.string().min(1),
-  region: z.string().min(1),
-  postalCode: z.string().min(1),
-  country: z.string().min(1),
+// Same rules as checkout (last name and postal code are optional), minus the email.
+const addressSchema = checkoutAddressSchema.omit({ email: true }).extend({
   isDefault: z.boolean().optional().default(false),
 })
 
@@ -58,13 +52,13 @@ export async function POST(req: NextRequest) {
       data: {
         userId: session!.user.id,
         firstname: data!.firstname,
-        lastname: data!.lastname,
+        lastname: data!.lastname ?? '',
         phone: data!.phone,
         street: data!.street,
         city: data!.city,
         region: data!.region,
-        postalCode: data!.postalCode,
-        country: data!.country,
+        postalCode: data!.postalCode ?? '',
+        country: data!.country ?? 'Chile',
         isDefault: data!.isDefault || existingCount === 0,
       },
     })
